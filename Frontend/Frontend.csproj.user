@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Source>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</Source>
+    <SmallTileSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</SmallTileSource>
+    <MediumTileSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</MediumTileSource>
+    <WideTileSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</WideTileSource>
+    <LargeTileSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</LargeTileSource>
+    <AppIconSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</AppIconSource>
+    <SplashScreenSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</SplashScreenSource>
+    <PackageLogoSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</PackageLogoSource>
+  </PropertyGroup>
+</Project>

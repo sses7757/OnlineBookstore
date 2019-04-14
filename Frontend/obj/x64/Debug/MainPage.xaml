@@ -1,0 +1,68 @@
+﻿<Page
+    x:Class="Frontend.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Frontend"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <NavigationView x:ConnectionId='2' x:Name="NavigationViewControl">
+        <NavigationView.Header>
+            <Grid Margin="-12,-4,0,4" Background="#FFE6E6E6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" FontSize="20"
+                           Margin="12,0,0,0" VerticalAlignment="Center" Text="Welcome to BookHub" SelectionHighlightColor="{x:Null}">
+                    <TextBlock.Foreground>
+                        <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                    </TextBlock.Foreground>
+                </TextBlock>
+                <CommandBar Grid.Column="1" HorizontalAlignment="Right"
+                            VerticalAlignment="Center" Background="{x:Null}">
+                    <AppBarButton Label="Refresh" Icon="Refresh"/>
+                </CommandBar>
+            </Grid>
+        </NavigationView.Header>
+        <NavigationView.AutoSuggestBox>
+            <AutoSuggestBox x:ConnectionId='3' x:Name="SearchMain" PlaceholderText="Search books" QueryIcon="Find"/>
+        </NavigationView.AutoSuggestBox>
+        <NavigationView.MenuItems>
+            <NavigationViewItem x:ConnectionId='4' Content="Home" x:Name="Home" FontSize="16" Icon="Home">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+            <NavigationViewItem x:ConnectionId='5' Content="Read list" x:Name="Readlist" FontSize="16" Icon="AllApps">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+            <NavigationViewItem x:ConnectionId='6' Content="Billboard" x:Name="Billboard" FontSize="16" Icon="PreviewLink">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+            <NavigationViewItem x:ConnectionId='7' Content="Bookshelf" x:Name="Books" FontSize="16" Icon="Library">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+        <NavigationView.PaneFooter>
+            <NavigationViewItem x:ConnectionId='8' Content="关于" x:Name="About" Icon="Help"/>
+        </NavigationView.PaneFooter>
+        <Frame x:ConnectionId='9' x:Name="ContentFrame" Margin="12,0,12,12">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+        </Frame>
+    </NavigationView>
+
+
+</Page>
+

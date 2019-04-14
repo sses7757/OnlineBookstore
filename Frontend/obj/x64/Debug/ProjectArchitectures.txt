@@ -1,0 +1,1 @@
+C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\Frontend.csproj;x64
