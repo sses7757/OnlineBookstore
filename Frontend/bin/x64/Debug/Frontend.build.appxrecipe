@@ -34,6 +34,9 @@
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\bin\10.0.17763.0\XamlCompiler\Microsoft.UI.Xaml.Markup.winmd">
       <PackagePath>Microsoft.UI.Xaml.Markup.winmd</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\Assets\books.png">
+      <PackagePath>Assets\books.png</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\Assets\LargeTile.scale-100.png">
       <PackagePath>Assets\LargeTile.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
@@ -178,6 +181,9 @@
       <PackagePath>Assets\StoreLogo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\Assets\tempBook.png">
+      <PackagePath>Assets\tempBook.png</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\Assets\Wide310x150Logo.scale-100.png">
       <PackagePath>Assets\Wide310x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
@@ -225,6 +231,36 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BillboardPage.xbf">
+      <PackagePath>BillboardPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BookDetailPage.xbf">
+      <PackagePath>BookDetailPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BookshelfPage.xbf">
+      <PackagePath>BookshelfPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\HomePage.xbf">
+      <PackagePath>HomePage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MyDanmuPage.xbf">
+      <PackagePath>MyDanmuPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MyReadlistPage.xbf">
+      <PackagePath>MyReadlistPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MyWishlistPage.xbf">
+      <PackagePath>MyWishlistPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\ReadlistPage.xbf">
+      <PackagePath>ReadlistPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\SettingPage.xbf">
+      <PackagePath>SettingPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\LoginPage.xbf">
+      <PackagePath>LoginPage.xbf</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MainPage.xbf">
       <PackagePath>MainPage.xbf</PackagePath>
