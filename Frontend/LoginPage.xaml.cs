@@ -25,7 +25,7 @@ namespace Frontend
         public LoginPage()
         {
             this.InitializeComponent();
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
         private void ShowProgress(bool visible)
@@ -34,15 +34,10 @@ namespace Frontend
             btn.IsEnabled = !visible;
             nameBox.IsEnabled = !visible;
             passBox.IsEnabled = !visible;
-            //lastRow.Height = new GridLength(lastRow.Height.Value * (visible ? 2 : 0.5),
-            //    lastRow.Height.GridUnitType);
         }
 
-        private const int DELAY = 2000;
+        private const int DELAY = 5000;
 
-        /// <summary>
-        /// Click login confirm button
-        /// </summary>
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if ((string) btn.Content == "Press to logout")
@@ -50,31 +45,21 @@ namespace Frontend
                 ShowProgress(true);
                 if (await Networks.RemoteLogout())
                 {
-                    btn.Content = "Logout success";
-                    await System.Threading.Tasks.Task.Delay(DELAY);
+                    notification.Show("Logout success", DELAY);
                     btn.Content = "Confirm";
                     ShowProgress(false);
-                    Util.main.NavigateToHomeAndShowMine(false);
                 }
                 else
                 {
-                    progress.IsActive = false;
-                    btn.Content = "Please try again later";
-                    await System.Threading.Tasks.Task.Delay(DELAY);
-                    btn.Content = "Press to logout";
-                    btn.IsEnabled = true;
+                    ShowProgress(false);
+                    notification.Show("Please try again later", DELAY);
                 }
                 return;
             }
 
             if (nameBox.Text.Length <= 4 || passBox.Password.Length <= 6)
             {
-                var orgText = nameBox.Text;
-                nameBox.Text = "Please input valid user name & password";
-                nameBox.IsEnabled = false;
-                await System.Threading.Tasks.Task.Delay(DELAY);
-                nameBox.IsEnabled = true;
-                nameBox.Text = orgText;
+                notification.Show("Please input valid user name & password", DELAY);
                 return;
             }
 
@@ -86,31 +71,29 @@ namespace Frontend
             switch (status)
             {
                 case LoginStatus.Success:
-                    btn.Content = "Success";
-                    btn.IsEnabled = false;
                     nameBox.IsEnabled = false;
                     passBox.IsEnabled = false;
-                    await System.Threading.Tasks.Task.Delay(DELAY);
+                    notification.Show("Login success", DELAY);
                     btn.Content = "Press to logout";
-                    btn.IsEnabled = true;
-                    Util.main.NavigateToHomeAndShowMine(true);
                     break;
                 case LoginStatus.NoSuchUser:
-                    var orgText = nameBox.Text;
-                    nameBox.Text = "Wrong user name or e-mail";
-                    nameBox.IsEnabled = false;
-                    await System.Threading.Tasks.Task.Delay(DELAY);
-                    nameBox.IsEnabled = true;
-                    nameBox.Text = orgText;
+                    notification.Show("No such user name or e-mail", DELAY);
                     break;
                 case LoginStatus.WrongPassword:
-                    orgText = nameBox.Text;
-                    nameBox.Text = "Wrong password";
-                    nameBox.IsEnabled = false;
-                    await System.Threading.Tasks.Task.Delay(DELAY);
-                    nameBox.IsEnabled = true;
-                    nameBox.Text = orgText;
+                    notification.Show("Wrong password", DELAY);
                     break;
+            }
+        }
+
+        private void Notification_Closed(object sender, Microsoft.Toolkit.Uwp.UI.Controls.InAppNotificationClosedEventArgs e)
+        {
+            if ((string)notification.Content == "Login success")
+            {
+                Util.main.NavigateToHomeAndShowMine(true);
+            }
+            else if ((string)notification.Content == "Logout success")
+            {
+                Util.main.NavigateToHomeAndShowMine(false);
             }
         }
     }

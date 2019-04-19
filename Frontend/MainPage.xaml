@@ -33,18 +33,25 @@
                 </TextBlock>
                 <CommandBar Grid.Column="2" HorizontalAlignment="Right"  VerticalAlignment="Center"
                             DefaultLabelPosition="Right" Background="{x:Null}">
-                    <AppBarButton Label="Refresh" Icon="Refresh"/>
+                    <AppBarButton Label="Refresh" Icon="Refresh" PointerPressed="Refresh_Pressed"/>
                     <AppBarSeparator x:Name="TopSeparator"/>
-                    <AppBarToggleButton x:Name="ToggleAdmin" Label="Admin" Icon="Admin"/>
+                    <AppBarToggleButton x:Name="ToggleAdmin" Label="Admin" Icon="Admin"
+                                        Checked="Admin_Pressed" Unchecked="Admin_Pressed"/>
                 </CommandBar>
             </Grid>
         </NavigationView.Header>
         <NavigationView.AutoSuggestBox>
-            <AutoSuggestBox x:Name="SearchMain" PlaceholderText="Search books, read lists, ..." QueryIcon="Find"/>
+            <AutoSuggestBox x:Name="SearchMain" PlaceholderText="Search books, read lists, billboards, …"
+                            QueryIcon="Find" QuerySubmitted="SearchMain_QuerySubmitted"/>
         </NavigationView.AutoSuggestBox>
         <NavigationView.MenuItems>
             <NavigationViewItemHeader Content="Discovery"/>
             <NavigationViewItem Content="Home" Tag="home" x:Name="HomeBtn" Icon="Home">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+            <NavigationViewItem Content="Searching" Tag="search" x:Name="SearchBtn" Icon="Find">
                 <NavigationViewItem.FocusVisualPrimaryBrush>
                     <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
                 </NavigationViewItem.FocusVisualPrimaryBrush>
@@ -89,7 +96,8 @@
         <NavigationView.PaneFooter>
             <NavigationViewItem Content="关于" x:Name="AboutBtn" Icon="Help"/>
         </NavigationView.PaneFooter>
-        <Frame x:Name="ContentFrame" Margin="0,-15,0,0" Navigated="On_Navigated">
+        <Frame x:Name="ContentFrame" Margin="0,-15,0,0" Navigated="ContentFrame_Navigated"
+               Navigating="ContentFrame_Navigating">
             <Frame.ContentTransitions>
                 <TransitionCollection>
                     <NavigationThemeTransition>

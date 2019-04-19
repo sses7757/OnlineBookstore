@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI.Animations;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace Frontend
         public MainPage()
         {
             this.InitializeComponent();
+            ShowSearch(false);
         }
 
         private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
@@ -36,6 +38,7 @@ namespace Frontend
         private readonly List<(string Tag, Type Page)> _pages = new List<(string Tag, Type Page)>
         {
             ("home", typeof(HomePage)),
+            ("search", typeof(SearchPage)),
             ("readlist", typeof(ReadlistPage)),
             ("billboard", typeof(BillboardPage)),
             ("bookshelf", typeof(BookshelfPage)),
@@ -45,16 +48,22 @@ namespace Frontend
             ("login", typeof(LoginPage)),
         };
 
+        private void ShowSearch(bool visible)
+        {
+            SearchMain.Visibility = Util.BoolToVisibility(!visible);
+            SearchBtn.Visibility = Util.BoolToVisibility(visible);
+        }
+
         private void ShowAdmin(bool visible)
         {
-            var v = Util.ConvertFromBool(visible);
+            var v = Util.BoolToVisibility(visible);
             TopSeparator.Visibility = v;
             ToggleAdmin.Visibility = v;
         }
 
         private void ShowMyAccount(bool visible)
         {
-            var v = Util.ConvertFromBool(visible);
+            var v = Util.BoolToVisibility(visible);
             BookshelfBtn.Visibility = v;
             MyDanmuBtn.Visibility = v;
             MyReadlistBtn.Visibility = v;
@@ -74,21 +83,8 @@ namespace Frontend
             }
         }
 
-        public void NavigateToHomeAndShowMine(bool show)
-        {
-            if (show)
-            {
-                NavView.SelectedItem = NavView.MenuItems[1];
-                ShowMyAccount(true);
-            }
-            else
-            {
-                ShowMyAccount(false);
-                NavView.SelectedItem = NavView.MenuItems[NavView.MenuItems.Count - 1];
-            }
-        }
-
-        private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo, bool Override = true)
+        private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo,
+            bool Override = true, object pass = null)
         {
             // show admin toggle or not
             ShowAdmin(Util.isAdmin);
@@ -115,7 +111,7 @@ namespace Frontend
                     transitionInfo = new SlideNavigationTransitionInfo()
                     { Effect = SlideNavigationTransitionEffect.FromRight };
                 }
-                ContentFrame.Navigate(_page, null, transitionInfo);
+                ContentFrame.Navigate(_page, pass, transitionInfo);
             }
         }
 
@@ -168,9 +164,23 @@ namespace Frontend
             return true;
         }
 
-        private void On_Navigated(object sender, NavigationEventArgs e)
+        private void ContentFrame_Navigating(object sender, NavigatingCancelEventArgs e)
+        {
+            if (ContentFrame.SourcePageType == typeof(SearchPage))
+            {
+                ShowSearch(false);
+            }
+        }
+
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             NavView.IsBackEnabled = ContentFrame.CanGoBack;
+
+            if (Util.IsSubType(typeof(BookSummary), e.Parameter) /* or read book page */)
+            {
+                //NavView.SelectedItem = NavView.MenuItems[1];
+                return;
+            }
 
             if (ContentFrame.SourcePageType == typeof(SettingPage))
             {
@@ -185,6 +195,13 @@ namespace Frontend
                 WelcomeLabel1.Text = "Welcome to";
                 WelcomeLabel2.Text = " BookHub";
             }
+            else if (ContentFrame.SourcePageType == typeof(SearchPage))
+            {
+                ShowSearch(true);
+                NavView.SelectedItem = NavView.MenuItems[2];
+                WelcomeLabel1.Text = "Searching";
+                WelcomeLabel2.Text = "";
+            }
             else if (ContentFrame.SourcePageType != null)
             {
                 WelcomeLabel1.Text = ((NavigationViewItem)NavView.SelectedItem)?.Content?.ToString();
@@ -192,6 +209,59 @@ namespace Frontend
             }
             var item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
             NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First(n => n.Tag.Equals(item.Tag));
+        }
+
+        public void NavigateToHomeAndShowMine(bool show)
+        {
+            if (show)
+            {
+                NavView.SelectedItem = NavView.MenuItems[1];
+                ShowMyAccount(true);
+            }
+            else
+            {
+                ShowMyAccount(false);
+                NavView.SelectedItem = NavView.MenuItems[NavView.MenuItems.Count - 1];
+            }
+        }
+
+        public void NavigateToBookDetail(BookSummary itemToPass, Type page)
+        {
+            ContentFrame.SetListDataItemForNextConnectedAnimation(itemToPass);
+            ContentFrame.Navigate(page, itemToPass);
+        }
+
+        public void NavigateToBookDetail(BookSummary itemToPass, NavigationTransitionInfo info)
+        {
+            ContentFrame.SetListDataItemForNextConnectedAnimation(itemToPass);
+            ContentFrame.Navigate(typeof(BookDetailPage), itemToPass, info);
+        }
+
+        private void SearchMain_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            var query = args.QueryText;
+            ShowSearch(true);
+            NavView.SelectedItem = NavView.MenuItems[2];
+            NavView_Navigate("search", null, true, query);
+        }
+
+        private void Refresh_Pressed(object sender, PointerRoutedEventArgs e)
+        {
+            if (ContentFrame.SourcePageType != null)
+            {
+                ((RefreshAdminInterface)ContentFrame.Content).RefreshButtonPressed();
+            }
+            
+        }
+
+        private void Admin_Pressed(object sender, RoutedEventArgs e)
+        {
+            if (ContentFrame.SourcePageType != null)
+            {
+                var c = ((AppBarToggleButton)sender).IsChecked;
+                if (c.HasValue)
+                    ((RefreshAdminInterface)ContentFrame.Content).AdminButtonPressed(c.Value);
+            }
         }
     }
 }

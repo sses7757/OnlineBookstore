@@ -11,6 +11,6 @@
     <Grid>
         <TextBlock HorizontalAlignment="Center" Text="Browse billboards"
             VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
-
+        
     </Grid>
 </Page>
