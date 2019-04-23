@@ -36,6 +36,31 @@ namespace Frontend
             return true;
         }
 
+        public static async Task<string[]> RemoteGetMainLabels()
+        {
+            // TODO
+            await Task.Delay(1000);
+            return new string[] { "Arts & Photography",
+                                  "Biographies & Memoirs",
+                                  "Business & Money",
+                                  "Calendars",
+                                  "Children's Books",
+                                  "Christian Books & Bibles"
+            };
+        }
+
+        public static async void RemoteGetSubLabels(Label label)
+        {
+            // TODO
+            await Task.Delay(1000);
+            for (int i = 0; i < 15; ++i)
+            {
+                label.AllSubs.Add("AA");
+                label.OnPropertyChanged("HotSubs");
+                await Task.Delay(200);
+            }
+        }
+
         public static async Task<bool> RemoteGetBookSummary(BookSummary book)
         {
             if (book.BookId <= 0)
@@ -51,6 +76,31 @@ namespace Frontend
             book.BookFullName = "An Introduction to Thermal Physics " +
                 "(Translation Version by Database System Principle Team 309)";
             book.Author = "Daniel V. Schroeder";
+            return true;
+        }
+
+        public static async Task<bool> RemoteGetBookQuasiDetail(BookDetail book)
+        {
+            if (book.BookId <= 0)
+            {
+                throw new ArgumentNullException("Book id wrong");
+            }
+            // TODO only two level label
+            await Task.Delay(500);
+            book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
+                new Uri("https://images-na.ssl-images-amazon.com/images/I/51JVLQdducL._SX392_BO1,204,203,200_.jpg"));
+            //new Uri("ms-appx:///Assets/tempBook.png"));
+            book.BookName = "An Introduction to Thermal Physics";
+            book.BookFullName = "An Introduction to Thermal Physics " +
+                "(Translation Version by Database System Principle Team 309)";
+            book.Author = "Daniel V. Schroeder";
+            await Task.Delay(100);
+            book.Labels = "Science-Physics";
+            await Task.Delay(100);
+            book.Price = 48.67;
+            book.Discount = 85;
+            await Task.Delay(100);
+            book.OverallRating = 4.6;
             return true;
         }
 
@@ -142,6 +192,48 @@ namespace Frontend
                 collection.finished = true;
             }
 
+            private static async Task<bool> AddBookDetail(BookDetailCollection collection, int bookId, long timeout = 1000)
+            {
+                bool flag = true;
+                var timer = new Stopwatch();
+                timer.Start();
+                var book = new BookDetail(bookId);
+                while (!await RemoteGetBookQuasiDetail(book))
+                {
+                    if (timer.ElapsedMilliseconds > timeout)
+                    {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag)
+                    collection.Books.Add(book);
+                return flag;
+            }
+
+            private static void SetBookDetailCollection(BookDetailCollection collection, bool flag)
+            {
+                if (!flag)
+                {
+                    collection.Books.Add(BookDetail.TIMEOUT_BOOK);
+                }
+                collection.finished = true;
+            }
+
+            public static async void GetBooksFromQuery(BookDetailCollection collection, string query)
+            {
+                // TODO get book ids
+                await Task.Delay(delay);
+                bool flag = true;
+                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14 })
+                {
+                    flag = await AddBookDetail(collection, i);
+                    if (!flag)
+                        break;
+                }
+                SetBookDetailCollection(collection, flag);
+            }
+
             public static async void GetPersonalRecommands(BookSummaryCollection collection)
             {
                 // TODO get book ids
@@ -186,10 +278,10 @@ namespace Frontend
 
             public static async Task<bool> GetRelatedBooks(BookSummaryCollection collection, int relatedBookId)
             {
-                // TODO get book ids
+                // TODO get book ids only 7
                 await Task.Delay(delay);
                 bool flag = true;
-                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7, 8 })
+                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7 })
                 {
                     flag = await AddBookSummary(collection, i);
                     if (!flag)

@@ -25,6 +25,8 @@ namespace Frontend
     {
         private Dictionary<BookSummaryCollectionType, BookSummaryCollection> collections;
 
+        public ObservableCollection<Label> Labels { set; get; } = new ObservableCollection<Label>();
+
         public ObservableCollection<BookSummary> GetCollections(BookSummaryCollectionType t)
         {
             if (this.collections.ContainsKey(t))
@@ -58,6 +60,17 @@ namespace Frontend
             }
         }
 
+        private async void UpdateLabels()
+        {
+            var mainLabels = await Networks.RemoteGetMainLabels();
+            foreach (var s in mainLabels)
+            {
+                var l = new Label(s);
+                Labels.Add(l);
+                l.RetriveSubs();
+            }
+        }
+
         public HomePage()
         {
             this.collections = new Dictionary<BookSummaryCollectionType, BookSummaryCollection>
@@ -66,6 +79,8 @@ namespace Frontend
             {
                 this.collections.Add(t, new BookSummaryCollection(t));
             }
+            this.UpdateLabels();
+
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
             WaitLoading();
@@ -80,12 +95,23 @@ namespace Frontend
 
         private void HyperlinkButton_Click_Best(object sender, RoutedEventArgs e)
         {
-            
+            Util.main.NavigateToBooklist("Best Selling Books", "System generated recommendations",
+                BookSummaryCollection.DIRECT_QUERY_PREFIX + 
+                BookSummaryCollection.TYPE[BookSummaryCollectionType.TopBooks]);
         }
 
         private void HyperlinkButton_Click_New(object sender, RoutedEventArgs e)
         {
-            
+            Util.main.NavigateToBooklist("Newly Published Books", "System generated recommendations",
+                BookSummaryCollection.DIRECT_QUERY_PREFIX +
+                BookSummaryCollection.TYPE[BookSummaryCollectionType.NewBooks]);
+        }
+
+        private void HyperlinkButton_Click_Person(object sender, RoutedEventArgs e)
+        {
+            Util.main.NavigateToBooklist("Personalized Recommendation", "System generated recommendations",
+                BookSummaryCollection.DIRECT_QUERY_PREFIX +
+                BookSummaryCollection.TYPE[BookSummaryCollectionType.PersonalRecommands]);
         }
 
         public void RefreshButtonPressed()
@@ -99,12 +125,18 @@ namespace Frontend
                     this.collections.Add(t, new BookSummaryCollection(t));
                 }
                 WaitLoading();
+                //scroller.ChangeView(0, scroller.ScrollableHeight, 1);
             }
         }
 
         public void AdminButtonPressed(bool isChecked)
         {
             // do nothing
+        }
+
+        private void HyperlinkButton_Click_SubLabel(object sender, RoutedEventArgs e)
+        {
+            // goto search page
         }
     }
 }

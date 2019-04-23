@@ -10,6 +10,36 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Frontend
 {
+    public class Label : INotifyPropertyChanged
+    {
+        public string Name { set; get; }
+        public ObservableCollection<string> AllSubs { get; set; } = new ObservableCollection<string>();
+
+        public ObservableCollection<string> HotSubs {
+            get => new ObservableCollection<string>(AllSubs.Take(10));
+        }
+
+        public void RetriveSubs()
+        {
+            if (Name != null && Name.Trim().Length > 1)
+            {
+                Networks.RemoteGetSubLabels(this);
+            }
+        }
+
+        public Label(string name)
+        {
+            this.Name = name;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+
     public class ReadList
     {
         public string CreateUser { set; get; }
@@ -91,6 +121,29 @@ namespace Frontend
             Networks.RemoteGetBookDetail(this);
         }
 
+        public BookDetail(int id)
+        {
+            BookId = id;
+        }
+
+        public BookDetail(string errormsg) : base(errormsg)
+        {
+            BookDescription = Util.WAIT_STR;
+            Labels = Util.WAIT_STR;
+            OtherAuthors = Util.WAIT_STR;
+            PublishInfo = Util.WAIT_STR;
+            Price = OverallRating = 0;
+            Discount = 100;
+            ISBN = Util.WAIT_STR;
+            BuyAmount = DanmuAmount = PreviewAmount = ReviewAmount = PageCount = 0;
+            CanAddWishList = CanAddReadList = CanBuy = true;
+            Reviews = new ObservableCollection<Review>();
+            RelatedBooks = new BookSummaryCollection();
+        }
+
+        public new static readonly BookDetail TIMEOUT_BOOK =
+            new BookDetail("Timeout. Please check internet connection.");
+
         public void GetMoreReview()
         {
             finished = false;
@@ -100,7 +153,7 @@ namespace Frontend
 
     public class BookSummary
     {
-        public int BookId { get; }
+        public int BookId { set; get; }
         public string BookName { set; get; }
         public string BookFullName { set; get; }
         public BitmapImage BookCover { set; get; }
@@ -149,6 +202,21 @@ namespace Frontend
         }
     }
 
+    public class BookDetailCollection
+    {
+        public ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
+
+        public bool finished = false;
+
+        private string query = "";
+
+        public BookDetailCollection(string query)
+        {
+            this.query = query;
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query);
+        }
+    }
+
     public enum BookSummaryCollectionType
     {
         PersonalRecommands,
@@ -158,6 +226,8 @@ namespace Frontend
 
     public class BookSummaryCollection
     {
+        public const string DIRECT_QUERY_PREFIX = "direct-";
+
         public static readonly Dictionary<BookSummaryCollectionType, string> TYPE
                 = new Dictionary<BookSummaryCollectionType, string>
                 {

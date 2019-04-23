@@ -30,13 +30,13 @@
     <AppXManifest Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2019-04-19T13:53:34.991</Modified>
+      <Modified>2019-04-23T05:18:40.929</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\Frontend.exe">
       <PackagePath>entrypoint\Frontend.exe</PackagePath>
-      <Modified>2019-04-19T13:53:34.360</Modified>
+      <Modified>2019-04-23T05:18:40.344</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\.nuget\packages\colorcode.core\2.0.6\lib\netstandard1.4\ColorCode.Core.dll">
       <PackagePath>ColorCode.Core.dll</PackagePath>
@@ -349,67 +349,67 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\Frontend.xr.xml">
       <PackagePath>Frontend.xr.xml</PackagePath>
-      <Modified>2019-04-19T13:53:34.104</Modified>
+      <Modified>2019-04-23T04:30:13.420</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BillboardPage.xbf">
       <PackagePath>BillboardPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BookDetailPage2.xbf">
       <PackagePath>BookDetailPage2.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.128</Modified>
+      <Modified>2019-04-23T05:18:40.115</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BookDetailPage.xbf">
       <PackagePath>BookDetailPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.139</Modified>
+      <Modified>2019-04-23T05:18:40.126</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BooklistPage.xbf">
       <PackagePath>BooklistPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\BookshelfPage.xbf">
       <PackagePath>BookshelfPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\HomePage.xbf">
       <PackagePath>HomePage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.146</Modified>
+      <Modified>2019-04-23T05:18:40.139</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MyDanmuPage.xbf">
       <PackagePath>MyDanmuPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MyReadlistPage.xbf">
       <PackagePath>MyReadlistPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MyWishlistPage.xbf">
       <PackagePath>MyWishlistPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.145</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\ReadlistPage.xbf">
       <PackagePath>ReadlistPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.146</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\SearchPage.xbf">
       <PackagePath>SearchPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.154</Modified>
+      <Modified>2019-04-23T05:18:40.146</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\SettingPage.xbf">
       <PackagePath>SettingPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.155</Modified>
+      <Modified>2019-04-23T05:18:40.146</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\LoginPage.xbf">
       <PackagePath>LoginPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.155</Modified>
+      <Modified>2019-04-23T05:18:40.146</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\MainPage.xbf">
       <PackagePath>MainPage.xbf</PackagePath>
-      <Modified>2019-04-19T13:53:34.153</Modified>
+      <Modified>2019-04-23T05:18:40.144</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\10.0.17763.0\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
@@ -421,11 +421,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2019-04-19T13:36:37.916</Modified>
+      <Modified>2019-04-23T04:30:14.336</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\bin\x64\Debug\Core\Frontend.exe">
       <PackagePath>Frontend.exe</PackagePath>
-      <Modified>2019-04-19T13:53:34.987</Modified>
+      <Modified>2019-04-23T05:18:40.927</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

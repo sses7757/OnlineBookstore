@@ -83,8 +83,7 @@ namespace Frontend
             }
         }
 
-        private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo,
-            bool Override = true, object pass = null)
+        private void NavView_Navigate(string navItemTag, NavigationTransitionInfo info, bool Override = true, object pass = null)
         {
             // show admin toggle or not
             ShowAdmin(Util.isAdmin);
@@ -99,8 +98,7 @@ namespace Frontend
                 var item = _pages.FirstOrDefault(p => p.Tag.Equals(navItemTag));
                 _page = item.Page;
             }
-            // Get the page type before navigation so you can prevent duplicate
-            // entries in the backstack.
+            // Get the page type before navigation so you can prevent duplicate entries in the backstack.
             var preNavPageType = ContentFrame.CurrentSourcePageType;
 
             // Only navigate if the selected page isn't currently loaded.
@@ -108,10 +106,31 @@ namespace Frontend
             {
                 //Continuum, Common, DrillIn for go inside, Entrance, Slide, Suppress
                 if (Override) {
-                    transitionInfo = new SlideNavigationTransitionInfo()
+                    info = new SlideNavigationTransitionInfo()
                     { Effect = SlideNavigationTransitionEffect.FromRight };
                 }
-                ContentFrame.Navigate(_page, pass, transitionInfo);
+                ContentFrame.Navigate(_page, pass, info);
+            }
+        }
+
+        private void NavView_Navigate(Type toPage, NavigationTransitionInfo info, bool Override = true, object pass = null)
+        {
+            // show admin toggle or not
+            ShowAdmin(Util.isAdmin);
+
+            // Get the page type before navigation so you can prevent duplicate entries in the backstack.
+            var preNavPageType = ContentFrame.CurrentSourcePageType;
+
+            // Only navigate if the selected page isn't currently loaded.
+            if (!(toPage is null) && !Equals(preNavPageType, toPage))
+            {
+                //Continuum, Common, DrillIn for go inside, Entrance, Slide, Suppress
+                if (Override)
+                {
+                    info = new SlideNavigationTransitionInfo()
+                    { Effect = SlideNavigationTransitionEffect.FromRight };
+                }
+                ContentFrame.Navigate(toPage, pass, info);
             }
         }
 
@@ -182,6 +201,10 @@ namespace Frontend
                 return;
             }
 
+            var item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
+            if (item.Tag == null || item.Page == null)
+                return;
+
             if (ContentFrame.SourcePageType == typeof(SettingPage))
             {
                 // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
@@ -207,7 +230,7 @@ namespace Frontend
                 WelcomeLabel1.Text = ((NavigationViewItem)NavView.SelectedItem)?.Content?.ToString();
                 WelcomeLabel2.Text = "";
             }
-            var item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
+
             NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First(n => n.Tag.Equals(item.Tag));
         }
 
@@ -235,6 +258,11 @@ namespace Frontend
         {
             ContentFrame.SetListDataItemForNextConnectedAnimation(itemToPass);
             ContentFrame.Navigate(typeof(BookDetailPage), itemToPass, info);
+        }
+
+        public void NavigateToBooklist(string title, string description, string query)
+        {
+            NavView_Navigate(typeof(BooklistPage), null, true, new string[] { title, description, query });
         }
 
         private void SearchMain_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)

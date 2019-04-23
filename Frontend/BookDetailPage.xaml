@@ -115,8 +115,8 @@
 
         <RefreshContainer RefreshRequested="RefreshRequested"
                           PullDirection="BottomToTop" Grid.Column="2">
-            <ScrollViewer Margin="20,40">
-                <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical">
+            <ScrollViewer>
+                <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical" Margin="20,40">
                     <Grid animations:Connected.AnchorElement="{x:Bind bookCover}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

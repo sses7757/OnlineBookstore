@@ -3,12 +3,118 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frontend"
+    xmlns:sys="using:System"
+    xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
+        <ScrollViewer>
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock" x:Key="TitleTextStyle">
+                        <Setter Property="FontSize" Value="18"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}"/>
+                    </Style>
+                    <Style TargetType="TextBlock" x:Key="DescTextStyle">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="Margin" Value="0,10,0,0"/>
+                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                        <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                    </Style>
+                    <Style TargetType="TextBlock" x:Key="NormalTitleTextStyle">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="Margin" Value="10,2"/>
+                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                        <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                    </Style>
+                    <Style TargetType="TextBlock" x:Key="NormalTextStyle">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="Margin" Value="10,2"/>
+                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                        <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                    </Style>
 
-    </Grid>
+                    <Style TargetType="NavigationViewItemSeparator" x:Key="SeparatorStyle">
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="Width" Value="2000"/>
+                    </Style>
+
+                    <!--Create a Style for the Books-->
+                    <Style TargetType="Image" x:Key="BookImageStyle">
+                        <Setter Property="Stretch" Value="Uniform"/>
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
+                    </Style>
+                    <Style TargetType="controls:AdaptiveGridView" x:Key="AGVStyle">
+                        <Setter Property="OneRowModeEnabled" Value="False"/>
+                        <Setter Property="DesiredWidth" Value="400"/>
+                        <Setter Property="SelectionMode" Value="None"/>
+                        <Setter Property="IsItemClickEnabled" Value="True"/>
+                    </Style>
+                </Grid.Resources>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Margin="10,20" Grid.Column="1">
+                    <TextBlock Text="{x:Bind Title, Mode=OneWay}" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text="{x:Bind Description, Mode=OneWay}" Style="{StaticResource DescTextStyle}"/>
+                    <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
+                    <controls:AdaptiveGridView SelectionMode="None" IsItemClickEnabled="True"
+                                               Style="{StaticResource AGVStyle}"
+                                               ItemsSource="{x:Bind Books.Books, Mode=OneWay}"
+                                               animations:Connected.ListItemElementName="bookCover"
+                                               animations:Connected.ListItemKey="listItem">
+                        <controls:AdaptiveGridView.ItemTemplate>
+                            <DataTemplate x:DataType="local:BookDetail">
+                                <Grid Margin="10" PointerReleased="BookCover_Pointed" MaxHeight="180"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
+                                           x:Name="bookCover" Grid.Column="0"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{x:Bind BookName}" Style="{StaticResource NormalTitleTextStyle}"/>
+                                        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                                            <RatingControl Value="{x:Bind OverallRating}" IsReadOnly="True"
+                                                           VerticalAlignment="Center" Margin="10,0,10,-8"/>
+                                            <TextBlock Text="{x:Bind sys:String.Format('({0:N1})', OverallRating), Mode=OneWay}"
+                                                       Style="{StaticResource NormalTextStyle}"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{x:Bind sys:String.Format('Author: {0}', Author)}"
+                                                   Style="{StaticResource NormalTextStyle}"/>
+                                        <TextBlock Text="{x:Bind sys:String.Format('Category: {0}', Labels)}"
+                                                   Style="{StaticResource NormalTextStyle}"/>
+                                        <TextBlock Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"
+                                                   Style="{StaticResource NormalTitleTextStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </controls:AdaptiveGridView.ItemTemplate>
+                    </controls:AdaptiveGridView>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+    </RefreshContainer>
+
 </Page>
