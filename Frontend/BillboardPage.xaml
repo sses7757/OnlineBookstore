@@ -10,74 +10,99 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <ScrollViewer>
-        <Grid>
-            <Grid.Resources>
-                <Style TargetType="TextBlock" x:Key="TitleTextStyle">
-                    <Setter Property="FontSize" Value="18"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                    <Setter Property="VerticalAlignment" Value="Bottom"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}"/>
-                </Style>
-                <Style TargetType="TextBlock" x:Key="DescTextStyle">
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="VerticalAlignment" Value="Top"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property="Margin" Value="0,10,0,0"/>
-                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-                </Style>
-                <Style TargetType="TextBlock" x:Key="NormalTitleTextStyle">
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property="Margin" Value="10,2"/>
-                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-                </Style>
-                <Style TargetType="TextBlock" x:Key="NormalTextStyle">
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property="Margin" Value="10,2"/>
-                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-                </Style>
+    <Grid>
+        <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
+            <ScrollViewer>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Style TargetType="NavigationViewItemSeparator" x:Key="SeparatorStyle">
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                    <Setter Property="Width" Value="2000"/>
-                </Style>
+                    <controls:AdaptiveGridView Grid.Column="1" Style="{StaticResource AGVStyle}"
+                                               IsItemClickEnabled="False" Margin="0" DesiredWidth="500"
+                                               ItemsSource="{x:Bind Billboards.Billboards, Mode=OneWay}">
+                        <controls:AdaptiveGridView.ItemTemplate>
+                            <DataTemplate x:DataType="local:BookDetailCollection">
+                                <Grid Style="{StaticResource BoardPanelStyle}" HorizontalAlignment="Stretch"
+                                      Margin="8,20" Padding="13,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                <!--Create a Style for the Books-->
-                <Style TargetType="Image" x:Key="BookImageStyle">
-                    <Setter Property="Stretch" Value="Uniform"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property="VerticalAlignment" Value="Top"/>
-                </Style>
-                <Style TargetType="controls:AdaptiveGridView" x:Key="AGVStyle">
-                    <Setter Property="OneRowModeEnabled" Value="False"/>
-                    <Setter Property="DesiredWidth" Value="550"/>
-                    <Setter Property="SelectionMode" Value="None"/>
-                    <Setter Property="IsItemClickEnabled" Value="True"/>
-                </Style>
-            </Grid.Resources>
+                                    <TextBlock Style="{StaticResource TitleTextStyle}"
+                                               Text="{x:Bind Title, Mode=OneWay}"
+                                               Grid.Column="0" Grid.Row="0" Margin="0,15,0,0"/>
+                                    <HyperlinkButton Style="{StaticResource ShowAllBtnStyle}" Margin="0,15,0,0"
+                                                     Click="HyperlinkButton_Click" Grid.Column="1" Grid.Row="0"/>
+                                    <TextBlock Style="{StaticResource DescriptionTextStyle}"
+                                               Text="{x:Bind Description, Mode=OneWay}" Margin="0,10,0,0"
+                                               Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"/>
+                                    <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"
+                                                                 Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"/>
+                                    <ListView Style="{StaticResource ListStyle}" x:Name="billboardList" Grid.Row="3"
+                                              ItemsSource="{x:Bind Books, Mode=OneWay}" Grid.Column="0" Grid.ColumnSpan="2">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:BookDetail">
+                                                <Grid Margin="0,8" PointerReleased="Book_Pointed" MaxHeight="180"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="3*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Image Source="{x:Bind BookCover, Mode=OneWay}"
+                                                           Style="{StaticResource BookImageStyle}"
+                                                           x:Name="bookCover" Grid.Column="0" Margin="0"/>
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{x:Bind BookName, Mode=OneWay}"
+                                                                   Style="{StaticResource HorizontalBookNameTextStyle}"/>
+                                                        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                                                            <RatingControl Value="{x:Bind OverallRating, Mode=OneWay}"
+                                                                           IsReadOnly="True"
+                                                                           VerticalAlignment="Center" Margin="10,0,10,-8"/>
+                                                            <TextBlock Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"
+                                                                       Style="{StaticResource HorizontalBookTextStyle}"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{x:Bind sys:String.Format('Author:\\t{0}', Author)}"
+                                                                   Style="{StaticResource HorizontalBookTextStyle}"/>
+                                                        <TextBlock Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"
+                                                                   Style="{StaticResource HorizontalBookTextStyle}"/>
+                                                        <TextBlock Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"
+                                                                   Style="{StaticResource HorizontalBookTextStyle}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </DataTemplate>
+                        </controls:AdaptiveGridView.ItemTemplate>
+                    </controls:AdaptiveGridView>
+                </Grid>
+            </ScrollViewer>
+        </RefreshContainer>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="6*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <controls:AdaptiveGridView Grid.Column="1" Style="{StaticResource AGVStyle}"
-                                       Margin="10,20" ItemsSource="">
-                <DataTemplate x:DataType="local:BookDetailCollection">
-                    
-                </DataTemplate>
-            </controls:AdaptiveGridView>
-        </Grid>
-    </ScrollViewer>
-
+        <controls:Loading x:Name="loadingControl" HorizontalContentAlignment="Center"
+                          VerticalContentAlignment="Center" IsLoading="True">
+            <controls:Loading.Background>
+                <SolidColorBrush Color="Black" Opacity="0.7" />
+            </controls:Loading.Background>
+            <StackPanel Orientation="Horizontal" Spacing="15">
+                <ProgressRing IsActive="True" Height="35" Width="35"
+                              Foreground="{ThemeResource SystemAccentColorLight1}"/>
+                <TextBlock Style="{StaticResource TitleTextStyle}" Margin="0"
+                           Text="Loading..." Foreground="White"/>
+            </StackPanel>
+        </controls:Loading>
+        
+    </Grid>
+    
 </Page>

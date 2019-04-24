@@ -70,7 +70,7 @@ namespace Frontend
         private void StackPanel_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             var dataToPass = (BookSummary)((StackPanel)sender).DataContext;
-            if (dataToPass.BookId > 0)
+            if (Networks.IsValidID(dataToPass.BookId))
             {
                 relatedBookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "relateBookImage");
                 this._navigateItem = dataToPass;

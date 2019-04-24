@@ -7,16 +7,21 @@ using System.Threading.Tasks;
 
 namespace Frontend
 {
-    public enum LoginStatus
+    internal enum LoginStatus
     {
         Success,
         NoSuchUser,
         WrongPassword
     }
 
-    public class Networks
+    internal class Networks
     {
-        public const string REMOTE_IP = "10.20.30.40";
+        internal const string REMOTE_IP = "10.20.30.40";
+
+        internal static bool IsValidID(int id)
+        {
+            return id >= 0;
+        }
 
         internal static async Task<LoginStatus> RemoteLogin(string username, string encodedPassword)
         {
@@ -63,9 +68,10 @@ namespace Frontend
 
         internal static async Task<bool> RemoteGetBookSummary(BookSummary book)
         {
-            if (book.BookId <= 0)
+            if (!IsValidID(book.BookId))
             {
-                throw new ArgumentNullException("Book id wrong");
+                Console.Error.WriteLine("Book id wrong");
+                return false;
             }
             // TODO
             await Task.Delay(Util.REFRESH_RATE);
@@ -81,9 +87,10 @@ namespace Frontend
 
         internal static async Task<bool> RemoteGetBookQuasiDetail(BookDetail book)
         {
-            if (book.BookId <= 0)
+            if (!IsValidID(book.BookId))
             {
-                throw new ArgumentNullException("Book id wrong");
+                Console.Error.WriteLine("Book id wrong");
+                return false;
             }
             // TODO only two level label
             await Task.Delay(Util.REFRESH_RATE);
@@ -160,7 +167,19 @@ namespace Frontend
             }
         }
 
-        public class RemoteBookCollection
+        internal static async Task<int[]> GetBillboardIDs(int count, int from)
+        {
+            // TODO get top billboard ids
+            await Task.Delay(100);
+            List<int> ids = new List<int>(count);
+            for (int i = from; i < from + count; ++i)
+            {
+                ids.Add(i + 156);
+            }
+            return ids.ToArray();
+        }
+
+        internal class RemoteBookCollection
         {
             private const int delay = 1000;
 
@@ -235,40 +254,13 @@ namespace Frontend
                 SetBookDetailCollection(collection, flag);
             }
 
-            internal static async void GetPersonalRecommands(BookSummaryCollection collection)
+            internal static async void GetBooksFromQuery(BookSummaryCollection collection, string query,
+                                                       int amount, int from = 0)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
                 bool flag = true;
-                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7, 8 })
-                {
-                    flag = await AddBookSummary(collection, i);
-                    if (!flag)
-                        break;
-                }
-                SetBookSummaryCollection(collection, flag);
-            }
-
-            internal static async void GetTopBooks(BookSummaryCollection collection)
-            {
-                // TODO get book ids
-                await Task.Delay(delay);
-                bool flag = true;
-                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7, 8 })
-                {
-                    flag = await AddBookSummary(collection, i);
-                    if (!flag)
-                        break;
-                }
-                SetBookSummaryCollection(collection, flag);
-            }
-
-            internal static async void GetNewBooks(BookSummaryCollection collection)
-            {
-                // TODO get book ids
-                await Task.Delay(delay);
-                bool flag = true;
-                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7, 8 })
+                for (int i = from + 1; i <= amount + from; ++i)
                 {
                     flag = await AddBookSummary(collection, i);
                     if (!flag)
@@ -282,7 +274,7 @@ namespace Frontend
                 // TODO get book ids only 7
                 await Task.Delay(delay);
                 bool flag = true;
-                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7 })
+                for (int i = 0; i < Util.RELATE_BOOK_AMOUNT; ++i)
                 {
                     flag = await AddBookSummary(collection, i);
                     if (!flag)
@@ -292,9 +284,14 @@ namespace Frontend
                 return flag;
             }
 
-            internal static void GetTitleDescription(BookDetailCollection collection, string query)
+            internal static async void GetTitleDescription(BookDetailCollection collection, string query)
             {
-                throw new NotImplementedException();
+                // TODO
+                await Task.Delay(delay);
+                collection.Title = "Test billboard title";
+                collection.Description = "Test billboard descriptions: test test test test test test";
+                collection.OnPropertyChanged("Title");
+                collection.OnPropertyChanged("Description");
             }
         }
     }

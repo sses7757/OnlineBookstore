@@ -204,7 +204,56 @@ namespace Frontend
         }
     }
 
-    internal class BookDetailCollection
+    internal class BillboardCollection: INotifyPropertyChanged
+    {
+        internal ObservableCollection<BookDetailCollection> Billboards { set; get; }
+            = new ObservableCollection<BookDetailCollection>();
+
+        private const int INIT_AMOUNT = 4;
+        private const int ADD_AMOUNT = 2;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        internal BillboardCollection()
+        {
+            GetBillboards();
+        }
+
+        private async void GetBillboards()
+        {
+            Billboards.Clear();
+            int[] ids = await Networks.GetBillboardIDs(INIT_AMOUNT, 0);
+            foreach (int id in ids)
+            {
+                var collection = new BookDetailCollection(Util.BILLBOARD_ID_QUERY + id);
+                Billboards.Add(collection);
+            }
+        }
+
+        internal async void Refresh(bool addMore = false)
+        {
+            if (addMore)
+            {
+                int[] ids = await Networks.GetBillboardIDs(ADD_AMOUNT, Billboards.Count);
+                foreach (int id in ids)
+                {
+                    var collection = new BookDetailCollection(Util.BILLBOARD_ID_QUERY + id);
+                    Billboards.Add(collection);
+                }
+            }
+            else
+            {
+                GetBillboards();
+            }
+        }
+    }
+
+    internal class BookDetailCollection : INotifyPropertyChanged
     {
         internal ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
         internal string Title { set; get; }
@@ -212,31 +261,34 @@ namespace Frontend
 
         internal bool finished = false;
 
-        private string query = "";
+        private readonly string query = "";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
 
         internal BookDetailCollection(string query, string title, string content)
         {
             this.query = query;
             Title = title;
             Description = content;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, INIT_AMOUNT);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, Util.INIT_AMOUNT);
         }
 
         internal BookDetailCollection(string query)
         {
             this.query = query;
             Networks.RemoteBookCollection.GetTitleDescription(this, query);
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, PREVIEW_AMOUNT);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, Util.PREVIEW_AMOUNT);
         }
-
-        internal const int PREVIEW_AMOUNT = 8;
-        internal const int INIT_AMOUNT = 14;
-        internal const int ADD_AMOUNT = 6;
 
         internal void AddBooks()
         {
             this.finished = false;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, ADD_AMOUNT, this.Books.Count);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, Util.ADD_AMOUNT, this.Books.Count);
         }
     }
 
@@ -250,15 +302,17 @@ namespace Frontend
 
     internal class BookSummaryCollection
     {
-        internal const string DIRECT_QUERY_PREFIX = "direct-";
-
-        internal static readonly Dictionary<BookSummaryCollectionType, string> TYPE
+        private static readonly Dictionary<BookSummaryCollectionType, string> TYPE
                 = new Dictionary<BookSummaryCollectionType, string>
                 {
                     { BookSummaryCollectionType.PersonalRecommands, "PR" },
                     { BookSummaryCollectionType.TopBooks, "TB" },
                     { BookSummaryCollectionType.NewBooks, "NB" },
                 };
+
+        internal ObservableCollection<BookSummary> Books { set; get; } = new ObservableCollection<BookSummary>();
+
+        internal bool finished = false;
 
         internal static string GetStringType(BookSummaryCollectionType t)
         {
@@ -272,20 +326,10 @@ namespace Frontend
         {
             this.Books.Clear();
             this.finished = false;
-            switch (type)
+            if (type != BookSummaryCollectionType.Other)
             {
-                case BookSummaryCollectionType.PersonalRecommands:
-                    Networks.RemoteBookCollection.GetPersonalRecommands(this);
-                    break;
-                case BookSummaryCollectionType.TopBooks:
-                    Networks.RemoteBookCollection.GetTopBooks(this);
-                    break;
-                case BookSummaryCollectionType.NewBooks:
-                    Networks.RemoteBookCollection.GetNewBooks(this);
-                    break;
-                default:
-                    this.finished = true;
-                    break;
+                Networks.RemoteBookCollection.GetBooksFromQuery(this, 
+                    Util.DIRECT_QUERY_PREFIX + TYPE[type], Util.PREVIEW_AMOUNT);
             }
         }
 
@@ -294,40 +338,24 @@ namespace Frontend
             // do nothing
         }
 
-        internal BookSummaryCollection(BookSummaryCollection org)
-        {
-            this.Books = new ObservableCollection<BookSummary>(org.Books);
-        }
-
         internal BookSummaryCollection(BookSummaryCollectionType type)
         {
-            switch (type)
-            {
-                case BookSummaryCollectionType.PersonalRecommands:
-                    Networks.RemoteBookCollection.GetPersonalRecommands(this);
-                    break;
-                case BookSummaryCollectionType.TopBooks:
-                    Networks.RemoteBookCollection.GetTopBooks(this);
-                    break;
-                case BookSummaryCollectionType.NewBooks:
-                    Networks.RemoteBookCollection.GetNewBooks(this);
-                    break;
-                default:
-                    break;
-            }
+            this.Refresh(type);
         }
-
-        internal const int MAX_SHOW_BOOKS = 8;
-
-        internal ObservableCollection<BookSummary> Books { set; get; } = new ObservableCollection<BookSummary>();
-        
-        internal bool finished = false;
     }
 
     internal class Util
     {
+        internal const int PREVIEW_AMOUNT = 8;
+        internal const int INIT_AMOUNT = 14;
+        internal const int ADD_AMOUNT = 6;
+        internal const int RELATE_BOOK_AMOUNT = 7;
+
         internal const string TO_BOOK_DETAIL = "toDetail";
         internal const string FROM_BOOK_DETAIL = "fromDetail";
+
+        internal const string DIRECT_QUERY_PREFIX = "direct-";
+        internal const string BILLBOARD_ID_QUERY = "billboard_id=";
 
         internal const int REFRESH_RATE = 500;
 

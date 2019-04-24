@@ -26,6 +26,9 @@ namespace Frontend
     {
         public HomePage()
         {
+            this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+
             this.collections = new Dictionary<BookSummaryCollectionType, BookSummaryCollection>
                 (Enum.GetValues(typeof(BookSummaryCollectionType)).Length);
             foreach (BookSummaryCollectionType t in Enum.GetValues(typeof(BookSummaryCollectionType)))
@@ -34,9 +37,6 @@ namespace Frontend
                     this.collections.Add(t, new BookSummaryCollection(t));
             }
             this.UpdateLabels();
-
-            this.InitializeComponent();
-            this.NavigationCacheMode = NavigationCacheMode.Enabled;
             WaitLoading();
         }
 
@@ -84,7 +84,7 @@ namespace Frontend
         {
             var item = sender as StackPanel;
             var dataToPass = item.DataContext as BookSummary;
-            if (dataToPass.BookId > 0)
+            if (Networks.IsValidID(dataToPass.BookId))
             {
                 switch ((BookSummaryCollectionType)item.Tag)
                 {
@@ -128,6 +128,7 @@ namespace Frontend
 
         private async void WaitLoading()
         {
+            await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
             while (true)
             {
                 var load = false;
@@ -170,22 +171,22 @@ namespace Frontend
         private void HyperlinkButton_Click_Best(object sender, RoutedEventArgs e)
         {
             Util.main.NavigateToBooklist("Best Selling Books", "System generated recommendations",
-                BookSummaryCollection.DIRECT_QUERY_PREFIX + 
-                BookSummaryCollection.TYPE[BookSummaryCollectionType.TopBooks]);
+                Util.DIRECT_QUERY_PREFIX + 
+                BookSummaryCollection.GetStringType(BookSummaryCollectionType.TopBooks));
         }
 
         private void HyperlinkButton_Click_New(object sender, RoutedEventArgs e)
         {
             Util.main.NavigateToBooklist("Newly Published Books", "System generated recommendations",
-                BookSummaryCollection.DIRECT_QUERY_PREFIX +
-                BookSummaryCollection.TYPE[BookSummaryCollectionType.NewBooks]);
+                Util.DIRECT_QUERY_PREFIX +
+                BookSummaryCollection.GetStringType(BookSummaryCollectionType.NewBooks));
         }
 
         private void HyperlinkButton_Click_Person(object sender, RoutedEventArgs e)
         {
             Util.main.NavigateToBooklist("Personalized Recommendation", "System generated recommendations",
-                BookSummaryCollection.DIRECT_QUERY_PREFIX +
-                BookSummaryCollection.TYPE[BookSummaryCollectionType.PersonalRecommands]);
+                Util.DIRECT_QUERY_PREFIX +
+                BookSummaryCollection.GetStringType(BookSummaryCollectionType.PersonalRecommands));
         }
 
         public void RefreshButtonPressed()

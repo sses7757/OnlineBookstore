@@ -47,7 +47,7 @@ namespace Frontend
         private void BookCover_Pointed(object sender, PointerRoutedEventArgs e)
         {
             var dataToPass = (sender as FrameworkElement).DataContext as BookDetail;
-            if (dataToPass.BookId > 0)
+            if (Networks.IsValidID(dataToPass.BookId))
             {
                 bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
                 this._navigateItem = dataToPass;
@@ -122,7 +122,7 @@ namespace Frontend
             {
                 this.books.AddBooks();
                 await RefreshAsync();
-                scroller.ChangeView(0, scroller.ScrollableHeight, 1);
+                //scroller.ChangeView(0, scroller.ScrollableHeight, 1);
             }
             else
             {
