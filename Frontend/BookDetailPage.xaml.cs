@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -21,17 +22,90 @@ namespace Frontend
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class BookDetailPage : Page, INotifyPropertyChanged, RefreshAdminInterface
+    public sealed partial class BookDetailPage : Page, INotifyPropertyChanged, IRefreshAdminInterface
     {
         public BookDetailPage()
         {
             this.InitializeComponent();
+            //this.NavigationCacheMode = NavigationCacheMode.Enabled;
+        }
+
+        /// <summary>
+        /// Navigate from list pages, etc.
+        /// </summary>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            // load details first
+            var bookSummary = (BookSummary)e.Parameter;
+            detail = new BookDetail(bookSummary);
+            Refresh();
+            // start animations
+            var animationService = ConnectedAnimationService.GetForCurrentView();
+            var animation = animationService.GetAnimation(Util.TO_BOOK_DETAIL);
+            if (animation != null)
+            {
+                animation.TryStart(bookCover, new UIElement[] { anchorGrid });
+            }
+        }
+
+        /// <summary>
+        /// Navigate back to list pages, etc.
+        /// </summary>
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            if (e.NavigationMode == NavigationMode.Back)
+            {
+                var service = ConnectedAnimationService.GetForCurrentView();
+                service.PrepareToAnimate(Util.FROM_BOOK_DETAIL, bookCover);
+                // Use the recommended configuration for back animation.
+                service.GetAnimation(Util.FROM_BOOK_DETAIL).Configuration =
+                    new DirectConnectedAnimationConfiguration();
+            }
+        }
+
+        /// <summary>
+        /// Navigate to another detail page
+        /// </summary>
+        private void StackPanel_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            var dataToPass = (BookSummary)((StackPanel)sender).DataContext;
+            if (dataToPass.BookId > 0)
+            {
+                relatedBookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "relateBookImage");
+                this._navigateItem = dataToPass;
+                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+            }
+        }
+
+        private BookSummary _navigateItem = null;
+
+        /// <summary>
+        /// Navigate back from another detail page
+        /// </summary>
+        private async void RelatedBookGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this._navigateItem == null)
+                return;
+            ConnectedAnimation animation =
+                ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
+            if (animation != null)
+            {
+                animation.Configuration = new DirectConnectedAnimationConfiguration();
+                relatedBookGrid.ScrollIntoView(this._navigateItem);
+                await relatedBookGrid.TryStartConnectedAnimationAsync(animation,
+                                                                      this._navigateItem, "relateBookImage");
+            }
         }
 
         private BookDetail detail;
-        public BookDetail Detail {
+        internal BookDetail Detail {
             get { return detail; }
             set { detail = value; OnPropertyChanged("Detail"); }
+        }
+
+        internal System.Collections.ObjectModel.ObservableCollection<BookSummary> RelatedBooks {
+            get { return Detail.RelatedBooks.Books; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,17 +115,17 @@ namespace Frontend
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public static string PublishInfoAndPage(BookDetail detail)
+        internal static string PublishInfoAndPage(BookDetail detail)
         {
             return string.Format("{0} / {1} pages", detail.PublishInfo, detail.PageCount);
         }
 
-        public static string RatingReviewCount(BookDetail detail)
+        internal static string RatingReviewCount(BookDetail detail)
         {
             return string.Format("({0:N1}, {1} reviews)", detail.OverallRating, detail.ReviewAmount);
         }
 
-        public static string PriceDiscount(BookDetail detail)
+        internal static string PriceDiscount(BookDetail detail)
         {
             if (detail.Discount == 100)
             {
@@ -64,7 +138,7 @@ namespace Frontend
             }
         }
 
-        public static string GetAllAuthors(BookDetail detail)
+        internal static string GetAllAuthors(BookDetail detail)
         {
             var str = "";
             if (detail.OtherAuthors == null || detail.OtherAuthors.Trim().Length == 0)
@@ -78,7 +152,7 @@ namespace Frontend
             return str;
         }
 
-        public static string OtherStatistic(BookDetail detail)
+        internal static string OtherStatistic(BookDetail detail)
         {
             return string.Format("{0} bullet-screen comments & {1} previews",
                                  detail.DanmuAmount, detail.PreviewAmount);
@@ -86,29 +160,16 @@ namespace Frontend
 
         private async void Refresh()
         {
-            await System.Threading.Tasks.Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
             while (!detail.finished)
             {
                 await System.Threading.Tasks.Task.Delay(100);
                 Detail = detail;
+                OnPropertyChanged("RelatedBooks");
             }
-            await System.Threading.Tasks.Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
             Detail = detail;
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-            var bookSummary = (BookSummary)e.Parameter;
-            detail = new BookDetail(bookSummary);
-            Refresh();
-        }
-
-        private void StackPanel_PointerReleased(object sender, PointerRoutedEventArgs e)
-        {
-            var dataToPass = (BookSummary)((StackPanel)sender).DataContext;
-            if (dataToPass.BookId > 0)
-                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage2));
+            OnPropertyChanged("RelatedBooks");
         }
 
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
@@ -126,7 +187,7 @@ namespace Frontend
 
         public void RefreshButtonPressed()
         {
-            detail.GetMoreReview();
+            detail = new BookDetail(detail as BookSummary);
             Refresh();
         }
 

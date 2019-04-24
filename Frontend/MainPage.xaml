@@ -33,7 +33,7 @@
                 </TextBlock>
                 <CommandBar Grid.Column="2" HorizontalAlignment="Right"  VerticalAlignment="Center"
                             DefaultLabelPosition="Right" Background="{x:Null}">
-                    <AppBarButton Label="Refresh" Icon="Refresh" PointerPressed="Refresh_Pressed"/>
+                    <AppBarButton Label="Refresh" Icon="Refresh" Click="Refresh_Pressed"/>
                     <AppBarSeparator x:Name="TopSeparator"/>
                     <AppBarToggleButton x:Name="ToggleAdmin" Label="Admin" Icon="Admin"
                                         Checked="Admin_Pressed" Unchecked="Admin_Pressed"/>

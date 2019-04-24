@@ -195,12 +195,6 @@ namespace Frontend
         {
             NavView.IsBackEnabled = ContentFrame.CanGoBack;
 
-            if (Util.IsSubType(typeof(BookSummary), e.Parameter) /* or read book page */)
-            {
-                //NavView.SelectedItem = NavView.MenuItems[1];
-                return;
-            }
-
             var item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
             if (item.Tag == null || item.Page == null)
                 return;
@@ -234,7 +228,7 @@ namespace Frontend
             NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First(n => n.Tag.Equals(item.Tag));
         }
 
-        public void NavigateToHomeAndShowMine(bool show)
+        internal void NavigateToHomeAndShowMine(bool show)
         {
             if (show)
             {
@@ -248,19 +242,19 @@ namespace Frontend
             }
         }
 
-        public void NavigateToBookDetail(BookSummary itemToPass, Type page)
+        internal void NavigateToBookDetail(BookSummary itemToPass, Type page)
         {
             ContentFrame.SetListDataItemForNextConnectedAnimation(itemToPass);
-            ContentFrame.Navigate(page, itemToPass);
+            ContentFrame.Navigate(page, itemToPass, new SuppressNavigationTransitionInfo());
         }
 
-        public void NavigateToBookDetail(BookSummary itemToPass, NavigationTransitionInfo info)
+        internal void NavigateToBookDetail(BookSummary itemToPass, Type page, NavigationTransitionInfo info)
         {
             ContentFrame.SetListDataItemForNextConnectedAnimation(itemToPass);
-            ContentFrame.Navigate(typeof(BookDetailPage), itemToPass, info);
+            ContentFrame.Navigate(page, itemToPass, info);
         }
 
-        public void NavigateToBooklist(string title, string description, string query)
+        internal void NavigateToBooklist(string title, string description, string query)
         {
             NavView_Navigate(typeof(BooklistPage), null, true, new string[] { title, description, query });
         }
@@ -273,11 +267,11 @@ namespace Frontend
             NavView_Navigate("search", null, true, query);
         }
 
-        private void Refresh_Pressed(object sender, PointerRoutedEventArgs e)
+        private void Refresh_Pressed(object sender, RoutedEventArgs e)
         {
             if (ContentFrame.SourcePageType != null)
             {
-                ((RefreshAdminInterface)ContentFrame.Content).RefreshButtonPressed();
+                ((IRefreshAdminInterface)ContentFrame.Content).RefreshButtonPressed();
             }
             
         }
@@ -288,7 +282,7 @@ namespace Frontend
             {
                 var c = ((AppBarToggleButton)sender).IsChecked;
                 if (c.HasValue)
-                    ((RefreshAdminInterface)ContentFrame.Content).AdminButtonPressed(c.Value);
+                    ((IRefreshAdminInterface)ContentFrame.Content).AdminButtonPressed(c.Value);
             }
         }
     }

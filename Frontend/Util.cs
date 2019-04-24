@@ -10,16 +10,18 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Frontend
 {
-    public class Label : INotifyPropertyChanged
+    internal class Label : INotifyPropertyChanged
     {
-        public string Name { set; get; }
-        public ObservableCollection<string> AllSubs { get; set; } = new ObservableCollection<string>();
+        internal string Name { set; get; }
+        internal ObservableCollection<string> AllSubs { get; set; } = new ObservableCollection<string>();
 
-        public ObservableCollection<string> HotSubs {
-            get => new ObservableCollection<string>(AllSubs.Take(10));
+        internal ObservableCollection<string> HotSubs {
+            get => new ObservableCollection<string>(AllSubs.Take(HOT_AMOUNT));
         }
 
-        public void RetriveSubs()
+        private const int HOT_AMOUNT = 8;
+
+        internal void RetriveSubs()
         {
             if (Name != null && Name.Trim().Length > 1)
             {
@@ -27,37 +29,37 @@ namespace Frontend
             }
         }
 
-        public Label(string name)
+        internal Label(string name)
         {
             this.Name = name;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged(string name)
+        internal void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 
-    public class ReadList
+    internal class ReadList
     {
-        public string CreateUser { set; get; }
-        public string Title { set; get; }
-        public string Description { set; get; }
-        public BookSummaryCollection BookCollection { get; set; } = new BookSummaryCollection();
+        internal string CreateUser { set; get; }
+        internal string Title { set; get; }
+        internal string Description { set; get; }
+        internal BookSummaryCollection BookCollection { get; set; } = new BookSummaryCollection();
 
-        public ReadList()
+        internal ReadList()
         {
 
         }
     }
 
-    public class Review
+    internal class Review
     {
-        public string UserName { set; get; }
+        internal string UserName { set; get; }
         private int rating = 5;
-        public int Rating {
+        internal int Rating {
             set
             {
                 if (value <= 5 && value >= 1)
@@ -65,11 +67,11 @@ namespace Frontend
             }
             get { return rating; }
         }
-        public DateTime PublishDate { set; get; }
-        public string Content { set; get; }
-        public string Title { set; get; }
+        internal DateTime PublishDate { set; get; }
+        internal string Content { set; get; }
+        internal string Title { set; get; }
 
-        public Review(string name, int rating, DateTime time, string title, string content)
+        internal Review(string name, int rating, DateTime time, string title, string content)
         {
             UserName = name;
             Rating = rating;
@@ -79,33 +81,33 @@ namespace Frontend
         }
     }
 
-    public class BookDetail : BookSummary
+    internal class BookDetail : BookSummary
     {
-        public string BookDescription { get; set; }
-        public string Labels { get; set; }
-        public string OtherAuthors { get; set; }
-        public string PublishInfo { get; set; }
-        public string ISBN { get; set; }
-        public double Price { get; set; }
-        public int Discount { get; set; }
-        public int BuyAmount { get; set; }
-        public int DanmuAmount { get; set; }
-        public int PreviewAmount { get; set; }
-        public int ReviewAmount { get; set; }
-        public int PageCount { get; set; }
-        public bool CanAddWishList { get; set; }
-        public bool CanAddReadList { get; set; }
-        public bool CanBuy { get; set; }
-        public double OverallRating { set; get; }
+        internal string BookDescription { get; set; }
+        internal string Labels { get; set; }
+        internal string OtherAuthors { get; set; }
+        internal string PublishInfo { get; set; }
+        internal string ISBN { get; set; }
+        internal double Price { get; set; }
+        internal int Discount { get; set; }
+        internal int BuyAmount { get; set; }
+        internal int DanmuAmount { get; set; }
+        internal int PreviewAmount { get; set; }
+        internal int ReviewAmount { get; set; }
+        internal int PageCount { get; set; }
+        internal bool CanAddWishList { get; set; }
+        internal bool CanAddReadList { get; set; }
+        internal bool CanBuy { get; set; }
+        internal double OverallRating { set; get; }
 
-        public ObservableCollection<Review> Reviews { get; set; }
-        public BookSummaryCollection RelatedBooks { get; set; }
+        internal ObservableCollection<Review> Reviews { get; set; }
+        internal BookSummaryCollection RelatedBooks { get; set; }
 
-        public bool finished = false;
+        internal bool finished = false;
 
-        public const int REVIEW_ONE_TIME = 4;
+        internal const int REVIEW_ONE_TIME = 4;
 
-        public BookDetail(BookSummary summary) : base(summary)
+        internal BookDetail(BookSummary summary) : base(summary)
         {
             BookDescription = Util.WAIT_STR;
             Labels = Util.WAIT_STR;
@@ -121,12 +123,12 @@ namespace Frontend
             Networks.RemoteGetBookDetail(this);
         }
 
-        public BookDetail(int id)
+        internal BookDetail(int id)
         {
             BookId = id;
         }
 
-        public BookDetail(string errormsg) : base(errormsg)
+        internal BookDetail(string errormsg) : base(errormsg)
         {
             BookDescription = Util.WAIT_STR;
             Labels = Util.WAIT_STR;
@@ -141,25 +143,25 @@ namespace Frontend
             RelatedBooks = new BookSummaryCollection();
         }
 
-        public new static readonly BookDetail TIMEOUT_BOOK =
+        internal new static readonly BookDetail TIMEOUT_BOOK =
             new BookDetail("Timeout. Please check internet connection.");
 
-        public void GetMoreReview()
+        internal void GetMoreReview()
         {
             finished = false;
             Networks.RemoteGetReviews(this, this.Reviews.Count);
         }
     }
 
-    public class BookSummary
+    internal class BookSummary
     {
-        public int BookId { set; get; }
-        public string BookName { set; get; }
-        public string BookFullName { set; get; }
-        public BitmapImage BookCover { set; get; }
-        public string Author { set; get; }
+        internal int BookId { set; get; }
+        internal string BookName { set; get; }
+        internal string BookFullName { set; get; }
+        internal BitmapImage BookCover { set; get; }
+        internal string Author { set; get; }
 
-        public BookSummary(BookSummary book)
+        internal BookSummary(BookSummary book)
         {
             this.BookCover = book.BookCover;
             this.BookId = book.BookId;
@@ -168,7 +170,7 @@ namespace Frontend
             this.Author = book.Author;
         }
 
-        public BookSummary()
+        internal BookSummary()
         {
             this.BookId = 0;
             this.BookName = Util.WAIT_STR;
@@ -178,7 +180,7 @@ namespace Frontend
 
         }
 
-        public BookSummary(string errorMsg)
+        internal BookSummary(string errorMsg)
         {
             this.BookId = 0;
             this.BookName = errorMsg;
@@ -187,12 +189,12 @@ namespace Frontend
             this.Author = "ERROR";
         }
 
-        public readonly static BookSummary DEFAULT_BOOK = new BookSummary();
+        internal readonly static BookSummary DEFAULT_BOOK = new BookSummary();
 
-        public readonly static BookSummary TIMEOUT_BOOK = 
+        internal readonly static BookSummary TIMEOUT_BOOK = 
             new BookSummary("Timeout. Please check internet connection.");
 
-        public BookSummary(int BookId)
+        internal BookSummary(int BookId)
         {
             this.BookId = BookId;
             this.BookName = null;
@@ -202,33 +204,55 @@ namespace Frontend
         }
     }
 
-    public class BookDetailCollection
+    internal class BookDetailCollection
     {
-        public ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
+        internal ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
+        internal string Title { set; get; }
+        internal string Description { set; get; }
 
-        public bool finished = false;
+        internal bool finished = false;
 
         private string query = "";
 
-        public BookDetailCollection(string query)
+        internal BookDetailCollection(string query, string title, string content)
         {
             this.query = query;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query);
+            Title = title;
+            Description = content;
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, INIT_AMOUNT);
+        }
+
+        internal BookDetailCollection(string query)
+        {
+            this.query = query;
+            Networks.RemoteBookCollection.GetTitleDescription(this, query);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, PREVIEW_AMOUNT);
+        }
+
+        internal const int PREVIEW_AMOUNT = 8;
+        internal const int INIT_AMOUNT = 14;
+        internal const int ADD_AMOUNT = 6;
+
+        internal void AddBooks()
+        {
+            this.finished = false;
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, ADD_AMOUNT, this.Books.Count);
         }
     }
 
-    public enum BookSummaryCollectionType
+    internal enum BookSummaryCollectionType
     {
         PersonalRecommands,
         TopBooks,
-        NewBooks
+        NewBooks,
+        Other
     }
 
-    public class BookSummaryCollection
+    internal class BookSummaryCollection
     {
-        public const string DIRECT_QUERY_PREFIX = "direct-";
+        internal const string DIRECT_QUERY_PREFIX = "direct-";
 
-        public static readonly Dictionary<BookSummaryCollectionType, string> TYPE
+        internal static readonly Dictionary<BookSummaryCollectionType, string> TYPE
                 = new Dictionary<BookSummaryCollectionType, string>
                 {
                     { BookSummaryCollectionType.PersonalRecommands, "PR" },
@@ -236,7 +260,7 @@ namespace Frontend
                     { BookSummaryCollectionType.NewBooks, "NB" },
                 };
 
-        public static string GetStringType(BookSummaryCollectionType t)
+        internal static string GetStringType(BookSummaryCollectionType t)
         {
             if (TYPE.ContainsKey(t))
                 return TYPE[t];
@@ -244,17 +268,38 @@ namespace Frontend
                 return "";
         }
 
-        public BookSummaryCollection()
+        internal void Refresh(BookSummaryCollectionType type)
+        {
+            this.Books.Clear();
+            this.finished = false;
+            switch (type)
+            {
+                case BookSummaryCollectionType.PersonalRecommands:
+                    Networks.RemoteBookCollection.GetPersonalRecommands(this);
+                    break;
+                case BookSummaryCollectionType.TopBooks:
+                    Networks.RemoteBookCollection.GetTopBooks(this);
+                    break;
+                case BookSummaryCollectionType.NewBooks:
+                    Networks.RemoteBookCollection.GetNewBooks(this);
+                    break;
+                default:
+                    this.finished = true;
+                    break;
+            }
+        }
+
+        internal BookSummaryCollection()
         {
             // do nothing
         }
 
-        public BookSummaryCollection(BookSummaryCollection org)
+        internal BookSummaryCollection(BookSummaryCollection org)
         {
             this.Books = new ObservableCollection<BookSummary>(org.Books);
         }
 
-        public BookSummaryCollection(BookSummaryCollectionType type)
+        internal BookSummaryCollection(BookSummaryCollectionType type)
         {
             switch (type)
             {
@@ -272,39 +317,44 @@ namespace Frontend
             }
         }
 
-        public const int MAX_SHOW_BOOKS = 8;
+        internal const int MAX_SHOW_BOOKS = 8;
 
-        public ObservableCollection<BookSummary> Books { set; get; } = new ObservableCollection<BookSummary>();
+        internal ObservableCollection<BookSummary> Books { set; get; } = new ObservableCollection<BookSummary>();
         
-        public bool finished = false;
+        internal bool finished = false;
     }
 
-    public class Util
+    internal class Util
     {
-        public const string WAIT_STR = "Waiting...";
+        internal const string TO_BOOK_DETAIL = "toDetail";
+        internal const string FROM_BOOK_DETAIL = "fromDetail";
 
-        public static int UserId = 0;
-        public static bool isAdmin = false;
-        public static MainPage main;
+        internal const int REFRESH_RATE = 500;
+
+        internal const string WAIT_STR = "Waiting...";
+
+        internal static int UserId = 0;
+        internal static bool isAdmin = false;
+        internal static MainPage main;
 
 
 
-        public static Visibility BoolToVisibility(bool visible)
+        internal static Visibility BoolToVisibility(bool visible)
         {
             return visible ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public static Visibility ReverseBoolToVisibility(bool notVisible)
+        internal static Visibility ReverseBoolToVisibility(bool notVisible)
         {
             return notVisible ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        public static string ShowStringByBool(bool visible, string format, string str1, string str2)
+        internal static string ShowStringByBool(bool visible, string format, string str1, string str2)
         {
             return visible ? string.Format(format, str1) : string.Format(format, str2);
         }
 
-        public static string SHA256(string data)
+        internal static string SHA256(string data)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             byte[] hash = System.Security.Cryptography.SHA256Managed.Create().ComputeHash(bytes);
@@ -318,9 +368,16 @@ namespace Frontend
             return builder.ToString();
         }
 
-        public static bool IsSubType(Type type, object obj)
+        internal static bool IsSubType(Type type, object obj)
         {
             return obj != null && type.IsAssignableFrom(obj.GetType());
         }
+    }
+
+    internal interface IRefreshAdminInterface
+    {
+        void RefreshButtonPressed();
+
+        void AdminButtonPressed(bool isChecked);
     }
 }

@@ -1,10 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Roots >
-  <Roots.PropertyPathNames>
-    <RootPropertyPathName Name="Name" />
-    <RootPropertyPathName Name="AllSubs" />
-    <RootPropertyPathName Name="HotSubs" />
-  </Roots.PropertyPathNames>
   <Roots.RootTypes>
     <RootType FullName="Windows.UI.Xaml.Application" />
     <RootType FullName="Windows.UI.Xaml.Controls.Page">
@@ -12,10 +7,13 @@
       <RootProperty Name="Content" />
     </RootType>
     <RootType FullName="Microsoft.Xaml.DirectUI.ProxyTypes.ThemeResourceExtension" />
+    <RootType FullName="Windows.UI.Xaml.Controls.ScrollViewer">
+      <RootProperty Name="Content" />
+    </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Grid">
-      <RootProperty Name="Children" />
       <RootProperty Name="Resources" />
       <RootProperty Name="ColumnDefinitions" />
+      <RootProperty Name="Children" />
       <RootProperty Name="RowDefinitions" />
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="Margin" />
@@ -30,26 +28,24 @@
       <RootMethod Name="SetRow" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.TextBlock">
-      <RootProperty Name="HorizontalAlignment" />
-      <RootProperty Name="Text" />
-      <RootProperty Name="VerticalAlignment" />
-      <RootProperty Name="Style" />
       <RootProperty Name="FontSize" />
       <RootProperty Name="FontWeight" />
-      <RootProperty Name="TextAlignment" />
       <RootProperty Name="TextWrapping" />
+      <RootProperty Name="TextAlignment" />
       <RootProperty Name="Foreground" />
+      <RootProperty Name="Text" />
+      <RootProperty Name="Style" />
       <RootProperty Name="Margin" />
+      <RootProperty Name="HorizontalAlignment" />
+      <RootProperty Name="VerticalAlignment" />
       <RootProperty Name="SelectionHighlightColor" />
       <RootProperty Name="FontStyle" />
     </RootType>
-    <RootType FullName="Microsoft.Xaml.DirectUI.ProxyTypes.StaticResourceExtension" />
-    <RootType FullName="Frontend.BillboardPage" />
     <RootType FullName="Windows.UI.Xaml.FrameworkElement">
-      <RootProperty Name="Margin" />
       <RootProperty Name="VerticalAlignment" />
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="Style" />
+      <RootProperty Name="Margin" />
       <RootProperty Name="Width" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.NavigationViewItemSeparator">
@@ -73,12 +69,26 @@
       <RootProperty Name="ItemsSource" />
       <RootProperty Name="Margin" />
       <RootProperty Name="ItemTemplate" />
-      <RootProperty Name="SelectionMode" />
-      <RootProperty Name="IsItemClickEnabled" />
+      <RootEvent Name="Loaded" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.ListViewBase">
       <RootProperty Name="SelectionMode" />
       <RootProperty Name="IsItemClickEnabled" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Setter">
+      <RootProperty Name="Property" />
+      <RootProperty Name="Value" />
+    </RootType>
+    <RootType FullName="Microsoft.Xaml.DirectUI.ProxyTypes.StaticResourceExtension" />
+    <RootType FullName="Windows.UI.Xaml.Controls.ColumnDefinition">
+      <RootProperty Name="Width" />
+      <RootProperty Name="MinWidth" />
+    </RootType>
+    <RootType FullName="Frontend.BillboardPage" />
+    <RootType FullName="Windows.UI.Xaml.Controls.RefreshContainer">
+      <RootProperty Name="PullDirection" />
+      <RootProperty Name="Content" />
+      <RootEvent Name="RefreshRequested" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.HyperlinkButton">
       <RootProperty Name="Style" />
@@ -95,14 +105,6 @@
       <RootProperty Name="Padding" />
       <RootProperty Name="Foreground" />
     </RootType>
-    <RootType FullName="Windows.UI.Xaml.Setter">
-      <RootProperty Name="Property" />
-      <RootProperty Name="Value" />
-    </RootType>
-    <RootType FullName="Windows.UI.Xaml.Controls.ColumnDefinition">
-      <RootProperty Name="Width" />
-      <RootProperty Name="MinWidth" />
-    </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.StackPanel">
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="VerticalAlignment" />
@@ -111,25 +113,8 @@
       <RootProperty Name="Orientation" />
       <RootProperty Name="MaxWidth" />
       <RootProperty Name="Spacing" />
+      <RootProperty Name="Tag" />
       <RootEvent Name="PointerReleased" />
-    </RootType>
-    <RootType FullName="Windows.UI.Xaml.Controls.RefreshContainer">
-      <RootProperty Name="PullDirection" />
-      <RootProperty Name="Content" />
-      <RootEvent Name="RefreshRequested" />
-    </RootType>
-    <RootType FullName="Windows.UI.Xaml.Controls.ScrollViewer">
-      <RootProperty Name="Content" />
-    </RootType>
-    <RootType FullName="Microsoft.Toolkit.Uwp.UI.Animations.Connected">
-      <RootMethod Name="GetAnchorElement" />
-      <RootMethod Name="SetAnchorElement" />
-      <RootMethod Name="GetListItemElementName" />
-      <RootMethod Name="SetListItemElementName" />
-      <RootMethod Name="GetListItemKey" />
-      <RootMethod Name="SetListItemKey" />
-      <RootMethod Name="GetKey" />
-      <RootMethod Name="SetKey" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Border">
       <RootProperty Name="BorderBrush" />
@@ -171,7 +156,6 @@
       <RootProperty Name="MinWidth" />
       <RootEvent Name="Click" />
     </RootType>
-    <RootType FullName="Frontend.BookDetailPage2" />
     <RootType FullName="Frontend.BookDetailPage" />
     <RootType FullName="Frontend.BooklistPage" />
     <RootType FullName="Frontend.BookshelfPage" />
@@ -203,15 +187,13 @@
       <RootProperty Name="Content" />
       <RootProperty Name="ContentOverlay" />
     </RootType>
-    <RootType FullName="Windows.UI.Xaml.Data.Binding">
-      <RootProperty Name="Mode" />
-    </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.GridView">
       <RootProperty Name="ItemsSource" />
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="SelectionMode" />
       <RootProperty Name="ItemTemplate" />
     </RootType>
+    <RootType FullName="Windows.UI.Xaml.Data.Binding" />
     <RootType FullName="Frontend.HomePage" />
     <RootType FullName="Frontend.MyDanmuPage" />
     <RootType FullName="Frontend.MyReadlistPage" />
@@ -272,7 +254,7 @@
     <RootType FullName="Windows.UI.Xaml.Controls.AppBarButton">
       <RootProperty Name="Label" />
       <RootProperty Name="Icon" />
-      <RootEvent Name="PointerPressed" />
+      <RootEvent Name="Click" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.AppBarSeparator" />
     <RootType FullName="Windows.UI.Xaml.Controls.AppBarToggleButton">

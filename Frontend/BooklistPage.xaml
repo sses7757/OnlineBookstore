@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frontend"
     xmlns:sys="using:System"
-    xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,7 +11,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
-        <ScrollViewer>
+        <ScrollViewer x:Name="scroller">
             <Grid>
                 <Grid.Resources>
                     <Style TargetType="TextBlock" x:Key="TitleTextStyle">
@@ -74,14 +73,12 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Margin="10,20" Grid.Column="1">
-                    <TextBlock Text="{x:Bind Title, Mode=OneWay}" Style="{StaticResource TitleTextStyle}"/>
-                    <TextBlock Text="{x:Bind Description, Mode=OneWay}" Style="{StaticResource DescTextStyle}"/>
+                    <TextBlock Text="{x:Bind Books.Title, Mode=OneWay}" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text="{x:Bind Books.Description, Mode=OneWay}" Style="{StaticResource DescTextStyle}"/>
                     <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
-                    <controls:AdaptiveGridView SelectionMode="None" IsItemClickEnabled="True"
-                                               Style="{StaticResource AGVStyle}"
+                    <controls:AdaptiveGridView Style="{StaticResource AGVStyle}"
                                                ItemsSource="{x:Bind Books.Books, Mode=OneWay}"
-                                               animations:Connected.ListItemElementName="bookCover"
-                                               animations:Connected.ListItemKey="listItem">
+                                               x:Name="bookGrid" Loaded="BookGrid_Loaded">
                         <controls:AdaptiveGridView.ItemTemplate>
                             <DataTemplate x:DataType="local:BookDetail">
                                 <Grid Margin="10" PointerReleased="BookCover_Pointed" MaxHeight="180"
@@ -97,15 +94,15 @@
                                         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
                                             <RatingControl Value="{x:Bind OverallRating}" IsReadOnly="True"
                                                            VerticalAlignment="Center" Margin="10,0,10,-8"/>
-                                            <TextBlock Text="{x:Bind sys:String.Format('({0:N1})', OverallRating), Mode=OneWay}"
+                                            <TextBlock Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"
                                                        Style="{StaticResource NormalTextStyle}"/>
                                         </StackPanel>
-                                        <TextBlock Text="{x:Bind sys:String.Format('Author: {0}', Author)}"
+                                        <TextBlock Text="{x:Bind sys:String.Format('Author:\\t{0}', Author)}"
                                                    Style="{StaticResource NormalTextStyle}"/>
-                                        <TextBlock Text="{x:Bind sys:String.Format('Category: {0}', Labels)}"
+                                        <TextBlock Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"
                                                    Style="{StaticResource NormalTextStyle}"/>
                                         <TextBlock Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"
-                                                   Style="{StaticResource NormalTitleTextStyle}"/>
+                                                   Style="{StaticResource NormalTextStyle}"/>
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>

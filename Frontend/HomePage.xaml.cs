@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 
@@ -21,13 +22,103 @@ namespace Frontend
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class HomePage : Page, RefreshAdminInterface
+    public sealed partial class HomePage : Page, INotifyPropertyChanged, IRefreshAdminInterface
     {
+        public HomePage()
+        {
+            this.collections = new Dictionary<BookSummaryCollectionType, BookSummaryCollection>
+                (Enum.GetValues(typeof(BookSummaryCollectionType)).Length);
+            foreach (BookSummaryCollectionType t in Enum.GetValues(typeof(BookSummaryCollectionType)))
+            {
+                if (t != BookSummaryCollectionType.Other)
+                    this.collections.Add(t, new BookSummaryCollection(t));
+            }
+            this.UpdateLabels();
+
+            this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+            WaitLoading();
+        }
+
+        /// <summary>
+        /// Navigate back from detail page
+        /// </summary>
+        private async void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this._navigateItem == null)
+                return;
+            ConnectedAnimation animation =
+                ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
+            if (animation != null)
+            {
+                animation.Configuration = new DirectConnectedAnimationConfiguration();
+                switch (this._navigateType)
+                {
+                    case BookSummaryCollectionType.NewBooks:
+                        NBGrid.ScrollIntoView(this._navigateItem);
+                        await NBGrid.TryStartConnectedAnimationAsync(animation, this._navigateItem, "NBImage");
+                        break;
+                    case BookSummaryCollectionType.TopBooks:
+                        TBGrid.ScrollIntoView(this._navigateItem);
+                        await TBGrid.TryStartConnectedAnimationAsync(animation, this._navigateItem, "TBImage");
+                        break;
+                    case BookSummaryCollectionType.PersonalRecommands:
+                        PRGrid.ScrollIntoView(this._navigateItem);
+                        await PRGrid.TryStartConnectedAnimationAsync(animation, this._navigateItem, "PRImage");
+                        break;
+                    default:
+                        return;
+                }
+                this._navigateType = BookSummaryCollectionType.Other;
+                this._navigateItem = null;
+            }
+        }
+
+        private BookSummary _navigateItem = null;
+        private BookSummaryCollectionType _navigateType = BookSummaryCollectionType.Other;
+
+        /// <summary>
+        /// Navigate to detail page
+        /// </summary>
+        private void GridView_ItemClick(object sender, PointerRoutedEventArgs e)
+        {
+            var item = sender as StackPanel;
+            var dataToPass = item.DataContext as BookSummary;
+            if (dataToPass.BookId > 0)
+            {
+                switch ((BookSummaryCollectionType)item.Tag)
+                {
+                    case BookSummaryCollectionType.NewBooks:
+                        NBGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "NBImage");
+                        break;
+                    case BookSummaryCollectionType.TopBooks:
+                        TBGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "TBImage");
+                        break;
+                    case BookSummaryCollectionType.PersonalRecommands:
+                        PRGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "PRImage");
+                        break;
+                    default:
+                        return;
+                }
+                this._navigateType = (BookSummaryCollectionType)item.Tag;
+                this._navigateItem = dataToPass;
+                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+
+            }
+        }
+
         private Dictionary<BookSummaryCollectionType, BookSummaryCollection> collections;
 
-        public ObservableCollection<Label> Labels { set; get; } = new ObservableCollection<Label>();
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<BookSummary> GetCollections(BookSummaryCollectionType t)
+        private void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        internal ObservableCollection<Label> Labels { set; get; } = new ObservableCollection<Label>();
+
+        internal ObservableCollection<BookSummary> GetCollections(BookSummaryCollectionType t)
         {
             if (this.collections.ContainsKey(t))
                 return this.collections[t].Books;
@@ -55,13 +146,17 @@ namespace Frontend
                 }
                 else
                 {
-                    await System.Threading.Tasks.Task.Delay(500);
+                    await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
+                    OnPropertyChanged("Label");
                 }
             }
+            await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
+            OnPropertyChanged("Label");
         }
 
         private async void UpdateLabels()
         {
+            Labels.Clear();
             var mainLabels = await Networks.RemoteGetMainLabels();
             foreach (var s in mainLabels)
             {
@@ -69,28 +164,7 @@ namespace Frontend
                 Labels.Add(l);
                 l.RetriveSubs();
             }
-        }
-
-        public HomePage()
-        {
-            this.collections = new Dictionary<BookSummaryCollectionType, BookSummaryCollection>
-                (Enum.GetValues(typeof(BookSummaryCollectionType)).Length);
-            foreach (BookSummaryCollectionType t in Enum.GetValues(typeof(BookSummaryCollectionType)))
-            {
-                this.collections.Add(t, new BookSummaryCollection(t));
-            }
-            this.UpdateLabels();
-
-            this.InitializeComponent();
-            this.NavigationCacheMode = NavigationCacheMode.Enabled;
-            WaitLoading();
-        }
-
-        private void GridView_ItemClick(object sender, PointerRoutedEventArgs e)
-        {
-            var dataToPass = (BookSummary)((StackPanel)sender).DataContext;
-            if (dataToPass.BookId > 0)
-                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+            OnPropertyChanged("Label");
         }
 
         private void HyperlinkButton_Click_Best(object sender, RoutedEventArgs e)
@@ -118,14 +192,12 @@ namespace Frontend
         {
             if (!loadingControl.IsLoading)
             {
-                this.collections = new Dictionary<BookSummaryCollectionType, BookSummaryCollection>
-                (Enum.GetValues(typeof(BookSummaryCollectionType)).Length);
-                foreach (BookSummaryCollectionType t in Enum.GetValues(typeof(BookSummaryCollectionType)))
+                foreach (KeyValuePair<BookSummaryCollectionType, BookSummaryCollection> kv in this.collections)
                 {
-                    this.collections.Add(t, new BookSummaryCollection(t));
+                    kv.Value.Refresh(kv.Key);
                 }
                 WaitLoading();
-                //scroller.ChangeView(0, scroller.ScrollableHeight, 1);
+                UpdateLabels();
             }
         }
 

@@ -123,9 +123,6 @@
     <Compile Include="BillboardPage.xaml.cs">
       <DependentUpon>BillboardPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BookDetailPage2.xaml.cs">
-      <DependentUpon>BookDetailPage2.xaml</DependentUpon>
-    </Compile>
     <Compile Include="BookDetailPage.xaml.cs">
       <DependentUpon>BookDetailPage.xaml</DependentUpon>
     </Compile>
@@ -151,7 +148,6 @@
     <Compile Include="ReadlistPage.xaml.cs">
       <DependentUpon>ReadlistPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RefreshAdminInterface.cs" />
     <Compile Include="SearchPage.xaml.cs">
       <DependentUpon>SearchPage.xaml</DependentUpon>
     </Compile>
@@ -237,10 +233,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BookDetailPage2.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="BookDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -293,9 +285,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.8</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Animations">
-      <Version>5.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
       <Version>5.1.1</Version>

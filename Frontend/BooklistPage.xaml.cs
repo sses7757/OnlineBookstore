@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -21,20 +22,64 @@ namespace Frontend
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class BooklistPage : Page, INotifyPropertyChanged, RefreshAdminInterface
+    public sealed partial class BooklistPage : Page, INotifyPropertyChanged, IRefreshAdminInterface
     {
         public BooklistPage()
         {
             this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            var para = (string[])e.Parameter;
+            this.title = para[0];
+            this.description = para[1];
+            this.queryText = para[2];
+            this.books = new BookDetailCollection(this.queryText, this.title, this.description);
+            _ = this.RefreshAsync();
+        }
+
+        /// <summary>
+        /// Navigate to detail page
+        /// </summary>
+        private void BookCover_Pointed(object sender, PointerRoutedEventArgs e)
+        {
+            var dataToPass = (sender as FrameworkElement).DataContext as BookDetail;
+            if (dataToPass.BookId > 0)
+            {
+                bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
+                this._navigateItem = dataToPass;
+                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+            }
+        }
+
+        private BookDetail _navigateItem = null;
+
+        /// <summary>
+        /// Navigate back from detail page
+        /// </summary>
+        private async void BookGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this._navigateItem == null)
+                return;
+            ConnectedAnimation animation =
+                ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
+            if (animation != null)
+            {
+                animation.Configuration = new DirectConnectedAnimationConfiguration();
+                bookGrid.ScrollIntoView(this._navigateItem);
+                await bookGrid.TryStartConnectedAnimationAsync(animation, this._navigateItem, "bookCover");
+            }
+        }
         private string queryText = "";
-        public string Title { set; get; }
-        public string Description { set; get; }
+        private string title = "";
+        private string description = "";
 
         private BookDetailCollection books;
 
-        public BookDetailCollection Books {
+        internal BookDetailCollection Books {
             get { return books; }
             set { books = value; OnPropertyChanged("Books"); }
         }
@@ -46,50 +91,44 @@ namespace Frontend
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private async void Refresh()
+        private async System.Threading.Tasks.Task<bool> RefreshAsync()
         {
-            await System.Threading.Tasks.Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
             while (!books.finished)
             {
-                await System.Threading.Tasks.Task.Delay(100);
+                await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
                 Books = books;
             }
-            await System.Threading.Tasks.Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
             Books = books;
+            return true;
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-            var para = (string[])e.Parameter;
-            Title = para[0];
-            Description = para[1];
-            this.queryText = para[2];
-            this.books = new BookDetailCollection(this.queryText);
-            Refresh();
-        }
-
-        public static string PriceDiscount(double price, int discount)
+        internal static string PriceDiscount(double price, int discount)
         {
             if (discount == 100)
             {
-                return string.Format("{0:C2}", price);
+                return string.Format("Price:\t{0:C2}", price);
             }
             else
             {
-                return string.Format("{0:C2} ({1}% OFF)", price, 100 - discount);
+                return string.Format("Price:\t{0:C2} ({1}% OFF)", price, 100 - discount);
             }
         }
 
-        private void BookCover_Pointed(object sender, PointerRoutedEventArgs e)
+        private async void RefreshPage(bool addBooks)
         {
-
-        }
-
-        private void RefreshPage(bool addBooks)
-        {
-            // TODO
-            Refresh();
+            if (addBooks)
+            {
+                this.books.AddBooks();
+                await RefreshAsync();
+                scroller.ChangeView(0, scroller.ScrollableHeight, 1);
+            }
+            else
+            {
+                this.books = new BookDetailCollection(this.queryText, this.title, this.description);
+                _ = this.RefreshAsync();
+            }
         }
 
         private void RefreshRequested(RefreshContainer sender, RefreshRequestedEventArgs args)

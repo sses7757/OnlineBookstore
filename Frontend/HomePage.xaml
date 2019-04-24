@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frontend"
     xmlns:sys="using:System"
-    xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -52,7 +51,7 @@
             </Style>
             <Style TargetType="controls:AdaptiveGridView" x:Key="AGVStyle">
                 <Setter Property="OneRowModeEnabled" Value="False"/>
-                <Setter Property="DesiredWidth" Value="175"/>
+                <Setter Property="DesiredWidth" Value="140"/>
                 <Setter Property="SelectionMode" Value="None"/>
                 <Setter Property="IsItemClickEnabled" Value="True"/>
             </Style>
@@ -85,9 +84,9 @@
                                 <controls:Expander VerticalAlignment="Top"
                                                    Margin="0,10" HorizontalContentAlignment="Stretch"
                                                    IsExpanded="False" ExpandDirection="Down"
-                                                   Header="{Binding Name, Mode=OneWay}"
+                                                   Header="{x:Bind Name, Mode=OneWay}"
                                                    FontSize="18">
-                                    <GridView ItemsSource="{Binding AllSubs, Mode=OneWay}"
+                                    <GridView ItemsSource="{x:Bind AllSubs, Mode=OneWay}"
                                               HorizontalAlignment="Stretch" SelectionMode="None">
                                         <GridView.ItemTemplate>
                                             <DataTemplate x:DataType="x:String">
@@ -97,12 +96,12 @@
                                         </GridView.ItemTemplate>
                                     </GridView>
                                     <controls:Expander.ContentOverlay>
-                                        <GridView ItemsSource="{Binding HotSubs, Mode=OneWay}"
+                                        <GridView ItemsSource="{x:Bind HotSubs, Mode=OneWay}"
                                                   HorizontalAlignment="Stretch" SelectionMode="None">
                                             <GridView.ItemTemplate>
                                                 <DataTemplate x:DataType="x:String">
                                                     <HyperlinkButton Content="{Binding}" Margin="5,0" FontSize="16"
-                                                                 Click="HyperlinkButton_Click_SubLabel"/>
+                                                                     Click="HyperlinkButton_Click_SubLabel"/>
                                                 </DataTemplate>
                                             </GridView.ItemTemplate>
                                         </GridView>
@@ -128,12 +127,11 @@
                     <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
                     <controls:AdaptiveGridView Style="{StaticResource AGVStyle}"
                                                ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.TopBooks)}"
-                                               animations:Connected.ListItemElementName="TBImage"
-                                               animations:Connected.ListItemKey="listItem">
+                                               x:Name="TBGrid" Loaded="Grid_Loaded">
                         <controls:AdaptiveGridView.ItemTemplate>
-                            <!--x:Name="ImageTextDataTemplate"-->
                             <DataTemplate x:DataType="local:BookSummary">
-                                <StackPanel Margin="16,12" PointerReleased="GridView_ItemClick" MaxWidth="200"
+                                <StackPanel Margin="10,6" MaxWidth="160" PointerReleased="GridView_ItemClick"
+                                            Tag="{x:Bind local:BookSummaryCollectionType.TopBooks}"
                                             HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
                                            x:Name="TBImage"/>
@@ -157,12 +155,11 @@
                     <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
                     <controls:AdaptiveGridView Style="{StaticResource AGVStyle}"
                                                ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.NewBooks)}"
-                                               animations:Connected.ListItemElementName="NBImage"
-                                               animations:Connected.ListItemKey="listItem">
+                                               x:Name="NBGrid" Loaded="Grid_Loaded">
                         <controls:AdaptiveGridView.ItemTemplate>
-                            <!--x:Name="ImageTextDataTemplate"-->
                             <DataTemplate x:DataType="local:BookSummary">
-                                <StackPanel Margin="16,12" PointerReleased="GridView_ItemClick" MaxWidth="200"
+                                <StackPanel Margin="10,6" MaxWidth="160" PointerReleased="GridView_ItemClick"
+                                            Tag="{x:Bind local:BookSummaryCollectionType.NewBooks}"
                                             HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
                                            x:Name="NBImage"/>
@@ -186,15 +183,14 @@
                     <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
                     <controls:AdaptiveGridView Style="{StaticResource AGVStyle}"
                                                ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.PersonalRecommands)}"
-                                               animations:Connected.ListItemElementName="PRImage"
-                                               animations:Connected.ListItemKey="listItem">
+                                               x:Name="PRGrid" Loaded="Grid_Loaded">
                         <controls:AdaptiveGridView.ItemTemplate>
                             <DataTemplate x:DataType="local:BookSummary">
-                                <!--AutomationProperties.Name="{x:Bind BookId}"-->
-                                <StackPanel Margin="16,12" PointerReleased="GridView_ItemClick" MaxWidth="200"
+                                <StackPanel Margin="10,6" MaxWidth="160" PointerReleased="GridView_ItemClick"
+                                            Tag="{x:Bind local:BookSummaryCollectionType.PersonalRecommands}"
                                             HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
-                                       x:Name="PRImage"/>
+                                           x:Name="PRImage"/>
                                     <TextBlock Text="{x:Bind BookName}" Style="{StaticResource BookNameTextStyle}"/>
                                     <TextBlock Text="{x:Bind Author}" Style="{StaticResource AuthorTextStyle}"/>
                                 </StackPanel>

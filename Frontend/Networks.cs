@@ -18,7 +18,7 @@ namespace Frontend
     {
         public const string REMOTE_IP = "10.20.30.40";
 
-        public static async Task<LoginStatus> RemoteLogin(string username, string encodedPassword)
+        internal static async Task<LoginStatus> RemoteLogin(string username, string encodedPassword)
         {
             // TODO
             await Task.Delay(4000);
@@ -27,7 +27,7 @@ namespace Frontend
             return LoginStatus.Success;
         }
 
-        public static async Task<bool> RemoteLogout()
+        internal static async Task<bool> RemoteLogout()
         {
             // TODO
             await Task.Delay(4000);
@@ -36,7 +36,7 @@ namespace Frontend
             return true;
         }
 
-        public static async Task<string[]> RemoteGetMainLabels()
+        internal static async Task<string[]> RemoteGetMainLabels()
         {
             // TODO
             await Task.Delay(1000);
@@ -49,7 +49,7 @@ namespace Frontend
             };
         }
 
-        public static async void RemoteGetSubLabels(Label label)
+        internal static async void RemoteGetSubLabels(Label label)
         {
             // TODO
             await Task.Delay(1000);
@@ -61,14 +61,14 @@ namespace Frontend
             }
         }
 
-        public static async Task<bool> RemoteGetBookSummary(BookSummary book)
+        internal static async Task<bool> RemoteGetBookSummary(BookSummary book)
         {
             if (book.BookId <= 0)
             {
                 throw new ArgumentNullException("Book id wrong");
             }
             // TODO
-            await Task.Delay(500);
+            await Task.Delay(Util.REFRESH_RATE);
             book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
                 new Uri("https://images-na.ssl-images-amazon.com/images/I/51JVLQdducL._SX392_BO1,204,203,200_.jpg"));
                 //new Uri("ms-appx:///Assets/tempBook.png"));
@@ -79,14 +79,14 @@ namespace Frontend
             return true;
         }
 
-        public static async Task<bool> RemoteGetBookQuasiDetail(BookDetail book)
+        internal static async Task<bool> RemoteGetBookQuasiDetail(BookDetail book)
         {
             if (book.BookId <= 0)
             {
                 throw new ArgumentNullException("Book id wrong");
             }
             // TODO only two level label
-            await Task.Delay(500);
+            await Task.Delay(Util.REFRESH_RATE);
             book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
                 new Uri("https://images-na.ssl-images-amazon.com/images/I/51JVLQdducL._SX392_BO1,204,203,200_.jpg"));
             //new Uri("ms-appx:///Assets/tempBook.png"));
@@ -104,7 +104,7 @@ namespace Frontend
             return true;
         }
 
-        public static async void RemoteGetBookDetail(BookDetail book)
+        internal static async void RemoteGetBookDetail(BookDetail book)
         {
             // TODO get book details Util.UserId
             await Task.Delay(1000);
@@ -142,7 +142,7 @@ namespace Frontend
             book.finished = true;
         }
 
-        public static async void RemoteGetReviews(BookDetail book, int from = 0,
+        internal static async void RemoteGetReviews(BookDetail book, int from = 0,
                                                         int count = BookDetail.REVIEW_ONE_TIME)
         {
             // TODO get book reviews (from -> from + count)
@@ -150,10 +150,10 @@ namespace Frontend
             for (int i = from; i < count - 1; ++i)
             {
                 book.Reviews.Add(new Review("Steven", 5, new DateTime(2019, 3, 24, 0, 45, 4), "A Fansinating Book", "I'm not new to programming; in fact I've been doing it professionally for the past decade. Although I've played around in quite a few different languages, most of my work over the last 6 years has been in .NET (C# mainly). I have always had an interest in C because I love its simplicity. Also, it's a language which brings one closer to the machine, stripping away many of the abstractions that higher level languages provide. Higher level languages (such as Java, C#, Python, etc.) are massive and powerful with HUGE frameworks, but I'm attracted to simple things."));
-                await Task.Delay(500);
+                await Task.Delay(Util.REFRESH_RATE);
             }
             book.Reviews.Add(new Review("Anis", 1, DateTime.Now, "Disappointed", "Print Type is very bad. Looks like old news paper printed on 80's. Too much description, may be good for beginners students but not for you if want to understand the concept of C Pointer, Structure, Union, etc. in few lines. I found may online tutorials better than this book. Just read the book less - than hours and returned; Paid $7.53 shipping fee....bad."));
-            await Task.Delay(500);
+            await Task.Delay(Util.REFRESH_RATE);
             if (from != 0)
             {
                 book.finished = true;
@@ -192,7 +192,7 @@ namespace Frontend
                 collection.finished = true;
             }
 
-            private static async Task<bool> AddBookDetail(BookDetailCollection collection, int bookId, long timeout = 1000)
+            private static async Task<bool> AddBookDetail(BookDetailCollection collection, int bookId, long timeout = 5000)
             {
                 bool flag = true;
                 var timer = new Stopwatch();
@@ -220,12 +220,13 @@ namespace Frontend
                 collection.finished = true;
             }
 
-            public static async void GetBooksFromQuery(BookDetailCollection collection, string query)
+            internal static async void GetBooksFromQuery(BookDetailCollection collection, string query,
+                                                       int amount, int from = 0)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
                 bool flag = true;
-                foreach (int i in new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14 })
+                for (int i = from + 1; i <= amount + from; ++i)
                 {
                     flag = await AddBookDetail(collection, i);
                     if (!flag)
@@ -234,7 +235,7 @@ namespace Frontend
                 SetBookDetailCollection(collection, flag);
             }
 
-            public static async void GetPersonalRecommands(BookSummaryCollection collection)
+            internal static async void GetPersonalRecommands(BookSummaryCollection collection)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
@@ -248,7 +249,7 @@ namespace Frontend
                 SetBookSummaryCollection(collection, flag);
             }
 
-            public static async void GetTopBooks(BookSummaryCollection collection)
+            internal static async void GetTopBooks(BookSummaryCollection collection)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
@@ -262,7 +263,7 @@ namespace Frontend
                 SetBookSummaryCollection(collection, flag);
             }
 
-            public static async void GetNewBooks(BookSummaryCollection collection)
+            internal static async void GetNewBooks(BookSummaryCollection collection)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
@@ -276,7 +277,7 @@ namespace Frontend
                 SetBookSummaryCollection(collection, flag);
             }
 
-            public static async Task<bool> GetRelatedBooks(BookSummaryCollection collection, int relatedBookId)
+            internal static async Task<bool> GetRelatedBooks(BookSummaryCollection collection, int relatedBookId)
             {
                 // TODO get book ids only 7
                 await Task.Delay(delay);
@@ -289,6 +290,11 @@ namespace Frontend
                 }
                 SetBookSummaryCollection(collection, flag);
                 return flag;
+            }
+
+            internal static void GetTitleDescription(BookDetailCollection collection, string query)
+            {
+                throw new NotImplementedException();
             }
         }
     }

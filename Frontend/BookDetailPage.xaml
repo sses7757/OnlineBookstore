@@ -6,118 +6,119 @@
     xmlns:sys="using:System"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <Grid.Resources>
-            <!--Create a Style for a TextBlock-->
-            <Style TargetType="TextBlock" x:Key="TitleTextStyle">
-                <Setter Property="Margin" Value="10"/>
-                <Setter Property="FontSize" Value="16"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="VerticalAlignment" Value="Top"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="TextAlignment" Value="Start"/>
-                <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}"/>
-            </Style>
-            <Style TargetType="TextBlock" x:Key="BookTextStyle">
-                <Setter Property="FontSize" Value="16"/>
-                <Setter Property="VerticalAlignment" Value="Top"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="Margin" Value="10"/>
-                <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                <Setter Property="TextAlignment" Value="Start"/>
-                <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-            </Style>
-            <Style TargetType="TextBlock" x:Key="BookNameTextStyle">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="VerticalAlignment" Value="Top"/>
-                <Setter Property="Margin" Value="0,5,0,0"/>
-                <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-            </Style>
-            <Style TargetType="TextBlock" x:Key="AuthorTextStyle">
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="VerticalAlignment" Value="Top"/>
-                <Setter Property="Margin" Value="0,3,0,0"/>
-                <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                <Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark2}"/>
-                <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-            </Style>
+    <RefreshContainer RefreshRequested="RefreshRequested"
+                          PullDirection="BottomToTop">
+        <ScrollViewer>
 
-            <!--Create a Style for the Separator-->
-            <Style TargetType="NavigationViewItemSeparator" x:Key="SeparatorStyle">
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="Width" Value="2000"/>
-                <Setter Property="Margin" Value="10,4,10,0"/>
-            </Style>
+            <Grid>
+            <Grid.Resources>
+                <!--Create a Style for a TextBlock-->
+                <Style TargetType="TextBlock" x:Key="TitleTextStyle">
+                    <Setter Property="Margin" Value="10"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="VerticalAlignment" Value="Top"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="TextAlignment" Value="Start"/>
+                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                    <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="BookTextStyle">
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="VerticalAlignment" Value="Top"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="Margin" Value="10"/>
+                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                    <Setter Property="TextAlignment" Value="Start"/>
+                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="BookNameTextStyle">
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="VerticalAlignment" Value="Top"/>
+                    <Setter Property="Margin" Value="0,5,0,0"/>
+                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="AuthorTextStyle">
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="VerticalAlignment" Value="Top"/>
+                    <Setter Property="Margin" Value="0,3,0,0"/>
+                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                    <Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark2}"/>
+                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                </Style>
 
-            <!--Create a Style for the Books-->
-            <Style TargetType="Image" x:Key="BookImageStyle">
-                <Setter Property="Stretch" Value="Uniform"/>
-                <Setter Property="Margin" Value="10,20"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="VerticalAlignment" Value="Stretch"/>
-            </Style>
-            <Style TargetType="controls:AdaptiveGridView" x:Key="AGVStyle">
-                <Setter Property="OneRowModeEnabled" Value="False"/>
-                <Setter Property="DesiredWidth" Value="110"/>
-                <Setter Property="SelectionMode" Value="None"/>
-                <Setter Property="IsItemClickEnabled" Value="True"/>
-            </Style>
+                <!--Create a Style for the Separator-->
+                <Style TargetType="NavigationViewItemSeparator" x:Key="SeparatorStyle">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="2000"/>
+                    <Setter Property="Margin" Value="10,4,10,0"/>
+                </Style>
+
+                <!--Create a Style for the Books-->
+                <Style TargetType="Image" x:Key="BookImageStyle">
+                    <Setter Property="Stretch" Value="Uniform"/>
+                    <Setter Property="Margin" Value="10,20"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalAlignment" Value="Stretch"/>
+                </Style>
+                <Style TargetType="controls:AdaptiveGridView" x:Key="AGVStyle">
+                    <Setter Property="OneRowModeEnabled" Value="False"/>
+                    <Setter Property="DesiredWidth" Value="110"/>
+                    <Setter Property="SelectionMode" Value="None"/>
+                    <Setter Property="IsItemClickEnabled" Value="True"/>
+                </Style>
             
-            <Style TargetType="HyperlinkButton" x:Key="ShowAllBtnStyle">
-                <Setter Property="Content" Value="Show All >>"/>
-                <Setter Property="FontSize" Value="16"/>
-                <Setter Property="VerticalAlignment" Value="Bottom"/>
-                <Setter Property="HorizontalAlignment" Value="Right"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="Margin" Value="0"/>
-                <Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark2}"/>
-            </Style>
+                <Style TargetType="HyperlinkButton" x:Key="ShowAllBtnStyle">
+                    <Setter Property="Content" Value="Show All >>"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark2}"/>
+                </Style>
 
-        </Grid.Resources>
+            </Grid.Resources>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.5*"/>
-            <ColumnDefinition Width="1.35*" MinWidth="160"/>
-            <ColumnDefinition Width="6*" MinWidth="260"/>
-            <ColumnDefinition Width="0.5*"/>
-        </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="1.35*" MinWidth="160"/>
+                <ColumnDefinition Width="6*" MinWidth="260"/>
+                <ColumnDefinition Width="0.5*"/>
+            </Grid.ColumnDefinitions>
 
-        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20" Grid.Column="1">
-            <Image Source="{x:Bind Detail.BookCover}" Style="{StaticResource BookImageStyle}" Grid.Row="1"
-                   animations:Connected.Key="listItem" x:Name="bookCover"/>
-            <Button Content="+ Readlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Style="{StaticResource AccentButtonStyle}"
-                    IsEnabled="{x:Bind Detail.CanAddReadList, Mode=OneWay}">
-            </Button>
-            <Button Content="Buy" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Style="{StaticResource AccentButtonStyle}"
-                    IsEnabled="{x:Bind Detail.CanBuy, Mode=OneWay}">
-            </Button>
-            <Button Content="+ Wishlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Style="{StaticResource AccentButtonStyle}"
-                    IsEnabled="{x:Bind Detail.CanAddWishList, Mode=OneWay}">
-            </Button>
-            <Button Content="Preview" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Style="{StaticResource AccentButtonStyle}">
-            </Button>
-        </StackPanel>
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20" Grid.Column="1">
+                    <Image Source="{x:Bind Detail.BookCover}" Style="{StaticResource BookImageStyle}" Grid.Row="1"
+                           x:Name="bookCover"/>
+                    <Button Content="+ Readlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="{x:Bind Detail.CanAddReadList, Mode=OneWay}">
+                    </Button>
+                    <Button Content="Buy" FontSize="16" FontWeight="SemiBold" Margin="10,5"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="{x:Bind Detail.CanBuy, Mode=OneWay}">
+                    </Button>
+                    <Button Content="+ Wishlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="{x:Bind Detail.CanAddWishList, Mode=OneWay}">
+                    </Button>
+                    <Button Content="Preview" FontSize="16" FontWeight="SemiBold" Margin="10,5"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            Style="{StaticResource AccentButtonStyle}">
+                    </Button>
+                </StackPanel>
 
-        <RefreshContainer RefreshRequested="RefreshRequested"
-                          PullDirection="BottomToTop" Grid.Column="2">
-            <ScrollViewer>
-                <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical" Margin="20,40">
-                    <Grid animations:Connected.AnchorElement="{x:Bind bookCover}">
+                <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical" Margin="20,40"
+                            Grid.Column="2">
+                    <Grid x:Name="anchorGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="3.5*"/>
@@ -139,11 +140,11 @@
                         <TextBlock Text="Price:" Style="{StaticResource TitleTextStyle}" Grid.Row="5" Grid.Column="0"/>
                         <TextBlock Text="Other statistics:" Style="{StaticResource TitleTextStyle}" Grid.Row="6" Grid.Column="0"/>
                         <TextBlock Text="{x:Bind Detail.BookFullName, Mode=OneWay}"
-                                  Style="{StaticResource BookTextStyle}" Grid.Row="0" Grid.Column="1"/>
+                                   Style="{StaticResource BookTextStyle}" Grid.Row="0" Grid.Column="1"/>
                         <TextBlock Text="{x:Bind local:BookDetailPage.GetAllAuthors(Detail), Mode=OneWay}"
-                                  Style="{StaticResource BookTextStyle}" Grid.Row="1" Grid.Column="1"/>
+                                   Style="{StaticResource BookTextStyle}" Grid.Row="1" Grid.Column="1"/>
                         <TextBlock Text="{x:Bind Detail.Labels, Mode=OneWay}"
-                                  Style="{StaticResource BookTextStyle}" Grid.Row="2" Grid.Column="1"/>
+                                   Style="{StaticResource BookTextStyle}" Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="{x:Bind local:BookDetailPage.PublishInfoAndPage(Detail), Mode=OneWay}"
                                    Style="{StaticResource BookTextStyle}" Grid.Row="3" Grid.Column="1"/>
                         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" Margin="0,0,0,-10">
@@ -182,9 +183,8 @@
                     </Grid>
                     <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
                     <controls:AdaptiveGridView Style="{StaticResource AGVStyle}"
-                                               ItemsSource="{x:Bind Detail.RelatedBooks.Books}" Margin="15,5"
-                                               animations:Connected.ListItemElementName="relateBookImage"
-                                               animations:Connected.ListItemKey="listItem2">
+                                               ItemsSource="{x:Bind RelatedBooks, Mode=OneWay}" Margin="15,5"
+                                               x:Name="relatedBookGrid" Loaded="RelatedBookGrid_Loaded">
                         <controls:AdaptiveGridView.ItemTemplate>
                             <DataTemplate x:DataType="local:BookSummary">
                                 <StackPanel Margin="8,6" PointerReleased="StackPanel_PointerReleased" MaxWidth="150"
@@ -241,8 +241,9 @@
                     </ListView>
 
                 </StackPanel>
-            </ScrollViewer>
-        </RefreshContainer>
 
-    </Grid>
+            </Grid>
+
+        </ScrollViewer>
+    </RefreshContainer>
 </Page>
