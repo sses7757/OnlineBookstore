@@ -15,7 +15,6 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
 namespace Frontend
 {
@@ -34,6 +33,8 @@ namespace Frontend
         {
             base.OnNavigatedTo(e);
             var para = (string[])e.Parameter;
+            if (this.title == para[0] && this.description == para[1] && this.queryText == para[2])
+                return;
             this.title = para[0];
             this.description = para[1];
             this.queryText = para[2];
@@ -121,8 +122,8 @@ namespace Frontend
             if (addBooks)
             {
                 this.books.AddBooks();
-                await RefreshAsync();
-                //scroller.ChangeView(0, scroller.ScrollableHeight, 1);
+                await this.RefreshAsync();
+                bookGrid.ScrollIntoView(this.books.Books[this.books.Books.Count - 1]);
             }
             else
             {

@@ -204,9 +204,9 @@ namespace Frontend
         }
     }
 
-    internal class BillboardCollection: INotifyPropertyChanged
+    internal class BooklistCollection: INotifyPropertyChanged
     {
-        internal ObservableCollection<BookDetailCollection> Billboards { set; get; }
+        internal ObservableCollection<BookDetailCollection> Booklists { set; get; }
             = new ObservableCollection<BookDetailCollection>();
 
         private const int INIT_AMOUNT = 4;
@@ -219,19 +219,19 @@ namespace Frontend
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        internal BillboardCollection()
+        internal BooklistCollection()
         {
-            GetBillboards();
+            GetBooklists();
         }
 
-        private async void GetBillboards()
+        private async void GetBooklists()
         {
-            Billboards.Clear();
-            int[] ids = await Networks.GetBillboardIDs(INIT_AMOUNT, 0);
+            Booklists.Clear();
+            int[] ids = await Networks.GetTopBillboardIDs(INIT_AMOUNT, 0);
             foreach (int id in ids)
             {
                 var collection = new BookDetailCollection(Util.BILLBOARD_ID_QUERY + id);
-                Billboards.Add(collection);
+                Booklists.Add(collection);
             }
         }
 
@@ -239,16 +239,16 @@ namespace Frontend
         {
             if (addMore)
             {
-                int[] ids = await Networks.GetBillboardIDs(ADD_AMOUNT, Billboards.Count);
+                int[] ids = await Networks.GetTopBillboardIDs(ADD_AMOUNT, Booklists.Count);
                 foreach (int id in ids)
                 {
                     var collection = new BookDetailCollection(Util.BILLBOARD_ID_QUERY + id);
-                    Billboards.Add(collection);
+                    Booklists.Add(collection);
                 }
             }
             else
             {
-                GetBillboards();
+                GetBooklists();
             }
         }
     }
@@ -258,10 +258,12 @@ namespace Frontend
         internal ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
         internal string Title { set; get; }
         internal string Description { set; get; }
+        internal string CreateUser { set; get; }
+        internal DateTime EditTime { set; get; }
 
         internal bool finished = false;
 
-        private readonly string query = "";
+        internal readonly string query = "";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -356,6 +358,7 @@ namespace Frontend
 
         internal const string DIRECT_QUERY_PREFIX = "direct-";
         internal const string BILLBOARD_ID_QUERY = "billboard_id=";
+        internal const string SHELF_QUERY = "shelf";
 
         internal const int REFRESH_RATE = 500;
 
@@ -372,6 +375,7 @@ namespace Frontend
             return visible ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        /*
         internal static Visibility ReverseBoolToVisibility(bool notVisible)
         {
             return notVisible ? Visibility.Collapsed : Visibility.Visible;
@@ -381,6 +385,7 @@ namespace Frontend
         {
             return visible ? string.Format(format, str1) : string.Format(format, str2);
         }
+        */
 
         internal static string SHA256(string data)
         {
@@ -399,6 +404,20 @@ namespace Frontend
         internal static bool IsSubType(Type type, object obj)
         {
             return obj != null && type.IsAssignableFrom(obj.GetType());
+        }
+
+        internal const int LEVEL_DataTemplate = 10;
+
+        internal static UIElement GetParentUpto(UIElement elem, int level = 1)
+        {
+            if (level < 1)
+                return elem;
+            UIElement parent = Windows.UI.Xaml.Media.VisualTreeHelper.GetParent(elem) as UIElement;
+            for (int i = 1; i < level; ++i)
+            {
+                parent = Windows.UI.Xaml.Media.VisualTreeHelper.GetParent(parent) as UIElement;
+            }
+            return parent;
         }
     }
 

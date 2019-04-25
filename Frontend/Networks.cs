@@ -167,7 +167,7 @@ namespace Frontend
             }
         }
 
-        internal static async Task<int[]> GetBillboardIDs(int count, int from)
+        internal static async Task<int[]> GetTopBillboardIDs(int count, int from)
         {
             // TODO get top billboard ids
             await Task.Delay(100);
@@ -240,12 +240,12 @@ namespace Frontend
             }
 
             internal static async void GetBooksFromQuery(BookDetailCollection collection, string query,
-                                                       int amount, int from = 0)
+                                                         int amount = int.MaxValue, int from = 0)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
                 bool flag = true;
-                for (int i = from + 1; i <= amount + from; ++i)
+                for (int i = from + 1; i <= (amount == int.MaxValue ? 18 : amount) + from; ++i)
                 {
                     flag = await AddBookDetail(collection, i);
                     if (!flag)
@@ -255,12 +255,12 @@ namespace Frontend
             }
 
             internal static async void GetBooksFromQuery(BookSummaryCollection collection, string query,
-                                                       int amount, int from = 0)
+                                                         int amount = int.MaxValue, int from = 0)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
                 bool flag = true;
-                for (int i = from + 1; i <= amount + from; ++i)
+                for (int i = from + 1; i <= (amount == int.MaxValue ? 18 : amount) + from; ++i)
                 {
                     flag = await AddBookSummary(collection, i);
                     if (!flag)
@@ -289,8 +289,12 @@ namespace Frontend
                 // TODO
                 await Task.Delay(delay);
                 collection.Title = "Test billboard title";
+                collection.CreateUser = "Test user name";
+                collection.EditTime = DateTime.Now;
                 collection.Description = "Test billboard descriptions: test test test test test test";
                 collection.OnPropertyChanged("Title");
+                collection.OnPropertyChanged("CreateUser");
+                collection.OnPropertyChanged("EditTime");
                 collection.OnPropertyChanged("Description");
             }
         }
