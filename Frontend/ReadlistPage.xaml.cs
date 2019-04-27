@@ -28,7 +28,7 @@ namespace Frontend
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            Readlists = new BooklistCollection();
+            Readlists = new BooklistCollection(false);
             WaitLoading();
         }
 
@@ -165,6 +165,11 @@ namespace Frontend
 
             this._navigateParentItem = null;
             this._navigateItem = null;
+        }
+
+        internal static string DateFollow(DateTime date, int followers)
+        {
+            return string.Format("Last edit at:\t{0}\n#Followers:\t{1}", date.ToShortDateString(), followers);
         }
     }
 }

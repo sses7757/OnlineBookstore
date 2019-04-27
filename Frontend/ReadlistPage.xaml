@@ -29,7 +29,7 @@
                                 <Grid Style="{StaticResource BoardPanelStyle}" HorizontalAlignment="Stretch"
                                       Margin="8,20" Padding="13,0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
@@ -40,8 +40,7 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Style="{StaticResource TitleTextStyle}"
-                                               Text="{x:Bind Title, Mode=OneWay}"
+                                    <TextBlock Style="{StaticResource TitleTextStyle}" Text="{x:Bind Title, Mode=OneWay}"
                                                Grid.Column="0" Grid.Row="0" Margin="0,15,0,0"/>
                                     <HyperlinkButton Style="{StaticResource ShowAllBtnStyle}" Margin="0,15,0,0"
                                                      Click="HyperlinkButton_Click" Grid.Column="1" Grid.Row="0"/>
@@ -49,7 +48,7 @@
                                                Text="{x:Bind CreateUser, Mode=OneWay}" Margin="0,10,0,0"
                                                Grid.Column="0" Grid.Row="1"/>
                                     <TextBlock Style="{StaticResource DescriptionTextStyle}" FontWeight="SemiLight"
-                                               Text="{x:Bind EditTime.ToShortDateString(), Mode=OneWay}"
+                                               Text="{x:Bind local:ReadlistPage.DateFollow(EditTime, FollowAmount), Mode=OneWay}"
                                                Margin="0,10,0,0" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"/>
                                     <TextBlock Style="{StaticResource DescriptionTextStyle}"
                                                Text="{x:Bind Description, Mode=OneWay}" Margin="0,10"

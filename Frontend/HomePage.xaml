@@ -32,8 +32,9 @@
                                     <GridView ItemsSource="{x:Bind AllSubs, Mode=OneWay}"
                                               HorizontalAlignment="Stretch" SelectionMode="None">
                                         <GridView.ItemTemplate>
-                                            <DataTemplate x:DataType="x:String">
-                                                <HyperlinkButton Content="{Binding}" Margin="5,0" FontSize="16"
+                                            <DataTemplate x:DataType="local:SubLabel">
+                                                <HyperlinkButton Content="{x:Bind Name, Mode=OneWay}"
+                                                                 Margin="5,0" FontSize="16"
                                                                  Click="HyperlinkButton_Click_SubLabel"/>
                                             </DataTemplate>
                                         </GridView.ItemTemplate>
@@ -42,8 +43,9 @@
                                         <GridView ItemsSource="{x:Bind HotSubs, Mode=OneWay}"
                                                   HorizontalAlignment="Stretch" SelectionMode="None">
                                             <GridView.ItemTemplate>
-                                                <DataTemplate x:DataType="x:String">
-                                                    <HyperlinkButton Content="{Binding}" Margin="5,0" FontSize="16"
+                                                <DataTemplate x:DataType="local:SubLabel">
+                                                    <HyperlinkButton Content="{x:Bind Name, Mode=OneWay}"
+                                                                     Margin="5,0" FontSize="16"
                                                                      Click="HyperlinkButton_Click_SubLabel"/>
                                                 </DataTemplate>
                                             </GridView.ItemTemplate>

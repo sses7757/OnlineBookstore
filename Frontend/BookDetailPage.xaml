@@ -85,6 +85,7 @@
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Full Name:" Style="{StaticResource TitleTextStyle}" Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Author(s):" Style="{StaticResource TitleTextStyle}" Grid.Row="1" Grid.Column="0"/>
@@ -93,6 +94,7 @@
                         <TextBlock Text="Overall rating:" Style="{StaticResource TitleTextStyle}" Grid.Row="4" Grid.Column="0"/>
                         <TextBlock Text="Price:" Style="{StaticResource TitleTextStyle}" Grid.Row="5" Grid.Column="0"/>
                         <TextBlock Text="Other statistics:" Style="{StaticResource TitleTextStyle}" Grid.Row="6" Grid.Column="0"/>
+                        <TextBlock Text="ISBN:" Style="{StaticResource TitleTextStyle}" Grid.Row="7" Grid.Column="0"/>
                         <TextBlock Text="{x:Bind Detail.BookFullName, Mode=OneWay}"
                                    Style="{StaticResource BookTextStyle}" Grid.Row="0" Grid.Column="1"/>
                         <TextBlock Text="{x:Bind local:BookDetailPage.GetAllAuthors(Detail), Mode=OneWay}"
@@ -111,6 +113,8 @@
                                    Style="{StaticResource BookTextStyle}" Grid.Row="5" Grid.Column="1"/>
                         <TextBlock Text="{x:Bind local:BookDetailPage.OtherStatistic(Detail), Mode=OneWay}"
                                    Style="{StaticResource BookTextStyle}" Grid.Row="6" Grid.Column="1"/>
+                        <TextBlock Text="{x:Bind Detail.ISBN, Mode=OneWay}"
+                                   Style="{StaticResource BookTextStyle}" Grid.Row="7" Grid.Column="1"/>
                     </Grid>
 
                     <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}" Margin="10,4,10,0"/>

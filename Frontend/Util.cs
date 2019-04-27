@@ -6,18 +6,291 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Frontend
 {
+    internal enum ContentType
+    {
+        Books,
+        Billboards,
+        ReadLists
+    }
+
+    internal enum BooksOrderType
+    {
+        Recommend,
+        Time,
+        Rating,
+        Price,
+        Discount,
+        ReviewAmount,
+        BuyAmount,
+        DanmuAmount,
+        PreviewAmount,
+        PageCount
+    }
+
+    internal enum BillboardsOrderType
+    {
+        Recommend,
+        Time
+    }
+
+    internal enum ReadlistsOrderType
+    {
+        Recommend,
+        Time,
+        FollowAmount
+    }
+
+    internal enum TimeSpanType
+    {
+        All,
+        Year,
+        Month,
+        Week
+    }
+
+    internal class SearchInfo: INotifyPropertyChanged
+    {
+        internal SearchInfo(string query)
+        {
+            this.QueryText = query;
+            this.Init();
+        }
+
+        private readonly ObservableCollection<ComboBoxItem> BookOrders =
+            new ObservableCollection<ComboBoxItem>();
+        private readonly ObservableCollection<ComboBoxItem> BillboardOrders = 
+            new ObservableCollection<ComboBoxItem>();
+        private readonly ObservableCollection<ComboBoxItem> ReadListOrders = 
+            new ObservableCollection<ComboBoxItem>();
+
+        private BooksOrderType OrderOfBooks;
+        private BillboardsOrderType OrderOfBillboards;
+        private ReadlistsOrderType OrderOfReadlists;
+
+        internal ObservableCollection<ComboBoxItem> OrderItems {
+            get {
+                switch (this.QueryType)
+                {
+                    case ContentType.Books:
+                        return BookOrders;
+                    case ContentType.Billboards:
+                        return BillboardOrders;
+                    case ContentType.ReadLists:
+                        return ReadListOrders;
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        internal void FromIndexSetOrder(int index)
+        {
+            switch (this.QueryType)
+            {
+                case ContentType.Books:
+                    this.OrderOfBooks = (BooksOrderType)index;
+                    break;
+                case ContentType.Billboards:
+                    this.OrderOfBillboards = (BillboardsOrderType)index;
+                    break;
+                case ContentType.ReadLists:
+                    this.OrderOfReadlists = (ReadlistsOrderType)index;
+                    break;
+                default:
+                    return;
+            }
+            this.OnPropertyChanged("OrderItems");
+            this.OnPropertyChanged(null);
+        }
+
+        internal int OrderToIndex()
+        {
+            return this.OrderToIndex(this.QueryType);
+        }
+
+        private int OrderToIndex(ContentType type)
+        {
+            switch (type)
+            {
+                case ContentType.Books:
+                    return (int)this.OrderOfBooks;
+                case ContentType.Billboards:
+                    return (int)this.OrderOfBillboards;
+                case ContentType.ReadLists:
+                    return (int)this.OrderOfReadlists;
+                default:
+                    return -1;
+            }
+        }
+
+        internal const int MAX_PAGE_RANGE = 500;
+        internal const int MIN_YEAR_RANGE = -50;
+        internal const int MIN_MONTH_RANGE = -24;
+        internal const int MIN_WEEK_RANGE = -24;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged(string name)
+        {
+            if (name != null)
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            if (name != "OrderItems")
+                this.Refresh();
+        }
+
+        internal string QueryText { set; get; } = "";
+        internal ContentType QueryType { set; get; }
+        internal bool OrderDescend { set; get; }
+        internal TimeSpanType TimeRangeType { set; get; }
+        internal Range<int> TimeRange { set; get; } = new Range<int>(MIN_YEAR_RANGE, 0, MIN_YEAR_RANGE);
+        internal Range<int> PageRange { set; get; } = new Range<int>(0, MAX_PAGE_RANGE, MAX_PAGE_RANGE);
+        internal bool IncludeFreeBooks { set; get; }
+
+        private readonly List<string> LabelFilters = new List<string>();
+
+        private void Init()
+        {
+            foreach (BooksOrderType t in Enum.GetValues(typeof(BooksOrderType)))
+                BookOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t)});
+            foreach (BillboardsOrderType t in Enum.GetValues(typeof(BillboardsOrderType)))
+                BillboardOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t) });
+            foreach (ReadlistsOrderType t in Enum.GetValues(typeof(ReadlistsOrderType)))
+                ReadListOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t) });
+            Books = new BookDetailCollection(this.ToQueryString(ContentType.Books),
+                                             "Search result of " + this.QueryText, "");
+            Billboards = new BookDetailCollection(this.ToQueryString(ContentType.Billboards));
+            ReadLists = new BookDetailCollection(this.ToQueryString(ContentType.ReadLists));
+        }
+
+        internal void Refresh(bool add = false)
+        {
+            switch (this.QueryType)
+            {
+                case ContentType.Books:
+                    if (!Books.finished)
+                        return;
+                    break;
+                case ContentType.Billboards:
+                    if (!Billboards.finished)
+                        return;
+                    break;
+                case ContentType.ReadLists:
+                    if (!ReadLists.finished)
+                        return;
+                    break;
+                default:
+                    return;
+            }
+
+            if (add)
+            {
+                switch (this.QueryType)
+                {
+                    case ContentType.Books:
+                        Books.AddBooks();
+                        break;
+                    case ContentType.Billboards:
+                        Billboards.AddBooks();
+                        break;
+                    case ContentType.ReadLists:
+                        ReadLists.AddBooks();
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                switch (this.QueryType)
+                {
+                    case ContentType.Books:
+                        Books.ReloadBooks(this.ToQueryString(), "Search result of " + this.QueryText);
+                        break;
+                    case ContentType.Billboards:
+                        Billboards.ReloadBooks(this.ToQueryString(), "Search result of " + this.QueryText);
+                        break;
+                    case ContentType.ReadLists:
+                        ReadLists.ReloadBooks(this.ToQueryString(), "Search result of " + this.QueryText);
+                        break;
+                    default:
+                        return;
+                }
+            }
+        }
+
+        private string ToQueryString()
+        {
+            return this.ToQueryString(this.QueryType);
+        }
+
+        private string ToQueryString(ContentType type)
+        {
+            var str = "QueryText=" + QueryText;
+            str += "\nResultOrder=" + this.OrderToIndex(type);
+            str += "\nOrderDescend=" + OrderDescend;
+            str += "\nTimeRangeType=" + (int)TimeRangeType;
+            str += "\nTimeRange=" + TimeRange.ToFormalString();
+            str += "\nPageRange=" + PageRange.ToFormalString();
+            str += "\nLabelFilters=" + Util.ListToString<string>(LabelFilters);
+            str += "\nIncludeFreeBooks=" + IncludeFreeBooks;
+            return str;
+        }
+
+        internal void LabelFilterChanged()
+        {
+            this.LabelFilters.Clear();
+            foreach (var mainLabel in Util.LABELS)
+            {
+                if (mainLabel.Selected)
+                {
+                    this.LabelFilters.Add(mainLabel.Name + "-All");
+                }
+                else
+                {
+                    var selected = mainLabel.SelectedSubs;
+                    foreach (var sub in selected)
+                    {
+                        this.LabelFilters.Add(mainLabel.Name + "-" + sub.Name);
+                    }
+                }
+            }
+            this.OnPropertyChanged(null);
+        }
+
+        internal BookDetailCollection Books { set; get; }
+        internal BookDetailCollection Billboards { set; get; }
+        internal BookDetailCollection ReadLists { set; get; }
+
+    }
+
     internal class Label : INotifyPropertyChanged
     {
         internal string Name { set; get; }
-        internal ObservableCollection<string> AllSubs { get; set; } = new ObservableCollection<string>();
+        internal ObservableCollection<SubLabel> AllSubs { get; set; } = new ObservableCollection<SubLabel>();
 
-        internal ObservableCollection<string> HotSubs {
-            get => new ObservableCollection<string>(AllSubs.Take(HOT_AMOUNT));
+        internal ObservableCollection<SubLabel> HotSubs {
+            get => new ObservableCollection<SubLabel>(AllSubs.Take(HOT_AMOUNT));
         }
+        internal ObservableCollection<SubLabel> SelectedSubs {
+            get {
+                List<SubLabel> subs = new List<SubLabel>();
+                foreach (SubLabel l in AllSubs)
+                {
+                    if (l.Selected)
+                    {
+                        subs.Add(l);
+                    }
+                }
+                return new ObservableCollection<SubLabel>(subs);
+            }
+        }
+
+        internal bool Selected { set; get; }
 
         private const int HOT_AMOUNT = 8;
 
@@ -29,9 +302,81 @@ namespace Frontend
             }
         }
 
-        internal Label(string name)
+        internal Label(string name, bool selected = false)
         {
-            this.Name = name;
+            Name = name;
+            Selected = selected;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void CheckSubLabelFull()
+        {
+            if (this.Selected && this.SelectedSubs.Count < this.AllSubs.Count)
+            {
+                this.Selected = false;
+                OnPropertyChanged("Selected");
+            }
+            else if (this.Selected && this.SelectedSubs.Count == this.AllSubs.Count)
+            {
+                this.Selected = true;
+                OnPropertyChanged("Selected");
+            }
+        }
+
+        internal void OnPropertyChanged(string name)
+        {
+            if (name != "Selected")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+                return;
+            }
+            // name == Selected
+            if (Selected)
+            {
+                foreach (SubLabel l in AllSubs)
+                {
+                    l.Selected = true;
+                    l.OnPropertyChanged("Selected");
+                }
+            }
+            else
+            {
+                bool allSubSelected = true;
+                foreach (SubLabel l in AllSubs)
+                {
+                    if (!l.Selected)
+                    {
+                        allSubSelected = false;
+                        break;
+                    }
+                }
+                if (allSubSelected)
+                {
+                    foreach (SubLabel l in AllSubs)
+                    {
+                        l.Selected = false;
+                        l.OnPropertyChanged("Selected");
+                    }
+                }
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedSubs"));
+        }
+    }
+
+    internal class SubLabel : INotifyPropertyChanged
+    {
+        internal string Name { set; get; }
+        internal bool Selected { set; get; }
+
+        internal Label Parent;
+
+        internal SubLabel(string name, Label parent, bool selected = false)
+        {
+            Name = name;
+            Selected = selected;
+            this.Parent = parent;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,19 +384,6 @@ namespace Frontend
         internal void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-    }
-
-    internal class ReadList
-    {
-        internal string CreateUser { set; get; }
-        internal string Title { set; get; }
-        internal string Description { set; get; }
-        internal BookSummaryCollection BookCollection { get; set; } = new BookSummaryCollection();
-
-        internal ReadList()
-        {
-
         }
     }
 
@@ -219,36 +551,42 @@ namespace Frontend
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        internal BooklistCollection()
-        {
-            GetBooklists();
-        }
+        private readonly bool isBillBoard;
 
-        private async void GetBooklists()
+        internal BooklistCollection(bool isBillBoard)
         {
-            Booklists.Clear();
-            int[] ids = await Networks.GetTopBillboardIDs(INIT_AMOUNT, 0);
-            foreach (int id in ids)
-            {
-                var collection = new BookDetailCollection(Util.BILLBOARD_ID_QUERY + id);
-                Booklists.Add(collection);
-            }
+            this.isBillBoard = isBillBoard;
+            Refresh();
         }
 
         internal async void Refresh(bool addMore = false)
         {
+            if (!addMore)
+            {
+                Booklists.Clear();
+            }
+
+            int[] ids;
             if (addMore)
             {
-                int[] ids = await Networks.GetTopBillboardIDs(ADD_AMOUNT, Booklists.Count);
-                foreach (int id in ids)
-                {
-                    var collection = new BookDetailCollection(Util.BILLBOARD_ID_QUERY + id);
-                    Booklists.Add(collection);
-                }
+                if (this.isBillBoard)
+                    ids = await Networks.GetTopBillboardIDs(ADD_AMOUNT, Booklists.Count);
+                else
+                    ids = await Networks.GetTopReadListIDs(ADD_AMOUNT, Booklists.Count);
             }
             else
             {
-                GetBooklists();
+                if (this.isBillBoard)
+                    ids = await Networks.GetTopBillboardIDs(INIT_AMOUNT, 0);
+                else
+                    ids = await Networks.GetTopReadListIDs(INIT_AMOUNT, 0);
+            }
+            foreach (int id in ids)
+            {
+                var collection = new BookDetailCollection(
+                    (this.isBillBoard ? Util.BILLBOARD_ID_QUERY : Util.READLIST_ID_QUERY)
+                    + id);
+                Booklists.Add(collection);
             }
         }
     }
@@ -260,10 +598,11 @@ namespace Frontend
         internal string Description { set; get; }
         internal string CreateUser { set; get; }
         internal DateTime EditTime { set; get; }
+        internal int FollowAmount { set; get; }
 
         internal bool finished = false;
 
-        internal readonly string query = "";
+        internal string query = "";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -277,20 +616,30 @@ namespace Frontend
             this.query = query;
             Title = title;
             Description = content;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, Util.INIT_AMOUNT);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.INIT_AMOUNT);
         }
 
         internal BookDetailCollection(string query)
         {
             this.query = query;
-            Networks.RemoteBookCollection.GetTitleDescription(this, query);
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, Util.PREVIEW_AMOUNT);
+            Networks.RemoteBookCollection.GetTitleDescription(this, this.query);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.PREVIEW_AMOUNT);
+        }
+
+        internal void ReloadBooks(string newQuery, string newTitle)
+        {
+            this.Books.Clear();
+            this.query = newQuery;
+            this.Title = newTitle;
+            this.OnPropertyChanged("Title");
+            this.finished = false;
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.PREVIEW_AMOUNT);
         }
 
         internal void AddBooks()
         {
             this.finished = false;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, query, Util.ADD_AMOUNT, this.Books.Count);
+            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.ADD_AMOUNT, this.Books.Count);
         }
     }
 
@@ -358,17 +707,18 @@ namespace Frontend
 
         internal const string DIRECT_QUERY_PREFIX = "direct-";
         internal const string BILLBOARD_ID_QUERY = "billboard_id=";
+        internal const string READLIST_ID_QUERY = "readlist_id=";
         internal const string SHELF_QUERY = "shelf";
 
         internal const int REFRESH_RATE = 500;
 
         internal const string WAIT_STR = "Waiting...";
 
-        internal static int UserId = 0;
+        internal static int UserId = -1;
         internal static bool isAdmin = false;
         internal static MainPage main;
 
-
+        internal static ObservableCollection<Label> LABELS;
 
         internal static Visibility BoolToVisibility(bool visible)
         {
@@ -419,6 +769,28 @@ namespace Frontend
             }
             return parent;
         }
+
+        internal static string EnumToString(Enum e)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(e.ToString("F"), @"(\p{Lu})", " $1").TrimStart();
+        }
+
+        internal static string ListToString<T>(List<T> list)
+        {
+            var str = "";
+            foreach (T elem in list)
+            {
+                str += elem.ToString();
+            }
+            if (str.Length == 0)
+            {
+                return "All";
+            }
+            else
+            {
+                return "(" + str + ")";
+            }
+        }
     }
 
     internal interface IRefreshAdminInterface
@@ -426,5 +798,90 @@ namespace Frontend
         void RefreshButtonPressed();
 
         void AdminButtonPressed(bool isChecked);
+    }
+
+    /// <summary>The Range class. From drharris on Stackoverflow</summary>
+    /// <typeparam name="T">Generic parameter.</typeparam>
+    internal class Range<T> where T : IComparable<T>
+    {
+        private readonly T inf = default;
+        private readonly T minusInf = default;
+
+        internal Range(T min, T max, T valueAsInf)
+        {
+            if (max.CompareTo(min) < 0)
+                return;
+            Minimum = min;
+            Maximum = max;
+            if (valueAsInf.CompareTo(max) >= 0)
+            {
+                this.inf = valueAsInf;
+            }
+            else if (valueAsInf.CompareTo(min) <= 0)
+            {
+                this.minusInf = valueAsInf;
+            }
+        }
+
+        /// <summary>Minimum value of the range.</summary>
+        internal T Minimum { get; set; }
+
+        /// <summary>Maximum value of the range.</summary>
+        internal T Maximum { get; set; }
+
+        /// <summary>Presents the Range in readable format.</summary>
+        /// <returns>String representation of the Range</returns>
+        public override string ToString()
+        {
+            if (this.Maximum.CompareTo(this.inf) == 0 && this.inf.CompareTo(default) > 0)
+                return string.Format("[{0} ~ ∞]", this.Minimum);
+            else if (this.Minimum.CompareTo(this.minusInf) == 0 && this.minusInf.CompareTo(default) < 0)
+                return string.Format("[-∞ ~ {0}]", this.Maximum);
+            else
+                return string.Format("[{0} ~ {1}]", this.Minimum, this.Maximum);
+        }
+
+        internal string ToFormalString()
+        {
+            if (this.Maximum.CompareTo(this.inf) == 0 && this.inf.CompareTo(default) > 0)
+                return string.Format("({0},inf)", this.Minimum);
+            else if (this.Minimum.CompareTo(this.minusInf) == 0 && this.minusInf.CompareTo(default) < 0)
+                return string.Format("(-inf,{0})", this.Maximum);
+            else
+                return string.Format("({0},{1})", this.Minimum, this.Maximum);
+        }
+
+        /// <summary>Determines if the range is valid.</summary>
+        /// <returns>True if range is valid, else false</returns>
+        internal bool IsValid()
+        {
+            return this.Minimum.CompareTo(this.Maximum) <= 0;
+        }
+
+        /// <summary>Determines if the provided value is inside the range.</summary>
+        /// <param name="value">The value to test</param>
+        /// <returns>True if the value is inside Range, else false</returns>
+        internal bool ContainsValue(T value)
+        {
+            return (this.Minimum.CompareTo(value) <= 0) && (value.CompareTo(this.Maximum) <= 0);
+        }
+
+        /// <summary>Determines if this Range is inside the bounds of another range.</summary>
+        /// <param name="Range">The parent range to test on</param>
+        /// <returns>True if range is inclusive, else false</returns>
+        internal bool IsInsideRange(Range<T> range)
+        {
+            return this.IsValid() && range.IsValid() && range.ContainsValue(this.Minimum)
+                && range.ContainsValue(this.Maximum);
+        }
+
+        /// <summary>Determines if another range is inside the bounds of this range.</summary>
+        /// <param name="Range">The child range to test</param>
+        /// <returns>True if range is inside, else false</returns>
+        internal bool ContainsRange(Range<T> range)
+        {
+            return this.IsValid() && range.IsValid() && this.ContainsValue(range.Minimum)
+                && this.ContainsValue(range.Maximum);
+        }
     }
 }

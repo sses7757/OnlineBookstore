@@ -22,7 +22,7 @@ namespace Frontend
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class HomePage : Page, INotifyPropertyChanged, IRefreshAdminInterface
+    public sealed partial class HomePage : Page, IRefreshAdminInterface
     {
         public HomePage()
         {
@@ -38,6 +38,7 @@ namespace Frontend
             }
             this.UpdateLabels();
             WaitLoading();
+            Util.LABELS = this.Labels;
         }
 
         /// <summary>
@@ -107,14 +108,7 @@ namespace Frontend
             }
         }
 
-        private Dictionary<BookSummaryCollectionType, BookSummaryCollection> collections;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        private readonly Dictionary<BookSummaryCollectionType, BookSummaryCollection> collections;
 
         internal ObservableCollection<Label> Labels { set; get; } = new ObservableCollection<Label>();
 
@@ -148,11 +142,9 @@ namespace Frontend
                 else
                 {
                     await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
-                    OnPropertyChanged("Label");
                 }
             }
             await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
-            OnPropertyChanged("Label");
         }
 
         private async void UpdateLabels()
@@ -165,7 +157,6 @@ namespace Frontend
                 Labels.Add(l);
                 l.RetriveSubs();
             }
-            OnPropertyChanged("Label");
         }
 
         private void HyperlinkButton_Click_Best(object sender, RoutedEventArgs e)

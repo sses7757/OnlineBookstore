@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.System;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -26,6 +27,10 @@ namespace Frontend
         public MainPage()
         {
             this.InitializeComponent();
+
+            ApplicationView.PreferredLaunchViewSize = new Size(1440, 960);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
             ShowSearch(false);
         }
 
@@ -262,27 +267,28 @@ namespace Frontend
         private void SearchMain_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             var query = args.QueryText;
+            if (query.Length <= 3)
+                return;
             ShowSearch(true);
-            NavView.SelectedItem = NavView.MenuItems[2];
-            NavView_Navigate("search", null, true, query);
+            NavView_Navigate("search", null, true, new SearchInfo(query));
+            //NavView.SelectedItem = NavView.MenuItems[2];
         }
 
         private void Refresh_Pressed(object sender, RoutedEventArgs e)
         {
             if (ContentFrame.SourcePageType != null)
             {
-                ((IRefreshAdminInterface)ContentFrame.Content).RefreshButtonPressed();
+                (ContentFrame.Content as IRefreshAdminInterface)?.RefreshButtonPressed();
             }
-            
         }
 
         private void Admin_Pressed(object sender, RoutedEventArgs e)
         {
             if (ContentFrame.SourcePageType != null)
             {
-                var c = ((AppBarToggleButton)sender).IsChecked;
-                if (c.HasValue)
-                    ((IRefreshAdminInterface)ContentFrame.Content).AdminButtonPressed(c.Value);
+                var c = (sender as AppBarToggleButton)?.IsChecked;
+                if (c != null && c.HasValue)
+                    (ContentFrame.Content as IRefreshAdminInterface).AdminButtonPressed(c.Value);
             }
         }
     }

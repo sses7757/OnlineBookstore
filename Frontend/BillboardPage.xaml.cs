@@ -29,7 +29,7 @@ namespace Frontend
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            Billboards = new BooklistCollection();
+            Billboards = new BooklistCollection(true);
             WaitLoading();
         }
 

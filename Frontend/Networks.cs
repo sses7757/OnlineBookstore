@@ -36,7 +36,7 @@ namespace Frontend
         {
             // TODO
             await Task.Delay(4000);
-            Util.UserId = 0;
+            Util.UserId = -1;
             Util.isAdmin = false;
             return true;
         }
@@ -60,7 +60,7 @@ namespace Frontend
             await Task.Delay(1000);
             for (int i = 0; i < 15; ++i)
             {
-                label.AllSubs.Add("AA");
+                label.AllSubs.Add(new SubLabel("AA", label));
                 label.OnPropertyChanged("HotSubs");
                 await Task.Delay(200);
             }
@@ -150,7 +150,7 @@ namespace Frontend
         }
 
         internal static async void RemoteGetReviews(BookDetail book, int from = 0,
-                                                        int count = BookDetail.REVIEW_ONE_TIME)
+                                                    int count = BookDetail.REVIEW_ONE_TIME)
         {
             // TODO get book reviews (from -> from + count)
             await Task.Delay(1000);
@@ -175,6 +175,18 @@ namespace Frontend
             for (int i = from; i < from + count; ++i)
             {
                 ids.Add(i + 156);
+            }
+            return ids.ToArray();
+        }
+        
+        internal static async Task<int[]> GetTopReadListIDs(int count, int from)
+        {
+            // TODO get top billboard ids
+            await Task.Delay(100);
+            List<int> ids = new List<int>(count);
+            for (int i = from; i < from + count; ++i)
+            {
+                ids.Add(i + 57);
             }
             return ids.ToArray();
         }
@@ -240,12 +252,12 @@ namespace Frontend
             }
 
             internal static async void GetBooksFromQuery(BookDetailCollection collection, string query,
-                                                         int amount = int.MaxValue, int from = 0)
+                                                         int count = int.MaxValue, int from = 0)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
                 bool flag = true;
-                for (int i = from + 1; i <= (amount == int.MaxValue ? 18 : amount) + from; ++i)
+                for (int i = from + 1; i <= (count == int.MaxValue ? 18 : count) + from; ++i)
                 {
                     flag = await AddBookDetail(collection, i);
                     if (!flag)
@@ -255,12 +267,12 @@ namespace Frontend
             }
 
             internal static async void GetBooksFromQuery(BookSummaryCollection collection, string query,
-                                                         int amount = int.MaxValue, int from = 0)
+                                                         int count = int.MaxValue, int from = 0)
             {
                 // TODO get book ids
                 await Task.Delay(delay);
                 bool flag = true;
-                for (int i = from + 1; i <= (amount == int.MaxValue ? 18 : amount) + from; ++i)
+                for (int i = from + 1; i <= (count == int.MaxValue ? 18 : count) + from; ++i)
                 {
                     flag = await AddBookSummary(collection, i);
                     if (!flag)
@@ -292,10 +304,13 @@ namespace Frontend
                 collection.CreateUser = "Test user name";
                 collection.EditTime = DateTime.Now;
                 collection.Description = "Test billboard descriptions: test test test test test test";
+                collection.FollowAmount = 324;
                 collection.OnPropertyChanged("Title");
                 collection.OnPropertyChanged("CreateUser");
                 collection.OnPropertyChanged("EditTime");
                 collection.OnPropertyChanged("Description");
+                collection.OnPropertyChanged("FollowAmount");
+
             }
         }
     }

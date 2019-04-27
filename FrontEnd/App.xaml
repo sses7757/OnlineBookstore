@@ -9,6 +9,7 @@
         <Style TargetType="TextBlock" x:Key="TitleTextStyle">
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextWrapping" Value="WrapWholeWords"/>
             <Setter Property="VerticalAlignment" Value="Bottom"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}"/>
