@@ -25,17 +25,17 @@ namespace Frontend
         public BookshelfPage()
         {
             this.InitializeComponent();
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            Networks.RemoteBookCollection.GetBooksFromQuery(ShelfBooks, Util.SHELF_QUERY);
-            WaitLoading();
+            this.Refresh();
         }
 
-        internal BookSummaryCollection ShelfBooks { set; get; } = new BookSummaryCollection();
+        internal BookSummaryCollection ShelfBooks { set; get; }
+            = new BookSummaryCollection(BookSummaryCollection.OtherType.Bookshelf);
 
         private async void WaitLoading()
         {
-            while (!ShelfBooks.finished)
+            while (!ShelfBooks.Finished)
             {
                 await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
             }
@@ -47,9 +47,7 @@ namespace Frontend
             if (!loadingControl.IsLoading)
             {
                 loadingControl.IsLoading = true;
-                ShelfBooks.Books.Clear();
-                ShelfBooks.finished = false;
-                Networks.RemoteBookCollection.GetBooksFromQuery(ShelfBooks, Util.SHELF_QUERY);
+                ShelfBooks.Reload();
                 WaitLoading();
             }
         }
@@ -66,7 +64,7 @@ namespace Frontend
 
         public void AdminButtonPressed(bool isChecked)
         {
-            throw new NotImplementedException();
+            // do nothing
         }
 
         /// <summary>
@@ -74,7 +72,7 @@ namespace Frontend
         /// </summary>
         private void GridView_ItemClick(object sender, PointerRoutedEventArgs e)
         {
-
+            // TODO
         }
     }
 }

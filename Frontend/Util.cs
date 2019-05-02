@@ -90,6 +90,8 @@ namespace Frontend
 
         internal void FromIndexSetOrder(int index)
         {
+            if (index < 0)
+                return;
             switch (this.QueryType)
             {
                 case ContentType.Books:
@@ -153,6 +155,10 @@ namespace Frontend
 
         private readonly List<string> LabelFilters = new List<string>();
 
+        internal BookDetailCollection Books { set; get; }
+        internal BooklistCollection Billboards { set; get; }
+        internal BooklistCollection ReadLists { set; get; }
+
         private void Init()
         {
             foreach (BooksOrderType t in Enum.GetValues(typeof(BooksOrderType)))
@@ -161,30 +167,33 @@ namespace Frontend
                 BillboardOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t) });
             foreach (ReadlistsOrderType t in Enum.GetValues(typeof(ReadlistsOrderType)))
                 ReadListOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t) });
-            Books = new BookDetailCollection(this.ToQueryString(ContentType.Books),
+            Books = new BookDetailCollection(this.ToQueryObject(ContentType.Books),
                                              "Search result of " + this.QueryText, "");
-            Billboards = new BookDetailCollection(this.ToQueryString(ContentType.Billboards));
-            ReadLists = new BookDetailCollection(this.ToQueryString(ContentType.ReadLists));
+            Billboards = new BooklistCollection(true, this.ToQueryObject(ContentType.Billboards));
+            ReadLists = new BooklistCollection(false, this.ToQueryObject(ContentType.ReadLists));
         }
 
-        internal void Refresh(bool add = false)
+        internal void Refresh(bool add = false, bool force = false)
         {
-            switch (this.QueryType)
+            if (!force)
             {
-                case ContentType.Books:
-                    if (!Books.finished)
+                switch (this.QueryType)
+                {
+                    case ContentType.Books:
+                        if (!Books.Finished)
+                            return;
+                        break;
+                    case ContentType.Billboards:
+                        if (!Billboards.Finished)
+                            return;
+                        break;
+                    case ContentType.ReadLists:
+                        if (!ReadLists.Finished)
+                            return;
+                        break;
+                    default:
                         return;
-                    break;
-                case ContentType.Billboards:
-                    if (!Billboards.finished)
-                        return;
-                    break;
-                case ContentType.ReadLists:
-                    if (!ReadLists.finished)
-                        return;
-                    break;
-                default:
-                    return;
+                }
             }
 
             if (add)
@@ -195,10 +204,10 @@ namespace Frontend
                         Books.AddBooks();
                         break;
                     case ContentType.Billboards:
-                        Billboards.AddBooks();
+                        Billboards.Reload(true);
                         break;
                     case ContentType.ReadLists:
-                        ReadLists.AddBooks();
+                        ReadLists.Reload(true);
                         break;
                     default:
                         return;
@@ -209,13 +218,13 @@ namespace Frontend
                 switch (this.QueryType)
                 {
                     case ContentType.Books:
-                        Books.ReloadBooks(this.ToQueryString(), "Search result of " + this.QueryText);
+                        _ = Books.ReloadBooks(this.ToQueryObject(), "Search result of " + this.QueryText);
                         break;
                     case ContentType.Billboards:
-                        Billboards.ReloadBooks(this.ToQueryString(), "Search result of " + this.QueryText);
+                        Billboards.Reload();
                         break;
                     case ContentType.ReadLists:
-                        ReadLists.ReloadBooks(this.ToQueryString(), "Search result of " + this.QueryText);
+                        ReadLists.Reload();
                         break;
                     default:
                         return;
@@ -223,22 +232,29 @@ namespace Frontend
             }
         }
 
-        private string ToQueryString()
+        private QueryObject ToQueryObject()
         {
-            return this.ToQueryString(this.QueryType);
+            return this.ToQueryObject(this.QueryType);
         }
 
-        private string ToQueryString(ContentType type)
+        private QueryObject ToQueryObject(ContentType type)
         {
-            var str = "QueryText=" + QueryText;
-            str += "\nResultOrder=" + this.OrderToIndex(type);
-            str += "\nOrderDescend=" + OrderDescend;
-            str += "\nTimeRangeType=" + (int)TimeRangeType;
-            str += "\nTimeRange=" + TimeRange.ToFormalString();
-            str += "\nPageRange=" + PageRange.ToFormalString();
-            str += "\nLabelFilters=" + Util.ListToString<string>(LabelFilters);
-            str += "\nIncludeFreeBooks=" + IncludeFreeBooks;
-            return str;
+            QueryObject query = new QueryObject()
+            {
+                SearchType = (int)type,
+                IsBillboard = type == ContentType.Books ? (bool?)null :
+                                (type == ContentType.Billboards ? true : false),
+                QueryText = QueryText,
+                Order = this.OrderToIndex(type),
+                OrderDescend = OrderDescend,
+                TimeRangeType = (int)TimeRangeType,
+                TimeRange = TimeRange.ToArray(),
+                PageRange = PageRange.ToArray(),
+                IncludeFreeBooks = IncludeFreeBooks,
+                LabelFilters = LabelFilters.ToArray()
+            };
+
+            return query;
         }
 
         internal void LabelFilterChanged()
@@ -261,14 +277,9 @@ namespace Frontend
             }
             this.OnPropertyChanged(null);
         }
-
-        internal BookDetailCollection Books { set; get; }
-        internal BookDetailCollection Billboards { set; get; }
-        internal BookDetailCollection ReadLists { set; get; }
-
     }
 
-    internal class Label : INotifyPropertyChanged
+    public class Label : INotifyPropertyChanged
     {
         internal string Name { set; get; }
         internal ObservableCollection<SubLabel> AllSubs { get; set; } = new ObservableCollection<SubLabel>();
@@ -298,7 +309,7 @@ namespace Frontend
         {
             if (Name != null && Name.Trim().Length > 1)
             {
-                Networks.RemoteGetSubLabels(this);
+                NetworkGet.GetSubLabels(this);
             }
         }
 
@@ -365,7 +376,7 @@ namespace Frontend
         }
     }
 
-    internal class SubLabel : INotifyPropertyChanged
+    public class SubLabel : INotifyPropertyChanged
     {
         internal string Name { set; get; }
         internal bool Selected { set; get; }
@@ -387,8 +398,9 @@ namespace Frontend
         }
     }
 
-    internal class Review
+    public class Review
     {
+        internal readonly int ID = -1;
         internal string UserName { set; get; }
         private int rating = 5;
         internal int Rating {
@@ -403,17 +415,13 @@ namespace Frontend
         internal string Content { set; get; }
         internal string Title { set; get; }
 
-        internal Review(string name, int rating, DateTime time, string title, string content)
+        internal Review(int id)
         {
-            UserName = name;
-            Rating = rating;
-            PublishDate = time;
-            Content = content;
-            Title = title;
+            this.ID = id;
         }
     }
 
-    internal class BookDetail : BookSummary
+    public class BookDetail : BookSummary
     {
         internal string BookDescription { get; set; }
         internal string Labels { get; set; }
@@ -437,8 +445,6 @@ namespace Frontend
 
         internal bool finished = false;
 
-        internal const int REVIEW_ONE_TIME = 4;
-
         internal BookDetail(BookSummary summary) : base(summary)
         {
             BookDescription = Util.WAIT_STR;
@@ -451,41 +457,317 @@ namespace Frontend
             BuyAmount = DanmuAmount = PreviewAmount = ReviewAmount = PageCount = 0;
             CanAddWishList = CanAddReadList = CanBuy = true;
             Reviews = new ObservableCollection<Review>();
-            RelatedBooks = new BookSummaryCollection();
-            Networks.RemoteGetBookDetail(this);
+            RelatedBooks = new BookSummaryCollection(BookSummaryCollection.OtherType.RelatedBooks, BookId);
+            _ = NetworkGet.GetBookDetail(this);
         }
 
-        internal BookDetail(int id)
-        {
-            BookId = id;
-        }
-
-        internal BookDetail(string errormsg) : base(errormsg)
-        {
-            BookDescription = Util.WAIT_STR;
-            Labels = Util.WAIT_STR;
-            OtherAuthors = Util.WAIT_STR;
-            PublishInfo = Util.WAIT_STR;
-            Price = OverallRating = 0;
-            Discount = 100;
-            ISBN = Util.WAIT_STR;
-            BuyAmount = DanmuAmount = PreviewAmount = ReviewAmount = PageCount = 0;
-            CanAddWishList = CanAddReadList = CanBuy = true;
-            Reviews = new ObservableCollection<Review>();
-            RelatedBooks = new BookSummaryCollection();
-        }
-
-        internal new static readonly BookDetail TIMEOUT_BOOK =
-            new BookDetail("Timeout. Please check internet connection.");
+        internal BookDetail(int id) : base(id) { }
 
         internal void GetMoreReview()
         {
             finished = false;
-            Networks.RemoteGetReviews(this, this.Reviews.Count);
+            _ = NetworkGet.GetReviewContents(this, true, this.Reviews.Count);
         }
     }
 
-    internal class BookSummary
+    /// <summary>
+    /// Collection for showing billboards / read lists
+    /// </summary>
+    public class BooklistCollection: INotifyPropertyChanged
+    {
+        internal ObservableCollection<BookDetailCollection> Booklists { set; get; }
+            = new ObservableCollection<BookDetailCollection>();
+
+        private const int INIT_AMOUNT = 4;
+        private const int ADD_AMOUNT = 2;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Booklists"));
+        }
+
+        private readonly bool isBillBoard;
+        private readonly QueryObject query;
+
+        internal BooklistCollection(bool isBillBoard)
+        {
+            this.isBillBoard = isBillBoard;
+            this.query = null;
+            Reload();
+        }
+
+        internal BooklistCollection(bool isBillBoard, QueryObject query)
+        {
+            this.isBillBoard = isBillBoard;
+            this.query = query;
+        }
+
+        internal bool Finished { get; private set; } = false;
+
+        internal async void Reload(bool addMore = false)
+        {
+            this.Finished = false;
+            if (!addMore)
+            {
+                Booklists.Clear();
+            }
+
+            int[] ids;
+            if (addMore)
+            {
+                if (this.query == null)
+                {
+                    if (this.isBillBoard)
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.BillboardTop, Booklists.Count, ADD_AMOUNT);
+                    else
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.ReadListTop, Booklists.Count, ADD_AMOUNT);
+                }
+                else
+                {
+                    ids = await NetworkGet.GetFromQuery(this.query, Booklists.Count, ADD_AMOUNT);
+                }
+            }
+            else
+            {
+                if (this.query == null)
+                {
+                    if (this.isBillBoard)
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.BillboardTop, 0, INIT_AMOUNT);
+                    else
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.ReadListTop, 0, INIT_AMOUNT);
+                }
+                else
+                {
+                    ids = await NetworkGet.GetFromQuery(query, 0, INIT_AMOUNT);
+                }
+            }
+            foreach (int id in ids)
+            {
+                var collection = new BookDetailCollection(this.isBillBoard, id);
+                await collection.ReloadBooks(this.isBillBoard, id);
+                Booklists.Add(collection);
+            }
+            this.Finished = true;
+        }
+    }
+
+    /// <summary>
+    /// Collection for showing book summary with more infos
+    /// </summary>
+    public class BookDetailCollection : INotifyPropertyChanged
+    {
+        internal ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
+        internal string Title { set; get; }
+        internal string Description { set; get; }
+        internal string CreateUser { set; get; }
+        internal DateTime EditTime { set; get; }
+        internal int FollowAmount { set; get; }
+        internal bool Finished { get; private set; } = false;
+
+        internal QueryObject query;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        internal BookDetailCollection(QueryObject query, string title, string content)
+        {
+            if (query.SearchType == null)
+            {
+                this.query = query;
+                Title = title;
+                Description = content;
+                _ = this.ReloadBooks(query.IsBillboard.Value, query.BookListId.Value, Util.INIT_AMOUNT);
+                return;
+            }
+            if (query.SearchType != (int)ContentType.Books)
+            {
+                Console.Error.WriteLine("wrong query search type");
+                return;
+            }
+            this.query = query;
+            Title = title;
+            Description = content;
+            _ = this.ReloadBooks();
+        }
+
+        internal BookDetailCollection(bool isBillboard, int id)
+        {
+            this.query = new QueryObject()
+            {
+                IsBillboard = isBillboard,
+                BookListId = id
+            };
+            NetworkGet.GetTitleDescription(this, isBillboard, id);
+            //_ = this.ReloadBooks(isBillboard, id);
+        }
+
+        internal async Task<bool> ReloadBooks(bool isBillboard, int id, int count = Util.ADD_AMOUNT)
+        {
+            this.Books.Clear();
+            this.Finished = false;
+            var ids = await NetworkGet.GetBookListBooks(isBillboard, id, 0, count);
+            await NetworkGet.GetBookQuasiDetailContents(this, ids);
+            this.Finished = true;
+            return true;
+        }
+
+        internal async Task<bool> ReloadBooks()
+        {
+            return await this.ReloadBooks(this.query, this.Title);
+        }
+
+        internal async Task<bool> ReloadBooks(QueryObject newQuery, string newTitle)
+        {
+            this.Books.Clear();
+            this.query = newQuery;
+            this.Title = newTitle;
+            this.OnPropertyChanged("Title");
+            this.Finished = false;
+            var ids = await NetworkGet.GetFromQuery(this.query, 0, Util.INIT_AMOUNT);
+            await NetworkGet.GetBookQuasiDetailContents(this, ids);
+            this.Finished = true;
+            return true;
+        }
+
+        private async Task AddBooks(bool isBillboard, int id)
+        {
+            this.Finished = false;
+            var ids = await NetworkGet.GetBookListBooks(isBillboard, id, this.Books.Count, Util.ADD_AMOUNT);
+            await NetworkGet.GetBookQuasiDetailContents(this, ids);
+            this.Finished = true;
+        }
+
+        internal async void AddBooks()
+        {
+            if (this.query.SearchType == null)
+            {
+                await this.AddBooks(query.IsBillboard.Value, query.BookListId.Value);
+                return;
+            }
+            this.Finished = false;
+            var ids = await NetworkGet.GetFromQuery(this.query, this.Books.Count, Util.ADD_AMOUNT);
+            await NetworkGet.GetBookQuasiDetailContents(this, ids);
+            this.Finished = true;
+        }
+    }
+
+    internal enum BookSummaryCollectionType
+    {
+        PersonalRecommands,
+        TopBooks,
+        NewBooks,
+        Other
+    }
+
+    /// <summary>
+    /// Collection for showing book summary
+    /// </summary>
+    internal class BookSummaryCollection : INotifyPropertyChanged
+    {
+        internal enum OtherType
+        {
+            Bookshelf,
+            RelatedBooks
+        }
+
+        internal ObservableCollection<BookSummary> Books { set; get; } = new ObservableCollection<BookSummary>();
+
+        internal bool Finished { get; private set; } = false;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Books"));
+        }
+
+        internal async void AddBooks()
+        {
+            if (this.type.Item2.Value != OtherType.RelatedBooks ||
+                !NetworkGet.IsValidID(this.type.relateBookId.Value))
+            {
+                return;
+            }
+            this.Finished = false;
+            var ids = await NetworkGet.GetRelatedBooks(this.type.relateBookId.Value,
+                                                       this.Books.Count, Util.ADD_AMOUNT);
+            await NetworkGet.GetBookSummaryContents(this, ids);
+            this.Finished = true;
+        }
+
+        internal async Task Reload()
+        {
+            this.Books.Clear();
+            this.Finished = false;
+            int[] ids;
+            if (this.type.Item1.HasValue)
+            {
+                switch (this.type.Item1.Value)
+                {
+                    case BookSummaryCollectionType.PersonalRecommands:
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.PersonalRecommend, 0, Util.PREVIEW_AMOUNT);
+                        break;
+                    case BookSummaryCollectionType.TopBooks:
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.TopBooks, 0, Util.PREVIEW_AMOUNT);
+                        break;
+                    case BookSummaryCollectionType.NewBooks:
+                        ids = await NetworkGet.GetFromQuery(NetworkGet.NewBooks, 0, Util.PREVIEW_AMOUNT);
+                        break;
+                    default:
+                        this.Finished = true;
+                        return;
+                }
+            }
+            else
+            {
+                switch (this.type.Item2.Value)
+                {
+                    case OtherType.Bookshelf:
+                        ids = await NetworkGet.GetShelfBooks();
+                        break;
+                    case OtherType.RelatedBooks:
+                        if (!NetworkGet.IsValidID(this.type.relateBookId.Value))
+                        {
+                            this.Finished = true;
+                            return;
+                        }
+                        ids = await NetworkGet.GetRelatedBooks(this.type.relateBookId.Value,
+                                                               0, Util.RELATE_BOOK_AMOUNT);
+                            break;
+                    default:
+                        this.Finished = true;
+                        return;
+                }
+            }
+            await NetworkGet.GetBookSummaryContents(this, ids);
+            this.Finished = true;
+        }
+
+        /// <summary>
+        /// ValueTuple
+        /// </summary>
+        private (BookSummaryCollectionType?, OtherType?, int? relateBookId) type;
+
+        internal BookSummaryCollection(BookSummaryCollectionType type)
+        {
+            this.type.Item1 = type;
+            _ = this.Reload();
+        }
+
+        internal BookSummaryCollection(OtherType type, int relateBookId = -1)
+        {
+            this.type.Item2 = type;
+            this.type.relateBookId = relateBookId;
+        }
+    }
+
+    public class BookSummary
     {
         internal int BookId { set; get; }
         internal string BookName { set; get; }
@@ -502,196 +784,9 @@ namespace Frontend
             this.Author = book.Author;
         }
 
-        internal BookSummary()
-        {
-            this.BookId = 0;
-            this.BookName = Util.WAIT_STR;
-            this.BookFullName = "";
-            this.BookCover = new BitmapImage(new Uri("ms-appx:///Assets/books.png"));
-            this.Author = Util.WAIT_STR;
-
-        }
-
-        internal BookSummary(string errorMsg)
-        {
-            this.BookId = 0;
-            this.BookName = errorMsg;
-            this.BookFullName = "";
-            this.BookCover = new BitmapImage(new Uri("ms-appx:///Assets/books.png"));
-            this.Author = "ERROR";
-        }
-
-        internal readonly static BookSummary DEFAULT_BOOK = new BookSummary();
-
-        internal readonly static BookSummary TIMEOUT_BOOK = 
-            new BookSummary("Timeout. Please check internet connection.");
-
         internal BookSummary(int BookId)
         {
             this.BookId = BookId;
-            this.BookName = null;
-            this.BookFullName = null;
-            this.BookCover = null;
-            this.Author = null;
-        }
-    }
-
-    internal class BooklistCollection: INotifyPropertyChanged
-    {
-        internal ObservableCollection<BookDetailCollection> Booklists { set; get; }
-            = new ObservableCollection<BookDetailCollection>();
-
-        private const int INIT_AMOUNT = 4;
-        private const int ADD_AMOUNT = 2;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        internal void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        private readonly bool isBillBoard;
-
-        internal BooklistCollection(bool isBillBoard)
-        {
-            this.isBillBoard = isBillBoard;
-            Refresh();
-        }
-
-        internal async void Refresh(bool addMore = false)
-        {
-            if (!addMore)
-            {
-                Booklists.Clear();
-            }
-
-            int[] ids;
-            if (addMore)
-            {
-                if (this.isBillBoard)
-                    ids = await Networks.GetTopBillboardIDs(ADD_AMOUNT, Booklists.Count);
-                else
-                    ids = await Networks.GetTopReadListIDs(ADD_AMOUNT, Booklists.Count);
-            }
-            else
-            {
-                if (this.isBillBoard)
-                    ids = await Networks.GetTopBillboardIDs(INIT_AMOUNT, 0);
-                else
-                    ids = await Networks.GetTopReadListIDs(INIT_AMOUNT, 0);
-            }
-            foreach (int id in ids)
-            {
-                var collection = new BookDetailCollection(
-                    (this.isBillBoard ? Util.BILLBOARD_ID_QUERY : Util.READLIST_ID_QUERY)
-                    + id);
-                Booklists.Add(collection);
-            }
-        }
-    }
-
-    internal class BookDetailCollection : INotifyPropertyChanged
-    {
-        internal ObservableCollection<BookDetail> Books { set; get; } = new ObservableCollection<BookDetail>();
-        internal string Title { set; get; }
-        internal string Description { set; get; }
-        internal string CreateUser { set; get; }
-        internal DateTime EditTime { set; get; }
-        internal int FollowAmount { set; get; }
-
-        internal bool finished = false;
-
-        internal string query = "";
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        internal void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        internal BookDetailCollection(string query, string title, string content)
-        {
-            this.query = query;
-            Title = title;
-            Description = content;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.INIT_AMOUNT);
-        }
-
-        internal BookDetailCollection(string query)
-        {
-            this.query = query;
-            Networks.RemoteBookCollection.GetTitleDescription(this, this.query);
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.PREVIEW_AMOUNT);
-        }
-
-        internal void ReloadBooks(string newQuery, string newTitle)
-        {
-            this.Books.Clear();
-            this.query = newQuery;
-            this.Title = newTitle;
-            this.OnPropertyChanged("Title");
-            this.finished = false;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.PREVIEW_AMOUNT);
-        }
-
-        internal void AddBooks()
-        {
-            this.finished = false;
-            Networks.RemoteBookCollection.GetBooksFromQuery(this, this.query, Util.ADD_AMOUNT, this.Books.Count);
-        }
-    }
-
-    internal enum BookSummaryCollectionType
-    {
-        PersonalRecommands,
-        TopBooks,
-        NewBooks,
-        Other
-    }
-
-    internal class BookSummaryCollection
-    {
-        private static readonly Dictionary<BookSummaryCollectionType, string> TYPE
-                = new Dictionary<BookSummaryCollectionType, string>
-                {
-                    { BookSummaryCollectionType.PersonalRecommands, "PR" },
-                    { BookSummaryCollectionType.TopBooks, "TB" },
-                    { BookSummaryCollectionType.NewBooks, "NB" },
-                };
-
-        internal ObservableCollection<BookSummary> Books { set; get; } = new ObservableCollection<BookSummary>();
-
-        internal bool finished = false;
-
-        internal static string GetStringType(BookSummaryCollectionType t)
-        {
-            if (TYPE.ContainsKey(t))
-                return TYPE[t];
-            else
-                return "";
-        }
-
-        internal void Refresh(BookSummaryCollectionType type)
-        {
-            this.Books.Clear();
-            this.finished = false;
-            if (type != BookSummaryCollectionType.Other)
-            {
-                Networks.RemoteBookCollection.GetBooksFromQuery(this, 
-                    Util.DIRECT_QUERY_PREFIX + TYPE[type], Util.PREVIEW_AMOUNT);
-            }
-        }
-
-        internal BookSummaryCollection()
-        {
-            // do nothing
-        }
-
-        internal BookSummaryCollection(BookSummaryCollectionType type)
-        {
-            this.Refresh(type);
         }
     }
 
@@ -701,14 +796,10 @@ namespace Frontend
         internal const int INIT_AMOUNT = 14;
         internal const int ADD_AMOUNT = 6;
         internal const int RELATE_BOOK_AMOUNT = 7;
+        internal const int REVIEW_AMOUNT_ONE_TIME = 4;
 
         internal const string TO_BOOK_DETAIL = "toDetail";
         internal const string FROM_BOOK_DETAIL = "fromDetail";
-
-        internal const string DIRECT_QUERY_PREFIX = "direct-";
-        internal const string BILLBOARD_ID_QUERY = "billboard_id=";
-        internal const string READLIST_ID_QUERY = "readlist_id=";
-        internal const string SHELF_QUERY = "shelf";
 
         internal const int REFRESH_RATE = 500;
 
@@ -724,18 +815,6 @@ namespace Frontend
         {
             return visible ? Visibility.Visible : Visibility.Collapsed;
         }
-
-        /*
-        internal static Visibility ReverseBoolToVisibility(bool notVisible)
-        {
-            return notVisible ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        internal static string ShowStringByBool(bool visible, string format, string str1, string str2)
-        {
-            return visible ? string.Format(format, str1) : string.Format(format, str2);
-        }
-        */
 
         internal static string SHA256(string data)
         {
@@ -828,6 +907,17 @@ namespace Frontend
 
         /// <summary>Maximum value of the range.</summary>
         internal T Maximum { get; set; }
+
+        internal T[] ToArray()
+        {
+            if (this.Maximum.CompareTo(this.inf) == 0 && this.inf.CompareTo(default) > 0)
+                return new T[] { this.Minimum, (T)typeof(T).GetField("MaxValue").GetValue(null)};
+            else if (this.Minimum.CompareTo(this.minusInf) == 0 && this.minusInf.CompareTo(default) < 0)
+                return new T[] { (T)typeof(T).GetField("MinValue").GetValue(null), this.Maximum };
+            else
+                return new T[] { this.Minimum, this.Maximum };
+        }
+
 
         /// <summary>Presents the Range in readable format.</summary>
         /// <returns>String representation of the Range</returns>

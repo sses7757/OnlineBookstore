@@ -36,7 +36,7 @@ namespace Frontend
 
         private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+            Console.Error.WriteLine("Failed to load Page " + e.SourcePageType.FullName);
         }
 
         // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
@@ -259,19 +259,26 @@ namespace Frontend
             ContentFrame.Navigate(page, itemToPass, info);
         }
 
-        internal void NavigateToBooklist(string title, string description, string query)
+        internal void NavigateToBooklist(string title, string description, QueryObject query)
         {
-            NavView_Navigate(typeof(BooklistPage), null, true, new string[] { title, description, query });
+            (string title, string description, QueryObject query) passObj;
+            passObj.title = title;
+            passObj.description = description;
+            passObj.query = query;
+            NavView_Navigate(typeof(BooklistPage), null, true, passObj);
         }
 
         private void SearchMain_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            var query = args.QueryText;
-            if (query.Length <= 3)
+            this.QuerySubmitted(args.QueryText);
+        }
+
+        internal void QuerySubmitted(string query)
+        {
+            if (query.Length < 2)
                 return;
             ShowSearch(true);
             NavView_Navigate("search", null, true, new SearchInfo(query));
-            //NavView.SelectedItem = NavView.MenuItems[2];
         }
 
         private void Refresh_Pressed(object sender, RoutedEventArgs e)

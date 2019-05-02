@@ -28,48 +28,38 @@ namespace Frontend
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            Readlists = new BooklistCollection(false);
+            ReadLists = new BooklistCollection(false);
             WaitLoading();
         }
 
         private async void WaitLoading()
         {
-            while (Readlists.Booklists.Count == 0)
+            while (ReadLists.Booklists.Count == 0)
                 await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
 
             while (true)
             {
-                var load = false;
-                foreach (var v in Readlists.Booklists)
+                if (ReadLists.Finished)
                 {
-                    if (!v.finished)
-                    {
-                        load = true;
-                        break;
-                    }
-                }
-                if (!load)
-                {
-                    loadingControl.IsLoading = false;
                     break;
                 }
                 else
                 {
                     await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
-                    Readlists.OnPropertyChanged("Booklists");
+                    ReadLists.OnPropertyChanged();
                 }
             }
             await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
-            Readlists.OnPropertyChanged("Booklists");
+            ReadLists.OnPropertyChanged();
         }
 
-        internal BooklistCollection Readlists { set; get; }
+        internal BooklistCollection ReadLists { set; get; }
 
         private void Refresh(bool add)
         {
             if (!loadingControl.IsLoading)
             {
-                Readlists.Refresh(add);
+                ReadLists.Reload(add);
                 WaitLoading();
             }
         }
@@ -112,7 +102,7 @@ namespace Frontend
         {
             var elem = sender as Grid;
             var dataToPass = elem.DataContext as BookDetail;
-            if (Networks.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.BookId))
             {
                 var parent = Util.GetParentUpto(elem, Util.LEVEL_DataTemplate);
                 var collectionParent = Util.GetParentUpto(parent, 2);

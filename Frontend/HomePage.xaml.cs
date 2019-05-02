@@ -48,8 +48,7 @@ namespace Frontend
         {
             if (this._navigateItem == null)
                 return;
-            ConnectedAnimation animation =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
             if (animation != null)
             {
                 animation.Configuration = new DirectConnectedAnimationConfiguration();
@@ -85,7 +84,7 @@ namespace Frontend
         {
             var item = sender as StackPanel;
             var dataToPass = item.DataContext as BookSummary;
-            if (Networks.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.BookId))
             {
                 switch ((BookSummaryCollectionType)item.Tag)
                 {
@@ -104,7 +103,6 @@ namespace Frontend
                 this._navigateType = (BookSummaryCollectionType)item.Tag;
                 this._navigateItem = dataToPass;
                 Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
-
             }
         }
 
@@ -128,7 +126,7 @@ namespace Frontend
                 var load = false;
                 foreach (KeyValuePair<BookSummaryCollectionType, BookSummaryCollection> kv in collections)
                 {
-                    if (!kv.Value.finished)
+                    if (!kv.Value.Finished)
                     {
                         load = true;
                         break;
@@ -150,7 +148,7 @@ namespace Frontend
         private async void UpdateLabels()
         {
             Labels.Clear();
-            var mainLabels = await Networks.RemoteGetMainLabels();
+            var mainLabels = await NetworkGet.GetMainLabels();
             foreach (var s in mainLabels)
             {
                 var l = new Label(s);
@@ -162,22 +160,19 @@ namespace Frontend
         private void HyperlinkButton_Click_Best(object sender, RoutedEventArgs e)
         {
             Util.main.NavigateToBooklist("Best Selling Books", "System generated recommendations",
-                Util.DIRECT_QUERY_PREFIX + 
-                BookSummaryCollection.GetStringType(BookSummaryCollectionType.TopBooks));
+                                         NetworkGet.TopBooks);
         }
 
         private void HyperlinkButton_Click_New(object sender, RoutedEventArgs e)
         {
             Util.main.NavigateToBooklist("Newly Published Books", "System generated recommendations",
-                Util.DIRECT_QUERY_PREFIX +
-                BookSummaryCollection.GetStringType(BookSummaryCollectionType.NewBooks));
+                                         NetworkGet.NewBooks);
         }
 
         private void HyperlinkButton_Click_Person(object sender, RoutedEventArgs e)
         {
             Util.main.NavigateToBooklist("Personalized Recommendation", "System generated recommendations",
-                Util.DIRECT_QUERY_PREFIX +
-                BookSummaryCollection.GetStringType(BookSummaryCollectionType.PersonalRecommands));
+                                         NetworkGet.PersonalRecommend);
         }
 
         public void RefreshButtonPressed()
@@ -186,7 +181,7 @@ namespace Frontend
             {
                 foreach (KeyValuePair<BookSummaryCollectionType, BookSummaryCollection> kv in this.collections)
                 {
-                    kv.Value.Refresh(kv.Key);
+                    _ = kv.Value.Reload();
                 }
                 WaitLoading();
                 UpdateLabels();
@@ -200,7 +195,7 @@ namespace Frontend
 
         private void HyperlinkButton_Click_SubLabel(object sender, RoutedEventArgs e)
         {
-            // goto search page
+            Util.main.QuerySubmitted((sender as HyperlinkButton).Content as string);
         }
     }
 }

@@ -32,13 +32,13 @@ namespace Frontend
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var para = (string[])e.Parameter;
-            if (this.title == para[0] && this.description == para[1] && this.queryText == para[2])
+            var para = ((string title, string description, QueryObject query))e.Parameter;
+            if (this.title == para.title && this.description == para.description && this.query == para.query)
                 return;
-            this.title = para[0];
-            this.description = para[1];
-            this.queryText = para[2];
-            this.books = new BookDetailCollection(this.queryText, this.title, this.description);
+            this.title = para.title;
+            this.description = para.description;
+            this.query = para.query;
+            this.books = new BookDetailCollection(this.query, this.title, this.description);
             _ = this.RefreshAsync();
         }
 
@@ -48,7 +48,7 @@ namespace Frontend
         private void BookCover_Pointed(object sender, PointerRoutedEventArgs e)
         {
             var dataToPass = (sender as FrameworkElement).DataContext as BookDetail;
-            if (Networks.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.BookId))
             {
                 bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
                 this._navigateItem = dataToPass;
@@ -74,7 +74,7 @@ namespace Frontend
                 await bookGrid.TryStartConnectedAnimationAsync(animation, this._navigateItem, "bookCover");
             }
         }
-        private string queryText = "";
+        private QueryObject query = new QueryObject();
         private string title = "";
         private string description = "";
 
@@ -95,7 +95,7 @@ namespace Frontend
         private async System.Threading.Tasks.Task<bool> RefreshAsync()
         {
             await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
-            while (!books.finished)
+            while (!books.Finished)
             {
                 await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
                 Books = books;
@@ -127,7 +127,7 @@ namespace Frontend
             }
             else
             {
-                this.books = new BookDetailCollection(this.queryText, this.title, this.description);
+                _ = this.books.ReloadBooks();
                 _ = this.RefreshAsync();
             }
         }

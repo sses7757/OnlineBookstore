@@ -70,7 +70,7 @@ namespace Frontend
         private void StackPanel_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             var dataToPass = (BookSummary)((StackPanel)sender).DataContext;
-            if (Networks.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.BookId))
             {
                 relatedBookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "relateBookImage");
                 this._navigateItem = dataToPass;
@@ -87,8 +87,7 @@ namespace Frontend
         {
             if (this._navigateItem == null)
                 return;
-            ConnectedAnimation animation =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
             if (animation != null)
             {
                 animation.Configuration = new DirectConnectedAnimationConfiguration();
@@ -101,18 +100,14 @@ namespace Frontend
         private BookDetail detail;
         internal BookDetail Detail {
             get { return detail; }
-            set { detail = value; OnPropertyChanged("Detail"); }
-        }
-
-        internal System.Collections.ObjectModel.ObservableCollection<BookSummary> RelatedBooks {
-            get { return Detail.RelatedBooks.Books; }
+            set { detail = value; OnPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string name)
+        private void OnPropertyChanged()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Detail"));
         }
 
         internal static string PublishInfoAndPage(BookDetail detail)
@@ -165,24 +160,17 @@ namespace Frontend
             {
                 await System.Threading.Tasks.Task.Delay(100);
                 Detail = detail;
-                OnPropertyChanged("RelatedBooks");
+                detail.RelatedBooks?.OnPropertyChanged();
             }
             await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
             Detail = detail;
-            OnPropertyChanged("RelatedBooks");
-        }
-
-        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
-        {
-            // TODO : goto booklist page
+            detail.RelatedBooks?.OnPropertyChanged();
         }
 
         private void RefreshRequested(RefreshContainer sender, RefreshRequestedEventArgs args)
         {
-            using (var RefreshCompletionDeferral = args.GetDeferral())
-            {
-                this.RefreshButtonPressed();
-            }
+            this.detail.GetMoreReview();
+            Refresh();
         }
 
         public void RefreshButtonPressed()
@@ -193,7 +181,7 @@ namespace Frontend
 
         public void AdminButtonPressed(bool isChecked)
         {
-            // add edit info button
+            // TODO add edit info button
         }
     }
 }

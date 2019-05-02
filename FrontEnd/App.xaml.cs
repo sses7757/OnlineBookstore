@@ -80,7 +80,7 @@ namespace Frontend
         ///<param name="e">有关导航失败的详细信息</param>
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+            Console.Error.WriteLine("Failed to load Page " + e.SourcePageType.FullName);
         }
 
         /// <summary>

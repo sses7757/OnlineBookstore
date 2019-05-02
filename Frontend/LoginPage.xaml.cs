@@ -43,7 +43,7 @@ namespace Frontend
             if ((string) btn.Content == "Press to logout")
             {
                 ShowProgress(true);
-                if (await Networks.RemoteLogout())
+                if (await NetworkSet.Logout())
                 {
                     notification.Show("Logout success", DELAY);
                     btn.Content = "Confirm";
@@ -66,20 +66,20 @@ namespace Frontend
             ShowProgress(true);
             var username = nameBox.Text;
             var pass = Util.SHA256(passBox.Password);
-            var status = await Networks.RemoteLogin(username, pass);
+            var status = await NetworkGet.Login(username, pass);
             ShowProgress(false);
             switch (status)
             {
-                case LoginStatus.Success:
+                case NetworkGet.LoginStatus.Success:
                     nameBox.IsEnabled = false;
                     passBox.IsEnabled = false;
                     notification.Show("Login success", DELAY);
                     btn.Content = "Press to logout";
                     break;
-                case LoginStatus.NoSuchUser:
+                case NetworkGet.LoginStatus.NoSuchUser:
                     notification.Show("No such user name or e-mail", DELAY);
                     break;
-                case LoginStatus.WrongPassword:
+                case NetworkGet.LoginStatus.WrongPassword:
                     notification.Show("Wrong password", DELAY);
                     break;
             }

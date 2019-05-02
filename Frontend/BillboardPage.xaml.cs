@@ -40,28 +40,18 @@ namespace Frontend
 
             while (true)
             {
-                var load = false;
-                foreach (var v in Billboards.Booklists)
+                if (Billboards.Finished)
                 {
-                    if (!v.finished)
-                    {
-                        load = true;
-                        break;
-                    }
-                }
-                if (!load)
-                {
-                    loadingControl.IsLoading = false;
                     break;
                 }
                 else
                 {
                     await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
-                    Billboards.OnPropertyChanged("Booklists");
+                    Billboards.OnPropertyChanged();
                 }
             }
             await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
-            Billboards.OnPropertyChanged("Booklists");
+            Billboards.OnPropertyChanged();
         }
 
         internal BooklistCollection Billboards { set; get; }
@@ -70,7 +60,7 @@ namespace Frontend
         {
             if (!loadingControl.IsLoading)
             {
-                Billboards.Refresh(add);
+                Billboards.Reload(add);
                 WaitLoading();
             }
         }
@@ -113,7 +103,7 @@ namespace Frontend
         {
             var elem = sender as Grid;
             var dataToPass = elem.DataContext as BookDetail;
-            if (Networks.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.BookId))
             {
                 var parent = Util.GetParentUpto(elem, Util.LEVEL_DataTemplate);
                 var collectionParent = Util.GetParentUpto(parent, 2);

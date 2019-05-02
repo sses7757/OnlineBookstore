@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,55 +8,107 @@ using System.Threading.Tasks;
 
 namespace Frontend
 {
-    internal enum LoginStatus
+
+    public class QueryObject
     {
-        Success,
-        NoSuchUser,
-        WrongPassword
+        public string Type { set; get; }
+        public string UserName { set; get; }
+        public string EncodedPassowrd { set; get; }
+        public string MainLabel { set; get; }
+        public int? BookId { set; get; }
+        public bool? IsBillboard { set; get; }
+        public int? BookListId { set; get; }
+        public int? ReviewId { set; get; }
+        public int? DanmuId { set; get; }
+        public int? From { set; get; }
+        public int? Count { set; get; }
+
+        public int? SearchType { set; get; }
+        public string DirectQuery { set; get; }
+        public string QueryText { set; get; }
+        public bool? OrderDescend { set; get; }
+        public int? Order { set; get; }
+        public int? TimeRangeType { set; get; }
+        public int[] TimeRange { set; get; }
+        public int[] PageRange { set; get; }
+        public string[] LabelFilters { set; get; }
+        public bool? IncludeFreeBooks { set; get; }
+
+        public int? Page { set; get; }
+
+        public QueryObject() { }
+
+        public QueryObject(string type)
+        {
+            Type = type;
+        }
+
+        public string ToJson()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                //DefaultValueHandling = DefaultValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            return JsonConvert.SerializeObject(this, settings);
+        }
     }
 
-    internal class Networks
+    public class NetworkGet
     {
-        internal const string REMOTE_IP = "10.20.30.40";
+        public const string REMOTE_IP = "10.20.30.40";
 
         internal static bool IsValidID(int id)
         {
             return id >= 0;
         }
 
-        internal static async Task<LoginStatus> RemoteLogin(string username, string encodedPassword)
+        public enum LoginStatus
         {
+            Success,
+            NoSuchUser,
+            WrongPassword
+        }
+
+        public static async Task<LoginStatus> Login(string UserName, string EncodedPassword)
+        {
+            var query = new QueryObject("Login")
+            {
+                UserName = UserName,
+                EncodedPassowrd = EncodedPassword
+            };
+            var json = query.ToString();
             // TODO
             await Task.Delay(4000);
             Util.UserId = 1111;
             Util.isAdmin = true;
             return LoginStatus.Success;
         }
-
-        internal static async Task<bool> RemoteLogout()
+        public static async Task<string[]> GetMainLabels()
         {
-            // TODO
-            await Task.Delay(4000);
-            Util.UserId = -1;
-            Util.isAdmin = false;
-            return true;
-        }
-
-        internal static async Task<string[]> RemoteGetMainLabels()
-        {
+            var query = new QueryObject("GetMainLabels")
+            {
+            };
+            var json = query.ToString();
             // TODO
             await Task.Delay(1000);
-            return new string[] { "Arts & Photography",
-                                  "Biographies & Memoirs",
-                                  "Business & Money",
+            return new string[] { "Arts",
+                                  "Biographies",
+                                  "Business",
                                   "Calendars",
-                                  "Children's Books",
-                                  "Christian Books & Bibles"
+                                  "Sciences",
+                                  "Bibles"
             };
         }
 
-        internal static async void RemoteGetSubLabels(Label label)
+        public static async void GetSubLabels(Label label)
         {
+            var query = new QueryObject("GetMainLabels")
+            {
+                MainLabel = label.Name
+            };
+            var json = query.ToString();
             // TODO
             await Task.Delay(1000);
             for (int i = 0; i < 15; ++i)
@@ -66,13 +119,18 @@ namespace Frontend
             }
         }
 
-        internal static async Task<bool> RemoteGetBookSummary(BookSummary book)
+        public static async Task<bool> GetBookSummary(BookSummary book)
         {
             if (!IsValidID(book.BookId))
             {
                 Console.Error.WriteLine("Book id wrong");
                 return false;
             }
+            var query = new QueryObject("GetBookSummary")
+            {
+                BookId = book.BookId
+            };
+            var json = query.ToString();
             // TODO
             await Task.Delay(Util.REFRESH_RATE);
             book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
@@ -85,13 +143,18 @@ namespace Frontend
             return true;
         }
 
-        internal static async Task<bool> RemoteGetBookQuasiDetail(BookDetail book)
+        public static async Task<bool> GetBookQuasiDetail(BookDetail book)
         {
             if (!IsValidID(book.BookId))
             {
                 Console.Error.WriteLine("Book id wrong");
                 return false;
             }
+            var query = new QueryObject("GetBookQuasiDetail")
+            {
+                BookId = book.BookId
+            };
+            var json = query.ToString();
             // TODO only two level label
             await Task.Delay(Util.REFRESH_RATE);
             book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
@@ -111,8 +174,13 @@ namespace Frontend
             return true;
         }
 
-        internal static async void RemoteGetBookDetail(BookDetail book)
+        public static async Task<bool> GetBookDetail(BookDetail book)
         {
+            var query = new QueryObject("GetBookDetail")
+            {
+                BookId = book.BookId
+            };
+            var json = query.ToString();
             // TODO get book details Util.UserId
             await Task.Delay(1000);
             book.BookDescription = "The authors present the complete guide to ANSI standard C language programming." +
@@ -144,174 +212,273 @@ namespace Frontend
             book.OverallRating = 4.6;
             book.CanAddReadList = true;
             book.CanAddWishList = book.CanBuy = false;
-            RemoteGetReviews(book);
-            await RemoteBookCollection.GetRelatedBooks(book.RelatedBooks, book.BookId);
+            await book.RelatedBooks.Reload();
+            await GetReviewContents(book);
             book.finished = true;
+            return true;
         }
 
-        internal static async void RemoteGetReviews(BookDetail book, int from = 0,
-                                                    int count = BookDetail.REVIEW_ONE_TIME)
+        internal static async Task<bool> GetReviewContents(BookDetail book, bool setFinish = false, int from = 0,
+                                                           int count = Util.REVIEW_AMOUNT_ONE_TIME)
         {
-            // TODO get book reviews (from -> from + count)
-            await Task.Delay(1000);
-            for (int i = from; i < count - 1; ++i)
+            var reviewIds = await GetBookReviews(book.BookId, from, count);
+            foreach (var rid in reviewIds)
             {
-                book.Reviews.Add(new Review("Steven", 5, new DateTime(2019, 3, 24, 0, 45, 4), "A Fansinating Book", "I'm not new to programming; in fact I've been doing it professionally for the past decade. Although I've played around in quite a few different languages, most of my work over the last 6 years has been in .NET (C# mainly). I have always had an interest in C because I love its simplicity. Also, it's a language which brings one closer to the machine, stripping away many of the abstractions that higher level languages provide. Higher level languages (such as Java, C#, Python, etc.) are massive and powerful with HUGE frameworks, but I'm attracted to simple things."));
-                await Task.Delay(Util.REFRESH_RATE);
+                var review = new Review(rid);
+                await GetReview(review);
+                book.Reviews.Add(review);
             }
-            book.Reviews.Add(new Review("Anis", 1, DateTime.Now, "Disappointed", "Print Type is very bad. Looks like old news paper printed on 80's. Too much description, may be good for beginners students but not for you if want to understand the concept of C Pointer, Structure, Union, etc. in few lines. I found may online tutorials better than this book. Just read the book less - than hours and returned; Paid $7.53 shipping fee....bad."));
-            await Task.Delay(Util.REFRESH_RATE);
-            if (from != 0)
-            {
+            if (setFinish)
                 book.finished = true;
-            }
+            return true;
         }
 
-        internal static async Task<int[]> GetTopBillboardIDs(int count, int from)
+        public static async Task<int[]> GetBookReviews(int bookId, int from, int count)
         {
-            // TODO get top billboard ids
-            await Task.Delay(100);
-            List<int> ids = new List<int>(count);
-            for (int i = from; i < from + count; ++i)
+            var query = new QueryObject("GetBookReviews")
             {
-                ids.Add(i + 156);
-            }
-            return ids.ToArray();
-        }
-        
-        internal static async Task<int[]> GetTopReadListIDs(int count, int from)
-        {
-            // TODO get top billboard ids
+                BookId = bookId,
+                From = from,
+                Count = count
+            };
+            var json = query.ToString();
+            // TODO get book reviews (from -> from + count)
             await Task.Delay(100);
-            List<int> ids = new List<int>(count);
-            for (int i = from; i < from + count; ++i)
+            var ids = new List<int>();
+            for (int i = from; i < count + from; ++i)
             {
-                ids.Add(i + 57);
+                ids.Add(i + 479);
             }
             return ids.ToArray();
         }
 
-        internal class RemoteBookCollection
+        public static async Task<bool> GetReview(Review review)
         {
-            private const int delay = 1000;
-
-            private static async Task<bool> AddBookSummary(BookSummaryCollection collection, int bookId, long timeout = 1000)
+            var query = new QueryObject("GetReview")
             {
-                bool flag = true;
-                var timer = new Stopwatch();
-                timer.Start();
-                BookSummary book = new BookSummary(bookId);
-                while (!await RemoteGetBookSummary(book))
-                {
-                    if (timer.ElapsedMilliseconds > timeout)
-                    {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag)
-                    collection.Books.Add(book);
-                return flag;
-            }
-
-            private static void SetBookSummaryCollection(BookSummaryCollection collection, bool flag)
+                ReviewId = review.ID
+            };
+            var json = query.ToString();
+            // TODO get review content from id
+            await Task.Delay(500);
+            if (new Random().Next(0, 6) < 5)
             {
-                if (!flag)
-                {
-                    collection.Books.Add(BookSummary.TIMEOUT_BOOK);
-                }
-                collection.finished = true;
+                review.UserName = "Steven";
+                review.PublishDate = new DateTime(2019, 3, 24, 0, 45, 4);
+                review.Rating = 5;
+                review.Title = "A Fansinating Book";
+                review.Content = "I'm not new to programming; in fact " +
+                    "I've been doing it professionally for the past decade." +
+                    " Although I've played around in quite a few different languages, " +
+                    "most of my work over the last 6 years has been in .NET (C# mainly)." +
+                    " I have always had an interest in C because I love its simplicity." +
+                    " Also, it's a language which brings one closer to the machine, " +
+                    "stripping away many of the abstractions that higher level languages provide." +
+                    " Higher level languages (such as Java, C#, Python, etc.) are massive and " +
+                    "powerful with HUGE frameworks, but I'm attracted to simple things.";
             }
-
-            private static async Task<bool> AddBookDetail(BookDetailCollection collection, int bookId, long timeout = 5000)
+            else
             {
-                bool flag = true;
-                var timer = new Stopwatch();
-                timer.Start();
-                var book = new BookDetail(bookId);
-                while (!await RemoteGetBookQuasiDetail(book))
-                {
-                    if (timer.ElapsedMilliseconds > timeout)
-                    {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag)
-                    collection.Books.Add(book);
-                return flag;
+                review.UserName = "Anis";
+                review.PublishDate = DateTime.Now;
+                review.Rating = 1;
+                review.Title = "Disappointed";
+                review.Content = "Print Type is very bad. Looks like old news paper printed on 80's." +
+                    " Too much description, may be good for beginners students but not for you if" +
+                    " want to understand the concept of C Pointer, Structure, Union, etc. in few lines." +
+                    " I found may online tutorials better than this book. Just read the book less -" +
+                    " than hours and returned; Paid $7.53 shipping fee....bad.";
             }
+            return true;
+        }
 
-            private static void SetBookDetailCollection(BookDetailCollection collection, bool flag)
+        public static async Task<int[]> GetBookListBooks(bool isBillboard, int id, int from = 0,
+                                                         int count = Util.PREVIEW_AMOUNT)
+        {
+            var query = new QueryObject("GetBookListBooks")
             {
-                if (!flag)
-                {
-                    collection.Books.Add(BookDetail.TIMEOUT_BOOK);
-                }
-                collection.finished = true;
-            }
-
-            internal static async void GetBooksFromQuery(BookDetailCollection collection, string query,
-                                                         int count = int.MaxValue, int from = 0)
+                IsBillboard = isBillboard,
+                BookListId = id,
+                From = from,
+                Count = count
+            };
+            var json = query.ToString();
+            // TODO get book reviews (from -> from + count)
+            await Task.Delay(100);
+            var ids = new List<int>();
+            for (int i = from; i < count + from; ++i)
             {
-                // TODO get book ids
-                await Task.Delay(delay);
-                bool flag = true;
-                for (int i = from + 1; i <= (count == int.MaxValue ? 18 : count) + from; ++i)
-                {
-                    flag = await AddBookDetail(collection, i);
-                    if (!flag)
-                        break;
-                }
-                SetBookDetailCollection(collection, flag);
+                ids.Add(i + 1657);
             }
+            return ids.ToArray();
+        }
 
-            internal static async void GetBooksFromQuery(BookSummaryCollection collection, string query,
-                                                         int count = int.MaxValue, int from = 0)
+        public static async Task<int[]> GetShelfBooks()
+        {
+            var query = new QueryObject("GetShelfBooks")
             {
-                // TODO get book ids
-                await Task.Delay(delay);
-                bool flag = true;
-                for (int i = from + 1; i <= (count == int.MaxValue ? 18 : count) + from; ++i)
-                {
-                    flag = await AddBookSummary(collection, i);
-                    if (!flag)
-                        break;
-                }
-                SetBookSummaryCollection(collection, flag);
-            }
-
-            internal static async Task<bool> GetRelatedBooks(BookSummaryCollection collection, int relatedBookId)
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            var ids = new List<int>();
+            for (int i = 0; i < 18; ++i)
             {
-                // TODO get book ids only 7
-                await Task.Delay(delay);
-                bool flag = true;
-                for (int i = 0; i < Util.RELATE_BOOK_AMOUNT; ++i)
-                {
-                    flag = await AddBookSummary(collection, i);
-                    if (!flag)
-                        break;
-                }
-                SetBookSummaryCollection(collection, flag);
-                return flag;
+                ids.Add(i + 768);
             }
+            return ids.ToArray();
+        }
 
-            internal static async void GetTitleDescription(BookDetailCollection collection, string query)
+        private const int delay = 1000;
+
+        public static async Task<int[]> GetFromQuery(QueryObject query, int from = 0, int count = int.MaxValue)
+        {
+            query.Type = "GetFromQuery";
+            query.From = from;
+            query.Count = count;
+            var json = query.ToJson();
+            // TODO get ids
+            await Task.Delay(delay);
+            List<int> ids = new List<int>();
+            for (int i = from + 1; i <= (count == int.MaxValue ? 18 : count) + from; ++i)
             {
-                // TODO
-                await Task.Delay(delay);
-                collection.Title = "Test billboard title";
-                collection.CreateUser = "Test user name";
-                collection.EditTime = DateTime.Now;
-                collection.Description = "Test billboard descriptions: test test test test test test";
-                collection.FollowAmount = 324;
-                collection.OnPropertyChanged("Title");
-                collection.OnPropertyChanged("CreateUser");
-                collection.OnPropertyChanged("EditTime");
-                collection.OnPropertyChanged("Description");
-                collection.OnPropertyChanged("FollowAmount");
-
+                ids.Add(i + 235);
             }
+            return ids.ToArray();
+        }
+
+        internal readonly static QueryObject NewBooks =
+            new QueryObject()
+            {
+                SearchType = 0,
+                OrderDescend = true,
+                Order = 1
+            };
+
+        internal readonly static QueryObject TopBooks =
+            new QueryObject()
+            {
+                SearchType = 0,
+                OrderDescend = true,
+                Order = 6
+            };
+
+        internal readonly static QueryObject PersonalRecommend =
+            new QueryObject()
+            {
+                SearchType = 0,
+                OrderDescend = false,
+                Order = 0
+            };
+
+        internal static QueryObject BillboardRecommend =
+            new QueryObject()
+            {
+                SearchType = 1,
+                OrderDescend = false,
+                Order = 0
+            };
+
+        internal readonly static QueryObject ReadListRecommend =
+            new QueryObject()
+            {
+                SearchType = 2,
+                OrderDescend = false,
+                Order = 0
+            };
+
+        internal static QueryObject BillboardTop =
+            new QueryObject()
+            {
+                SearchType = 1,
+                OrderDescend = true,
+                Order = 1
+            };
+
+        internal readonly static QueryObject ReadListTop =
+            new QueryObject()
+            {
+                SearchType = 2,
+                OrderDescend = false,
+                Order = 2
+            };
+
+        internal static async Task<bool> GetBookSummaryContents(BookSummaryCollection collection, int[] ids)
+        {
+            foreach (int id in ids)
+            {
+                var book = new BookSummary(id);
+                await GetBookSummary(book);
+                collection.Books.Add(book);
+            }
+            return true;
+        }
+
+        internal static async Task<bool> GetBookQuasiDetailContents(BookDetailCollection collection, int[] ids)
+        {
+            foreach (int id in ids)
+            {
+                var book = new BookDetail(id);
+                await GetBookQuasiDetail(book);
+                collection.Books.Add(book);
+            }
+            return true;
+        }
+
+        public static async Task<int[]> GetRelatedBooks(int BookId, int from = 0, int count = Util.RELATE_BOOK_AMOUNT)
+        {
+            var query = new QueryObject("GetRelatedBooks")
+            {
+                BookId = BookId,
+                From = from,
+                Count = count
+            };
+            var json = query.ToString();
+            // TODO get book ids only 7
+            await Task.Delay(100);
+            List<int> ids = new List<int>();
+            for (int i = from; i < from + count; ++i)
+            {
+                ids.Add(i + 564);
+            }
+            return ids.ToArray();
+        }
+
+        public static async void GetTitleDescription(BookDetailCollection collection, bool isBillboard, int id)
+        {
+            var query = new QueryObject("GetTitleDescription")
+            {
+                IsBillboard = isBillboard,
+                BookListId = id
+            };
+            var json = query.ToString();
+            // TODO
+            await Task.Delay(delay);
+            collection.Title = "Test billboard title";
+            collection.CreateUser = "Test user name";
+            collection.EditTime = DateTime.Now;
+            collection.Description = "Test billboard descriptions: test test test test test test";
+            collection.FollowAmount = 324;
+            collection.OnPropertyChanged("Title");
+            collection.OnPropertyChanged("CreateUser");
+            collection.OnPropertyChanged("EditTime");
+            collection.OnPropertyChanged("Description");
+            collection.OnPropertyChanged("FollowAmount");
+
         }
     }
+
+    public class NetworkSet
+    {
+        public static async Task<bool> Logout()
+        {
+
+            // TODO
+            await Task.Delay(4000);
+            Util.UserId = -1;
+            Util.isAdmin = false;
+            return true;
+        }
+    }
+
 }
