@@ -3,13 +3,60 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frontend"
+    xmlns:sys="using:System"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <TextBlock HorizontalAlignment="Center" Text="This is the published danmus of mine"
-            VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
+        <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
+            <ListView Style="{StaticResource ListStyle}" Padding="150,40,150,0"
+                      ItemsSource="{x:Bind Danmus, Mode=OneWay}" IsItemClickEnabled="False">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:FullDanmu">
+                        <SwipeControl Margin="10,5" Padding="10,5"
+                                      Background="{StaticResource AppBarBackgroundThemeBrush}">
+                            <SwipeControl.LeftItems>
+                                <SwipeItems Mode="Reveal">
+                                    <SwipeItem Text="Edit" Invoked="Edit_Invoked"
+                                               IconSource="{StaticResource EditIcon}"
+                                               Background="{StaticResource AppBarBackgroundThemeBrush}"/>
+                                    <SwipeItem Text="Delete" Invoked="Delete_Invoked"
+                                               IconSource="{StaticResource DeleteIcon}"
+                                               Background="{StaticResource AppBarBackgroundThemeBrush}"/>
+                                </SwipeItems>
+                            </SwipeControl.LeftItems>
+
+                            <StackPanel>
+                                <TextBlock Text="{x:Bind Content, Mode=OneWay}" Style="{StaticResource TitleTextStyle}"
+                                           FontSize="17"/>
+                                <TextBlock Text="{x:Bind local:MyDanmuPage.NamePageToString(BookName, PageNum)}"
+                                           Style="{StaticResource VerticalBookTextStyle}"
+                                           FontWeight="SemiLight"/>
+                                <TextBlock Text="{x:Bind local:MyDanmuPage.TimeToString(EditTime), Mode=OneWay}"
+                                           Style="{StaticResource VerticalBookTextStyle}"
+                                           FontWeight="SemiLight"/>
+                            </StackPanel>
+                            
+                        </SwipeControl>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </RefreshContainer>
+
+        <controls:Loading x:Name="loadingControl" HorizontalContentAlignment="Center"
+                          VerticalContentAlignment="Center" IsLoading="True">
+            <controls:Loading.Background>
+                <SolidColorBrush Color="Black" Opacity="0.7" />
+            </controls:Loading.Background>
+            <StackPanel Orientation="Horizontal" Spacing="15">
+                <ProgressRing IsActive="True" Height="35" Width="35"
+                              Foreground="{ThemeResource SystemAccentColorLight1}"/>
+                <TextBlock Style="{StaticResource TitleTextStyle}" Margin="0"
+                           Text="Loading..." Foreground="White"/>
+            </StackPanel>
+        </controls:Loading>
     </Grid>
 </Page>

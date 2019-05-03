@@ -11,6 +11,77 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Frontend
 {
+
+    public class DanmuCollection : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        internal int BookId { private set; get; }
+        internal int PageNum { private set; get; }
+        internal ObservableCollection<Danmu> Danmus { private set; get; } = new ObservableCollection<Danmu>();
+        internal bool Finish { private set; get; } = false;
+
+        public DanmuCollection(int bookId, int page)
+        {
+            this.BookId = bookId;
+            this.PageNum = page;
+            this.Reload();
+        }
+
+        internal async void Reload()
+        {
+            this.Danmus.Clear();
+            this.Finish = false;
+            // Read global settings to find how many danmus
+            var ids = await NetworkGet.GetDanmuOfBook(this.BookId, this.PageNum);
+            foreach (int id in ids)
+            {
+                var dan = new Danmu(id);
+                await NetworkGet.GetDanmuContent(dan);
+                this.Danmus.Add(dan);
+            }
+            this.Finish = true;
+        }
+    }
+
+    public class FullDanmu : INotifyPropertyChanged
+    {
+        internal string UserName { set; get; }
+        internal DateTime EditTime { set; get; }
+        internal string BookName { set; get; }
+        internal int PageNum { set; get; }
+        internal string Content { set; get; }
+        internal int ID { set; get; }
+
+        public FullDanmu(int id)
+        {
+            this.ID = id;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+
+    public class Danmu
+    {
+        internal string Content { set; get; }
+        internal int ID { set; get; }
+
+        public Danmu(int id)
+        {
+            this.ID = id;
+        }
+    }
+
+
     internal enum ContentType
     {
         Books,
@@ -53,7 +124,7 @@ namespace Frontend
         Week
     }
 
-    internal class SearchInfo: INotifyPropertyChanged
+    internal class SearchInfo : INotifyPropertyChanged
     {
         internal SearchInfo(string query)
         {
@@ -624,6 +695,10 @@ namespace Frontend
 
         internal async Task<bool> ReloadBooks(QueryObject newQuery, string newTitle)
         {
+            if (newQuery.SearchType == null)
+            {
+                return await this.ReloadBooks(query.IsBillboard.Value, query.BookListId.Value);
+            }
             this.Books.Clear();
             this.query = newQuery;
             this.Title = newTitle;
@@ -869,6 +944,31 @@ namespace Frontend
             {
                 return "(" + str + ")";
             }
+        }
+
+        internal static async Task<string> InputTextDialogAsync(string title, string placeholder, string previousContent)
+        {
+            TextBox inputTextBox = new TextBox
+            {
+                AcceptsReturn = false,
+                TextWrapping = TextWrapping.WrapWholeWords,
+                MinHeight = 32,
+                Text = previousContent,
+                PlaceholderText = placeholder
+            };
+            ContentDialog dialog = new ContentDialog
+            {
+                MaxWidth = 650,
+                Content = inputTextBox,
+                Title = title,
+                IsSecondaryButtonEnabled = true,
+                PrimaryButtonText = "Confirm",
+                SecondaryButtonText = "Cancel"
+            };
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                return inputTextBox.Text;
+            else
+                return previousContent;
         }
     }
 

@@ -27,7 +27,8 @@ namespace Frontend
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            this.Refresh();
+            _ = ShelfBooks.Reload();
+            this.WaitLoading();
         }
 
         internal BookSummaryCollection ShelfBooks { set; get; }
@@ -47,7 +48,7 @@ namespace Frontend
             if (!loadingControl.IsLoading)
             {
                 loadingControl.IsLoading = true;
-                ShelfBooks.Reload();
+                _ = ShelfBooks.Reload();
                 WaitLoading();
             }
         }

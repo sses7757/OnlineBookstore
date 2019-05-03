@@ -50,6 +50,7 @@
       <RootProperty Name="Padding" />
       <RootProperty Name="Header" />
       <RootEvent Name="Loaded" />
+      <RootEvent Name="ItemClick" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.ListViewBase">
       <RootProperty Name="SelectionMode" />
@@ -63,8 +64,10 @@
       <RootProperty Name="SelectionMode" />
       <RootProperty Name="Margin" />
       <RootProperty Name="Padding" />
+      <RootProperty Name="IsItemClickEnabled" />
       <RootProperty Name="HorizontalContentAlignment" />
       <RootProperty Name="VerticalAlignment" />
+      <RootEvent Name="Loaded" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Grid">
       <RootProperty Name="Children" />
@@ -105,6 +108,9 @@
       <RootProperty Name="FontSize" />
       <RootProperty Name="Padding" />
       <RootProperty Name="Foreground" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.SymbolIconSource">
+      <RootProperty Name="Symbol" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Setter">
       <RootProperty Name="Property" />
@@ -188,6 +194,7 @@
       <RootProperty Name="Margin" />
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="Tag" />
       <RootProperty Name="Style" />
       <RootProperty Name="IsEnabled" />
       <RootProperty Name="MinWidth" />
@@ -219,6 +226,24 @@
       <RootProperty Name="ItemTemplate" />
     </RootType>
     <RootType FullName="Frontend.HomePage" />
+    <RootType FullName="Windows.UI.Xaml.Controls.SwipeControl">
+      <RootProperty Name="Margin" />
+      <RootProperty Name="Padding" />
+      <RootProperty Name="Background" />
+      <RootProperty Name="LeftItems" />
+      <RootProperty Name="Content" />
+      <RootProperty Name="TopItems" />
+      <RootProperty Name="MaxHeight" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.SwipeItems">
+      <RootProperty Name="Mode" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.SwipeItem">
+      <RootProperty Name="Text" />
+      <RootProperty Name="IconSource" />
+      <RootProperty Name="Background" />
+      <RootEvent Name="Invoked" />
+    </RootType>
     <RootType FullName="Frontend.MyDanmuPage" />
     <RootType FullName="Frontend.MyReadlistPage" />
     <RootType FullName="Frontend.MyWishlistPage" />

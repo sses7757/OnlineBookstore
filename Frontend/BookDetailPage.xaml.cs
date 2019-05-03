@@ -183,5 +183,22 @@ namespace Frontend
         {
             // TODO add edit info button
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            switch((sender as Button).Tag as string)
+            {
+                case "buy":
+                    // TODO
+                case "readlist":
+
+                case "wishlist":
+
+                case "preview":
+
+                default:
+                    return;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI.Controls;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -85,15 +86,15 @@ namespace Frontend
             }
         }
 
-        private void Notification_Closed(object sender, Microsoft.Toolkit.Uwp.UI.Controls.InAppNotificationClosedEventArgs e)
+        private void Notification_Closed(object sender, InAppNotificationClosedEventArgs e)
         {
             if ((string)notification.Content == "Login success")
             {
-                Util.main.NavigateToHomeAndShowMine(true);
+                Util.main.NavigateToHomeAndShowMine(true, e.DismissKind == InAppNotificationDismissKind.User);
             }
             else if ((string)notification.Content == "Logout success")
             {
-                Util.main.NavigateToHomeAndShowMine(false);
+                Util.main.NavigateToHomeAndShowMine(false, e.DismissKind == InAppNotificationDismissKind.User);
             }
         }
     }

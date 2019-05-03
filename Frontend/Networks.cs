@@ -306,7 +306,7 @@ namespace Frontend
             // TODO get book reviews (from -> from + count)
             await Task.Delay(100);
             var ids = new List<int>();
-            for (int i = from; i < count + from; ++i)
+            for (int i = from; i < (count == int.MaxValue ? 12 : count) + from; ++i)
             {
                 ids.Add(i + 1657);
             }
@@ -465,6 +465,102 @@ namespace Frontend
             collection.OnPropertyChanged("Description");
             collection.OnPropertyChanged("FollowAmount");
 
+        }
+
+        public static async Task<int[]> GetMyWishlist()
+        {
+            var query = new QueryObject("GetMyWishlist")
+            {
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            List<int> ids = new List<int>();
+            for (int i = 0; i < 11; ++i)
+            {
+                ids.Add(i + 789);
+            }
+            return ids.ToArray();
+        }
+
+        public static async Task<int[]> GetMyDanmus()
+        {
+            var query = new QueryObject("GetMyDanmus")
+            {
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            List<int> ids = new List<int>();
+            for (int i = 0; i < 35; ++i)
+            {
+                ids.Add(i + 123);
+            }
+            return ids.ToArray();
+        }
+
+        public static async Task<int[]> GetDanmuOfBook(int bookId, int page)
+        {
+            var query = new QueryObject("GetDanmuOfBook")
+            {
+                BookId = bookId,
+                Page = page
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            List<int> ids = new List<int>();
+            for (int i = 0; i < 20; ++i)
+            {
+                ids.Add(i + 123);
+            }
+            return ids.ToArray();
+        }
+
+        public static async Task<bool> GetDanmuContent(Danmu danmu)
+        {
+            var query = new QueryObject("GetDanmuContent")
+            {
+                DanmuId = danmu.ID
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            danmu.Content = new string[] { "6666666666666666666", "test test test test test" }[new Random().Next(2)];
+            return true;
+        }
+
+        public static async Task<bool> GetFullDanmuContent(FullDanmu danmu)
+        {
+            var query = new QueryObject("GetFullDanmuContent")
+            {
+                DanmuId = danmu.ID
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            danmu.BookName = "Test book name";
+            danmu.PageNum = 13;
+            danmu.EditTime = DateTime.Now;
+            danmu.Content = new string[] { "6666666666666666666", "test test test test test" }[new Random().Next(2)];
+            danmu.UserName = "Myself";
+            return true;
+        }
+
+        public static async Task<int[]> GetMyReadLists()
+        {
+            var query = new QueryObject("GetMyReadLists")
+            {
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(100);
+            List<int> ids = new List<int>();
+            for (int i = 0; i < 3; ++i)
+            {
+                ids.Add(i + 456);
+            }
+            return ids.ToArray();
         }
     }
 

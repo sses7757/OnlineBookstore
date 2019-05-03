@@ -93,5 +93,9 @@
             <Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark2}"/>
         </Style>
 
+        <SymbolIconSource x:Key="BuyIcon" Symbol="Shop"/>
+        <SymbolIconSource x:Key="EditIcon" Symbol="Edit"/>
+        <SymbolIconSource x:Key="DeleteIcon" Symbol="Delete"/>
+
     </Application.Resources>
 </Application>

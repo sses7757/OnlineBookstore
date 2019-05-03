@@ -233,17 +233,19 @@ namespace Frontend
             NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First(n => n.Tag.Equals(item.Tag));
         }
 
-        internal void NavigateToHomeAndShowMine(bool show)
+        internal void NavigateToHomeAndShowMine(bool show, bool navigate = true)
         {
             if (show)
             {
-                NavView.SelectedItem = NavView.MenuItems[1];
+                if (navigate)
+                    NavView.SelectedItem = NavView.MenuItems[1];
                 ShowMyAccount(true);
             }
             else
             {
                 ShowMyAccount(false);
-                NavView.SelectedItem = NavView.MenuItems[NavView.MenuItems.Count - 1];
+                if (navigate)
+                    NavView.SelectedItem = NavView.MenuItems[NavView.MenuItems.Count - 1];
             }
         }
 

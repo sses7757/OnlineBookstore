@@ -50,23 +50,23 @@
                     <Image Source="{x:Bind Detail.BookCover}" Style="{StaticResource BookImageStyle}" Grid.Row="1"
                            x:Name="bookCover" Margin="10,20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                     <Button Content="+ Readlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            Style="{StaticResource AccentButtonStyle}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="readlist"
+                            Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
                             IsEnabled="{x:Bind Detail.CanAddReadList, Mode=OneWay}">
                     </Button>
                     <Button Content="Buy" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            Style="{StaticResource AccentButtonStyle}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="buy"
+                            Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
                             IsEnabled="{x:Bind Detail.CanBuy, Mode=OneWay}">
                     </Button>
                     <Button Content="+ Wishlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            Style="{StaticResource AccentButtonStyle}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="wishlist"
+                            Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
                             IsEnabled="{x:Bind Detail.CanAddWishList, Mode=OneWay}">
                     </Button>
                     <Button Content="Preview" FontSize="16" FontWeight="SemiBold" Margin="10,5"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            Style="{StaticResource AccentButtonStyle}">
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="preview"
+                            Style="{StaticResource AccentButtonStyle}" Click="Button_Click">
                     </Button>
                 </StackPanel>
 
