@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,6 +12,16 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Frontend
 {
+    public enum ReadListChangeType
+    {
+        AddBook,
+        RemoveReadList,
+        DeleteBook,
+        ChangeTitle,
+        ChangeContent
+    }
+
+
 
     public class DanmuCollection : INotifyPropertyChanged
     {
@@ -233,11 +244,11 @@ namespace Frontend
         private void Init()
         {
             foreach (BooksOrderType t in Enum.GetValues(typeof(BooksOrderType)))
-                BookOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t)});
+                BookOrders.Add(new ComboBoxItem { Content = t.EnumToString()});
             foreach (BillboardsOrderType t in Enum.GetValues(typeof(BillboardsOrderType)))
-                BillboardOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t) });
+                BillboardOrders.Add(new ComboBoxItem { Content = t.EnumToString() });
             foreach (ReadlistsOrderType t in Enum.GetValues(typeof(ReadlistsOrderType)))
-                ReadListOrders.Add(new ComboBoxItem { Content = Util.EnumToString(t) });
+                ReadListOrders.Add(new ComboBoxItem { Content = t.EnumToString() });
             Books = new BookDetailCollection(this.ToQueryObject(ContentType.Books),
                                              "Search result of " + this.QueryText, "");
             Billboards = new BooklistCollection(true, this.ToQueryObject(ContentType.Billboards));
@@ -865,7 +876,7 @@ namespace Frontend
         }
     }
 
-    internal class Util
+    internal static class Util
     {
         internal const int PREVIEW_AMOUNT = 8;
         internal const int INIT_AMOUNT = 14;
@@ -886,7 +897,7 @@ namespace Frontend
 
         internal static ObservableCollection<Label> LABELS;
 
-        internal static Visibility BoolToVisibility(bool visible)
+        internal static Visibility ToVisibility(this bool visible)
         {
             return visible ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -894,7 +905,7 @@ namespace Frontend
         internal static string SHA256(string data)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(data);
-            byte[] hash = System.Security.Cryptography.SHA256Managed.Create().ComputeHash(bytes);
+            byte[] hash = System.Security.Cryptography.SHA256.Create().ComputeHash(bytes);
 
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < hash.Length; i++)
@@ -905,14 +916,9 @@ namespace Frontend
             return builder.ToString();
         }
 
-        internal static bool IsSubType(Type type, object obj)
-        {
-            return obj != null && type.IsAssignableFrom(obj.GetType());
-        }
-
         internal const int LEVEL_DataTemplate = 10;
 
-        internal static UIElement GetParentUpto(UIElement elem, int level = 1)
+        internal static UIElement GetParentUpto(this UIElement elem, int level = 1)
         {
             if (level < 1)
                 return elem;
@@ -924,41 +930,39 @@ namespace Frontend
             return parent;
         }
 
-        internal static string EnumToString(Enum e)
+        internal static string EnumToString(this Enum e)
         {
             return System.Text.RegularExpressions.Regex.Replace(e.ToString("F"), @"(\p{Lu})", " $1").TrimStart();
         }
 
-        internal static string ListToString<T>(List<T> list)
+        internal static T CloneThroughJson<T>(this T source)
         {
-            var str = "";
-            foreach (T elem in list)
+            if (source == null)
             {
-                str += elem.ToString();
+                return default;
             }
-            if (str.Length == 0)
-            {
-                return "All";
-            }
-            else
-            {
-                return "(" + str + ")";
-            }
+            var deserializeSettings = new JsonSerializerSettings
+                { ObjectCreationHandling = ObjectCreationHandling.Replace };
+            return JsonConvert.DeserializeObject<T>
+                (JsonConvert.SerializeObject(source), deserializeSettings);
         }
 
-        internal static async Task<string> InputTextDialogAsync(string title, string placeholder, string previousContent)
+        internal static async Task<string> InputTextDialogAsync(string title, string placeholder,
+                                                                string previousContent)
         {
             TextBox inputTextBox = new TextBox
             {
                 AcceptsReturn = false,
-                TextWrapping = TextWrapping.WrapWholeWords,
+                TextWrapping = TextWrapping.Wrap,
                 MinHeight = 32,
+                MaxWidth = 650,
                 Text = previousContent,
                 PlaceholderText = placeholder
             };
             ContentDialog dialog = new ContentDialog
             {
-                MaxWidth = 650,
+                //HorizontalAlignment = HorizontalAlignment.Center,
+                //VerticalAlignment = VerticalAlignment.Center,
                 Content = inputTextBox,
                 Title = title,
                 IsSecondaryButtonEnabled = true,

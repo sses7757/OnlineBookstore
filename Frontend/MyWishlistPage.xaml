@@ -14,10 +14,10 @@
         <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
             <ListView Style="{StaticResource ListStyle}" Padding="150,40,150,0"
                       ItemsSource="{x:Bind WishBooks, Mode=OneWay}"
-                      x:Name="bookGrid" Loaded="BookGrid_Loaded">
+                      x:Name="bookGrid" Loaded="BookGrid_Loaded" ItemClick="Book_Pointed">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:BookDetail">
-                        <SwipeControl Margin="10" MaxHeight="100">
+                        <SwipeControl Margin="10" MaxHeight="105">
                             <SwipeControl.LeftItems>
                                 <SwipeItems Mode="Reveal">
                                     <SwipeItem Text="Buy" Invoked="Buy_Invoked"
@@ -29,8 +29,7 @@
                                 </SwipeItems>
                             </SwipeControl.LeftItems>
 
-                            <Grid PointerReleased="Book_Pointed"
-                                  HorizontalAlignment="Left" VerticalAlignment="Stretch">
+                            <Grid HorizontalAlignment="Left" VerticalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>

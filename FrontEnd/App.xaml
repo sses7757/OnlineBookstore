@@ -97,5 +97,8 @@
         <SymbolIconSource x:Key="EditIcon" Symbol="Edit"/>
         <SymbolIconSource x:Key="DeleteIcon" Symbol="Delete"/>
 
+        <!--<FontIconSource x:Key="LargeEditIcon" FontSize="40" Glyph="&#xE104;"/>
+        <FontIconSource x:Key="LargeDeleteIcon" FontSize="40" Glyph="&#xE107;"/>-->
+
     </Application.Resources>
 </Application>

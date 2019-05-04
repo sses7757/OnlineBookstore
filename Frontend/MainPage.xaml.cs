@@ -55,20 +55,20 @@ namespace Frontend
 
         private void ShowSearch(bool visible)
         {
-            SearchMain.Visibility = Util.BoolToVisibility(!visible);
-            SearchBtn.Visibility = Util.BoolToVisibility(visible);
+            SearchMain.Visibility = (!visible).ToVisibility();
+            SearchBtn.Visibility = visible.ToVisibility();
         }
 
         private void ShowAdmin(bool visible)
         {
-            var v = Util.BoolToVisibility(visible);
+            var v = visible.ToVisibility();
             TopSeparator.Visibility = v;
             ToggleAdmin.Visibility = v;
         }
 
         private void ShowMyAccount(bool visible)
         {
-            var v = Util.BoolToVisibility(visible);
+            var v = visible.ToVisibility();
             BookshelfBtn.Visibility = v;
             MyDanmuBtn.Visibility = v;
             MyReadlistBtn.Visibility = v;
@@ -249,6 +249,11 @@ namespace Frontend
             }
         }
 
+        internal void NavigateToSignUp()
+        {
+            NavView_Navigate(typeof(SignUpPage), null, true, null);
+        }
+
         internal void NavigateToBookDetail(BookSummary itemToPass, Type page)
         {
             ContentFrame.SetListDataItemForNextConnectedAnimation(itemToPass);
@@ -299,6 +304,11 @@ namespace Frontend
                 if (c != null && c.HasValue)
                     (ContentFrame.Content as IRefreshAdminInterface).AdminButtonPressed(c.Value);
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Connection.Test();
         }
     }
 }

@@ -7,7 +7,7 @@
 
   有关程序包清单文件的详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkID=241727
  -->
-  <Identity Name="e540f7ce-74dd-4b31-8a9b-845f9df105ca" Publisher="CN=skk77" Version="1.0.0.0" ProcessorArchitecture="x64" />
+  <Identity Name="e540f7ce-74dd-4b31-8a9b-845f9df105ca" Publisher="CN=skk77" Version="0.5.1.0" ProcessorArchitecture="x64" />
   <mp:PhoneIdentity PhoneProductId="e540f7ce-74dd-4b31-8a9b-845f9df105ca" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Frontend</DisplayName>

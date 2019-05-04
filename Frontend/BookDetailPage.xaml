@@ -49,7 +49,7 @@
                 <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20" Grid.Column="1">
                     <Image Source="{x:Bind Detail.BookCover}" Style="{StaticResource BookImageStyle}" Grid.Row="1"
                            x:Name="bookCover" Margin="10,20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                    <Button Content="+ Readlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
+                    <Button Content="+ Read List" FontSize="16" FontWeight="SemiBold" Margin="10,5"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="readlist"
                             Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
                             IsEnabled="{x:Bind Detail.CanAddReadList, Mode=OneWay}">
@@ -59,7 +59,7 @@
                             Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
                             IsEnabled="{x:Bind Detail.CanBuy, Mode=OneWay}">
                     </Button>
-                    <Button Content="+ Wishlist" FontSize="16" FontWeight="SemiBold" Margin="10,5"
+                    <Button Content="+ Wish List" FontSize="16" FontWeight="SemiBold" Margin="10,5"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="wishlist"
                             Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
                             IsEnabled="{x:Bind Detail.CanAddWishList, Mode=OneWay}">

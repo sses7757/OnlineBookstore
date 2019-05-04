@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Frontend
@@ -13,7 +16,7 @@ namespace Frontend
     {
         public string Type { set; get; }
         public string UserName { set; get; }
-        public string EncodedPassowrd { set; get; }
+        public string EncodedPassword { set; get; }
         public string MainLabel { set; get; }
         public int? BookId { set; get; }
         public bool? IsBillboard { set; get; }
@@ -33,6 +36,8 @@ namespace Frontend
         public int[] PageRange { set; get; }
         public string[] LabelFilters { set; get; }
         public bool? IncludeFreeBooks { set; get; }
+
+        public int UserId { set; get; }
 
         public int? Page { set; get; }
 
@@ -55,10 +60,100 @@ namespace Frontend
         }
     }
 
+    public class Connection
+    {
+        public const string REMOTE_IP = "10.21.37.214";
+        public const int REMOTE_PORT = 2307;
+
+        private Socket socket;
+
+        public Connection() { }
+
+        internal async Task Reconnect()
+        {
+            if (socket != null)
+            {
+                try
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                }
+                finally { }
+                socket.Close();
+            }
+            IPAddress ip = IPAddress.Parse(REMOTE_IP);
+            IPEndPoint ipEnd = new IPEndPoint(ip, REMOTE_PORT);
+            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                Debug.WriteLine("Start connecting...");
+                await socket.ConnectAsync(ipEnd);
+            }
+            catch (SocketException)
+            {
+                Debug.WriteLine("Fail to connect server, re-connecting...");
+                await Task.Delay(Util.REFRESH_RATE);
+                await this.Reconnect();
+            }
+        }
+
+        private bool SocketConnected
+        {
+            get => !(socket == null ||
+                     socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
+        }
+
+        /// <summary>
+        /// Send to remote host with user id
+        /// </summary>
+        /// <param name="query"> A copied <see cref="QueryObject">QueryObject</see> </param>
+        internal async Task SendWithUser(QueryObject query)
+        {
+            if (!this.SocketConnected)
+            {
+                await this.Reconnect();
+            }
+            query.UserId = Util.UserId;
+            var send = Encoding.UTF8.GetBytes(query.ToJson());
+            int sendLen;
+            try
+            {
+                sendLen = await socket.SendAsync(send, SocketFlags.None);
+                Debug.WriteLine("Send of {0} finish, total {1} bytes.", query.Type, sendLen);
+            }
+            catch (Exception)
+            {
+                await this.Reconnect();
+                await this.SendWithUser(query);
+            }
+            
+        }
+
+        internal static async void Test()
+        {
+            var conn = new Connection();
+            await conn.Reconnect();
+            var socket = conn.socket;
+            var stringSend = "{\n\"BookId\":123,\n\"bookName\":\"bookN\",\n\"authorId\":0,\n" +
+                             "\"publisherId\":0,\n\"labelId\":0,\n\"pages\":0,\n\"price\":0.0\n}";
+            //var stringSend = "{\"bookId\":123,\"bookName\":\"bookN\",\"authorId\":0," +
+            //             "\"publisherId\":0,\"labelId\":0,\"pages\":0,\"price\":0.0}";
+            var send = Encoding.UTF8.GetBytes(stringSend);
+            int sendLen = await socket.SendAsync(send, SocketFlags.None);
+            Debug.WriteLine("Send finish, total {0} bytes.", sendLen);
+
+            socket.Shutdown(SocketShutdown.Send);
+
+            byte[] receive = new byte[2048];
+            int recvLen = await socket.ReceiveAsync(receive, SocketFlags.None);
+            Debug.WriteLine("Test receive:\r\n" + Encoding.UTF8.GetString(receive, 0, recvLen));
+
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
+        }
+    }
+
     public class NetworkGet
     {
-        public const string REMOTE_IP = "10.20.30.40";
-
         internal static bool IsValidID(int id)
         {
             return id >= 0;
@@ -76,7 +171,7 @@ namespace Frontend
             var query = new QueryObject("Login")
             {
                 UserName = UserName,
-                EncodedPassowrd = EncodedPassword
+                EncodedPassword = EncodedPassword
             };
             var json = query.ToString();
             // TODO
@@ -333,10 +428,11 @@ namespace Frontend
 
         public static async Task<int[]> GetFromQuery(QueryObject query, int from = 0, int count = int.MaxValue)
         {
-            query.Type = "GetFromQuery";
-            query.From = from;
-            query.Count = count;
-            var json = query.ToJson();
+            var newQuery = query.CloneThroughJson();
+            newQuery.Type = "GetFromQuery";
+            newQuery.From = from;
+            newQuery.Count = count;
+            var json = newQuery.ToJson();
             // TODO get ids
             await Task.Delay(delay);
             List<int> ids = new List<int>();
@@ -564,15 +660,77 @@ namespace Frontend
         }
     }
 
+    public class ChangeObject
+    {
+        public string Type { set; get; }
+        public string UserName { set; get; }
+        public string Email { set; get; }
+        public string EncodedPassword { set; get; }
+
+        public int? DanmuId { set; get; }
+        public bool? IsDeleteAction { set; get; }
+        public string NewContent { set; get; }
+
+        public int? ReadListId { set; get; }
+        public ReadListChangeType? ChangeType { set; get; }
+        public int? AlteredBookId { set; get; }
+        public string AlteredText { set; get; }
+
+        public int? BookId { set; get; }
+        public bool? IsAddActiong { set; get; }
+
+        public string Content { set; get; }
+        public int? PageNum { set; get; }
+
+        public string Title { set; get; }
+        
+        public int? Rating { set; get; }
+
+
+        public ChangeObject() { }
+
+        public ChangeObject(string type)
+        {
+            Type = type;
+        }
+
+        public string ToJson()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            return JsonConvert.SerializeObject(this, settings);
+        }
+    }
+
     public class NetworkSet
     {
         public static async Task<bool> Logout()
         {
-
+            var change = new ChangeObject("Logout")
+            {
+            };
+            var json = change.ToJson();
             // TODO
-            await Task.Delay(4000);
+            await Task.Delay(2000);
             Util.UserId = -1;
             Util.isAdmin = false;
+            return true;
+        }
+
+        public static async Task<bool> SignUp(string userName, string email, string password)
+        {
+            var change = new ChangeObject("SignUp")
+            {
+                UserName = userName,
+                Email = email,
+                EncodedPassword = password
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(2000);
             return true;
         }
     }

@@ -86,7 +86,7 @@ namespace Frontend
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
             var elem = sender as UIElement;
-            var parent = Util.GetParentUpto(elem, 2);
+            var parent = elem.GetParentUpto(2);
             if (parent == null || !(parent is ListViewItemPresenter))
                 return;
             var collection = (parent as ListViewItemPresenter).DataContext as BookDetailCollection;
@@ -105,8 +105,8 @@ namespace Frontend
             var dataToPass = elem.DataContext as BookDetail;
             if (NetworkGet.IsValidID(dataToPass.BookId))
             {
-                var parent = Util.GetParentUpto(elem, Util.LEVEL_DataTemplate);
-                var collectionParent = Util.GetParentUpto(parent, 2);
+                var parent = elem.GetParentUpto(Util.LEVEL_DataTemplate);
+                var collectionParent = parent.GetParentUpto(2);
                 if (parent == null || !(parent is ListView) ||
                     collectionParent == null || !(collectionParent is ListViewItemPresenter))
                     return;

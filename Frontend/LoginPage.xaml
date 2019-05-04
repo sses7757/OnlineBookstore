@@ -10,6 +10,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="0.2*"/>
@@ -19,19 +25,23 @@
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <TextBlock HorizontalAlignment="Center" Text="Login BookHub"
-                   VerticalAlignment="Bottom" Grid.Row="0"
+                   VerticalAlignment="Bottom" Grid.Row="0" Grid.Column="1"
                    Style="{StaticResource SubheaderTextBlockStyle}"
                    Foreground="{ThemeResource SystemAccentColorDark2}"/>
-        <TextBox x:Name="nameBox" HorizontalAlignment="Center" Grid.Row="2" Width="350" FontSize="18"
-                 Header="User name" PlaceholderText="Your user name or e-mail" VerticalAlignment="Center"/>
-        <PasswordBox x:Name="passBox" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center"
-                     Width="350" Header="Password" PlaceholderText="Your password" FontSize="18"/>
-        <Button x:Name="btn" Content="Confirm" Grid.Column="1" Grid.Row="5" VerticalAlignment="Top"
-                HorizontalAlignment="Center" FontSize="22" MinWidth="120"
-                Style="{StaticResource AccentButtonStyle}"
-                Click="Button_Click"/>
-        <ProgressRing x:Name="progress" Grid.Row="5" Width="50" Height="50" IsActive="False"/>
-        <controls:InAppNotification x:Name="notification" ShowDismissButton="True"
+        <TextBox x:Name="nameBox" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1"
+                 MinWidth="350" FontSize="18" Header="User name"
+                 PlaceholderText="Your user name or e-mail" VerticalAlignment="Center"/>
+        <PasswordBox x:Name="passBox" HorizontalAlignment="Center" Grid.Row="3" Grid.Column="1"
+                     VerticalAlignment="Center" MinWidth="350" Header="Password"
+                     PlaceholderText="Your password" FontSize="18"/>
+        <Button x:Name="btn" Content="Confirm" Grid.Row="5" VerticalAlignment="Top"
+                HorizontalAlignment="Center" FontSize="22" MinWidth="120" Grid.Column="1"
+                Style="{StaticResource AccentButtonStyle}" Click="Button_Click"/>
+        <HyperlinkButton Content="Sign up" FontSize="18" Grid.Row="5" Grid.Column="1"
+                         VerticalAlignment="Top" HorizontalAlignment="Right"
+                         Click="HyperlinkButton_Click"/>
+        <ProgressRing x:Name="progress" Grid.Column="1" Grid.Row="5" Width="50" Height="50" IsActive="False"/>
+        <controls:InAppNotification x:Name="notification" ShowDismissButton="True" Grid.ColumnSpan="3"
                                     AnimationDuration="00:00:0.2" VerticalOffset="100"
                                     HorizontalOffset="0" StackMode="Replace" Grid.Row="5"
                                     Closed="Notification_Closed"/>

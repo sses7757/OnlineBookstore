@@ -97,5 +97,10 @@ namespace Frontend
                 Util.main.NavigateToHomeAndShowMine(false, e.DismissKind == InAppNotificationDismissKind.User);
             }
         }
+
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            Util.main.NavigateToSignUp();
+        }
     }
 }

@@ -66,9 +66,9 @@ namespace Frontend
         /// <summary>
         /// Navigate to detail page
         /// </summary>
-        private void Book_Pointed(object sender, PointerRoutedEventArgs e)
+        private void Book_Pointed(object sender, ItemClickEventArgs e)
         {
-            var dataToPass = (sender as FrameworkElement).DataContext as BookDetail;
+            var dataToPass = e.ClickedItem as BookDetail;
             if (NetworkGet.IsValidID(dataToPass.BookId))
             {
                 bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");

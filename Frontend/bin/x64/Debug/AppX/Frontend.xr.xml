@@ -68,6 +68,7 @@
       <RootProperty Name="HorizontalContentAlignment" />
       <RootProperty Name="VerticalAlignment" />
       <RootEvent Name="Loaded" />
+      <RootEvent Name="ItemClick" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Grid">
       <RootProperty Name="Children" />
@@ -99,6 +100,8 @@
       <RootProperty Name="Margin" />
       <RootProperty Name="Content" />
       <RootProperty Name="FontSize" />
+      <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="HorizontalAlignment" />
       <RootEvent Name="Click" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.ContentControl">
@@ -197,6 +200,7 @@
       <RootProperty Name="Tag" />
       <RootProperty Name="Style" />
       <RootProperty Name="IsEnabled" />
+      <RootProperty Name="Background" />
       <RootProperty Name="MinWidth" />
       <RootEvent Name="Click" />
     </RootType>
@@ -245,6 +249,10 @@
       <RootEvent Name="Invoked" />
     </RootType>
     <RootType FullName="Frontend.MyDanmuPage" />
+    <RootType FullName="Windows.UI.Xaml.Controls.FontIcon">
+      <RootProperty Name="FontSize" />
+      <RootProperty Name="Glyph" />
+    </RootType>
     <RootType FullName="Frontend.MyReadlistPage" />
     <RootType FullName="Frontend.MyWishlistPage" />
     <RootType FullName="Frontend.ReadlistPage" />
@@ -419,5 +427,6 @@
       <RootProperty Name="Effect" />
     </RootType>
     <RootType FullName="Frontend.MainPage" />
+    <RootType FullName="Frontend.SignUpPage" />
   </Roots.RootTypes>
 </Roots>

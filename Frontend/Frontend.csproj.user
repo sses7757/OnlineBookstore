@@ -9,5 +9,9 @@
     <AppIconSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</AppIconSource>
     <SplashScreenSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</SplashScreenSource>
     <PackageLogoSource>C:\Users\skk77\OneDrive\Textbook\数据库\project\OnlineBookstore\Frontend\books8.png</PackageLogoSource>
+    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
+    <AppxShowAllApps>False</AppxShowAllApps>
+    <AppxBuildConfigurationSelection>x64</AppxBuildConfigurationSelection>
+    <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
   </PropertyGroup>
 </Project>

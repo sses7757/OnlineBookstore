@@ -64,9 +64,10 @@ namespace Frontend
             // do nothing
         }
 
-        private async void EditTitle_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void EditTitle_Invoked(object sender, RoutedEventArgs e)
         {
-            var books = args.SwipeControl.DataContext as BookDetailCollection;
+            var swipe = (sender as Button).GetParentUpto(2) as FrameworkElement;
+            var books = swipe.DataContext as BookDetailCollection;
             var orgTitle = books.Title;
             var newTitle = await Util.InputTextDialogAsync("Editing Read List Title",
                                                            "Please input the title of your read list",
@@ -81,9 +82,10 @@ namespace Frontend
             }
         }
 
-        private async void EditDesc_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void EditDesc_Invoked(object sender, RoutedEventArgs e)
         {
-            var books = args.SwipeControl.DataContext as BookDetailCollection;
+            var swipe = (sender as Button).GetParentUpto(2) as FrameworkElement;
+            var books = swipe.DataContext as BookDetailCollection;
             var orgDesc = books.Description;
             var newDesc = await Util.InputTextDialogAsync("Editing Read List Description",
                                                            "Please input the description of your read list",
@@ -98,19 +100,33 @@ namespace Frontend
             }
         }
 
-        private void DeleteList_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void DeleteList_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            // TODO network delete
-            this.ReadLists.Remove(args.SwipeControl.DataContext as BookDetailCollection);
+            ContentDialog dialog = new ContentDialog()
+            {
+                Content = "Are you sure to delete the whole read lists?" +
+                          "\r\nThis operation is irrevesable.",
+                Title = "Deleting Read List",
+                IsSecondaryButtonEnabled = true,
+                PrimaryButtonText = "Confirm",
+                SecondaryButtonText = "Cancel"
+            };
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                // TODO network delete
+                this.ReadLists.Remove(args.SwipeControl.DataContext as BookDetailCollection);
+            }
         }
 
-        private void DeleteBook_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void DeleteBook_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            var parent = Util.GetParentUpto(args.SwipeControl, Util.LEVEL_DataTemplate + 6)
+            var parent = args.SwipeControl.GetParentUpto(Util.LEVEL_DataTemplate + 6)
                             as ListViewItemPresenter;
             var collection = parent.DataContext as BookDetailCollection;
             // TODO network delete
             collection.Books.Remove(args.SwipeControl.DataContext as BookDetail);
+            collection.EditTime = DateTime.Now;
+            collection.OnPropertyChanged("EditTime");
         }
 
         private BookDetail _navigateItem = null;
@@ -125,7 +141,7 @@ namespace Frontend
             var dataToPass = e.ClickedItem as BookDetail;
             if (NetworkGet.IsValidID(dataToPass.BookId))
             {
-                var collectionParent = Util.GetParentUpto(parent, 6) as ListViewItemPresenter;
+                var collectionParent = parent.GetParentUpto(6) as ListViewItemPresenter;
                 parent.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
                 var service = ConnectedAnimationService.GetForCurrentView();
                 service.DefaultDuration = TimeSpan.FromSeconds(0.45);

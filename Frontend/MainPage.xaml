@@ -21,8 +21,8 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="WelcomeLabel1" Grid.Column="0" Style="{StaticResource TitleTextStyle}" FontSize="16"
-                           VerticalAlignment="Center" Text="Welcome to">
-                </TextBlock>
+                           VerticalAlignment="Center" Text="Welcome to"/>
+                <Button Grid.Column="0" Content="test send" Click="Button_Click"/>
                 <TextBlock x:Name="WelcomeLabel2" Grid.Column="1" Style="{StaticResource TitleTextStyle}" FontSize="16"
                            VerticalAlignment="Center" FontStyle="Italic" Text=" BookHub">
                     <TextBlock.Foreground>
