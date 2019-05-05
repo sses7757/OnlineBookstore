@@ -540,6 +540,22 @@ namespace Frontend
             return ids.ToArray();
         }
 
+        public static async Task<BookDetailCollection> GetTitleDescription(bool isBillboard, int id)
+        {
+            var query = new QueryObject("GetTitleDescription")
+            {
+                IsBillboard = isBillboard,
+                BookListId = id
+            };
+            var json = query.ToString();
+            // TODO
+            await Task.Delay(delay);
+            var collection = new BookDetailCollection();
+            collection.Title = "Test billboard title";
+            collection.Description = "Test billboard descriptions: test test test test test test";
+            return collection;
+        }
+
         public static async void GetTitleDescription(BookDetailCollection collection, bool isBillboard, int id)
         {
             var query = new QueryObject("GetTitleDescription")
@@ -560,7 +576,6 @@ namespace Frontend
             collection.OnPropertyChanged("EditTime");
             collection.OnPropertyChanged("Description");
             collection.OnPropertyChanged("FollowAmount");
-
         }
 
         public static async Task<int[]> GetMyWishlist()
@@ -658,6 +673,54 @@ namespace Frontend
             }
             return ids.ToArray();
         }
+
+        public static async Task<int[]> GetMyReadListsWithout(int bookId)
+        {
+            var query = new QueryObject("GetMyReadListsWithout")
+            {
+                BookId = bookId
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(1000);
+            return new int[] { 323, 348, 978 };
+        }
+
+        public static async Task<string> GetBookPreview(int bookId)
+        {
+            var query = new QueryObject("GetBookPreview")
+            {
+                BookId = bookId
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(1000);
+            return "file:///";
+        }
+
+        public static async Task<string> DownloadBook(int bookId)
+        {
+            var query = new QueryObject("DownloadBook")
+            {
+                BookId = bookId
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(1000);
+            return "file:///";
+        }
+
+        public static async Task<string> GetBookKey(int bookId)
+        {
+            var query = new QueryObject("GetBookKey")
+            {
+                BookId = bookId
+            };
+            var json = query.ToString();
+            // TODO 
+            await Task.Delay(1000);
+            return "asngaesgnaesiof";
+        }
     }
 
     public class ChangeObject
@@ -677,7 +740,7 @@ namespace Frontend
         public string AlteredText { set; get; }
 
         public int? BookId { set; get; }
-        public bool? IsAddActiong { set; get; }
+        public bool? IsAddAction { set; get; }
 
         public string Content { set; get; }
         public int? PageNum { set; get; }
@@ -733,6 +796,127 @@ namespace Frontend
             await Task.Delay(2000);
             return true;
         }
-    }
 
+        public static async Task<bool> ChangeDanmu(int danmuId, bool isDeleteAction,
+                                                   string newContent = null)
+        {
+            var change = new ChangeObject("ChangeDanmu")
+            {
+                DanmuId = danmuId,
+                IsDeleteAction = isDeleteAction,
+                NewContent = newContent
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return true;
+        }
+
+        public static async Task<bool> ChangeReadList(int readListId, ReadListChangeType changeType,
+                                                      int? alteredId = null, string alteredText = null)
+        {
+            var change = new ChangeObject("ChangeReadList")
+            {
+                ReadListId = readListId,
+                ChangeType = changeType,
+                AlteredBookId = alteredId,
+                AlteredText = alteredText
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return true;
+        }
+
+        public static async Task<bool> ChangeWishlist(int bookId, bool isAddAction)
+        {
+            var change = new ChangeObject("ChangeWishlist")
+            {
+                BookId = bookId,
+                IsAddAction = isAddAction
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return true;
+        }
+
+        public static async Task<bool> CreateDanmu(string content, int bookId, int pageNum)
+        {
+            var change = new ChangeObject("CreateDanmu")
+            {
+                Content = content,
+                BookId = bookId,
+                PageNum = pageNum
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return true;
+        }
+
+        public static async Task<bool> CreateReadList(string title, string content)
+        {
+            var change = new ChangeObject("CreateReadList")
+            {
+                Content = content,
+                Title = title
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return true;
+        }
+
+        public static async Task<string> BuyBook(int bookId)
+        {
+            var change = new ChangeObject("BuyBook")
+            {
+                BookId = bookId
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return "http://test-url/buy?bookId=" + bookId;
+        }
+
+        public static async Task<bool> CreateReview(int bookId, int rating, string title, string content)
+        {
+            var change = new ChangeObject("CreateReview")
+            {
+                BookId = bookId,
+                Rating = rating,
+                Title = title,
+                Content = content
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(1000);
+            return true;
+        }
+
+        public static async Task<bool> CheckBuyComplete(int bookId)
+        {
+            var change = new ChangeObject("CheckBuyComplete")
+            {
+                BookId = bookId,
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(100);
+            return true;
+        }
+
+        public static async Task<bool> CancleTransaction(int bookId)
+        {
+            var change = new ChangeObject("CancleTransaction")
+            {
+                BookId = bookId,
+            };
+            var json = change.ToJson();
+            // TODO
+            await Task.Delay(100);
+            return true;
+        }
+    }
 }

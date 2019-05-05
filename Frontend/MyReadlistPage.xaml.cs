@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -74,7 +75,15 @@ namespace Frontend
                                                            orgTitle);
             if (newTitle != null && newTitle.Length > 0 && newTitle != orgTitle)
             {
-                // TODO network edit
+                if (!books.ID.HasValue)
+                {
+                    Debug.WriteLine("Read list id not found!");
+                }
+                var success = await NetworkSet.ChangeReadList(books.ID.Value,
+                                                ReadListChangeType.ChangeTitle,
+                                                null, newTitle);
+                if (!success)
+                    return;
                 books.Title = newTitle;
                 books.EditTime = DateTime.Now;
                 books.OnPropertyChanged("Title");
@@ -92,7 +101,15 @@ namespace Frontend
                                                            orgDesc);
             if (newDesc != null && newDesc.Length > 0 && newDesc != orgDesc)
             {
-                // TODO network edit
+                if (!books.ID.HasValue)
+                {
+                    Debug.WriteLine("Read list id not found!");
+                }
+                var success = await NetworkSet.ChangeReadList(books.ID.Value,
+                                                ReadListChangeType.ChangeDescription,
+                                                null, newDesc);
+                if (!success)
+                    return;
                 books.Description = newDesc;
                 books.EditTime = DateTime.Now;
                 books.OnPropertyChanged("Description");
@@ -102,6 +119,7 @@ namespace Frontend
 
         private async void DeleteList_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
+            var books = args.SwipeControl.DataContext as BookDetailCollection;
             ContentDialog dialog = new ContentDialog()
             {
                 Content = "Are you sure to delete the whole read lists?" +
@@ -113,7 +131,14 @@ namespace Frontend
             };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                // TODO network delete
+                if (!books.ID.HasValue)
+                {
+                    Debug.WriteLine("Read list id not found!");
+                }
+                var success = await NetworkSet.ChangeReadList(books.ID.Value,
+                                                ReadListChangeType.RemoveReadList);
+                if (!success)
+                    return;
                 this.ReadLists.Remove(args.SwipeControl.DataContext as BookDetailCollection);
             }
         }
@@ -122,11 +147,19 @@ namespace Frontend
         {
             var parent = args.SwipeControl.GetParentUpto(Util.LEVEL_DataTemplate + 6)
                             as ListViewItemPresenter;
-            var collection = parent.DataContext as BookDetailCollection;
-            // TODO network delete
-            collection.Books.Remove(args.SwipeControl.DataContext as BookDetail);
-            collection.EditTime = DateTime.Now;
-            collection.OnPropertyChanged("EditTime");
+            var books = parent.DataContext as BookDetailCollection;
+            if (!books.ID.HasValue)
+            {
+                Debug.WriteLine("Read list id not found!");
+            }
+            var success = await NetworkSet.ChangeReadList(books.ID.Value,
+                                            ReadListChangeType.DeleteBook,
+                                            (args.SwipeControl.DataContext as BookDetail).BookId);
+            if (!success)
+                return;
+            books.Books.Remove(args.SwipeControl.DataContext as BookDetail);
+            books.EditTime = DateTime.Now;
+            books.OnPropertyChanged("EditTime");
         }
 
         private BookDetail _navigateItem = null;

@@ -10,33 +10,31 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <RefreshContainer RefreshRequested="RefreshRequested"
-                          PullDirection="BottomToTop">
+    <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
         <ScrollViewer>
 
             <Grid>
-            <Grid.Resources>
-                <!--Create a Style for a TextBlock-->
-                <Style TargetType="TextBlock" x:Key="TitleTextStyle">
-                    <Setter Property="Margin" Value="10"/>
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                    <Setter Property="VerticalAlignment" Value="Top"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="TextAlignment" Value="Start"/>
-                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                    <Setter Property="Style" Value="{StaticResource TitleTextStyle}"/>
-                </Style>
-                <Style TargetType="TextBlock" x:Key="BookTextStyle">
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="VerticalAlignment" Value="Top"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="Margin" Value="10"/>
-                    <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                    <Setter Property="TextAlignment" Value="Start"/>
-                    <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
-                </Style>
-
+                <Grid.Resources>
+                    <!--Create a Style for a TextBlock-->
+                    <Style TargetType="TextBlock" x:Key="TitleTextStyle">
+                        <Setter Property="Margin" Value="10"/>
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="TextAlignment" Value="Start"/>
+                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                        <Setter Property="Style" Value="{StaticResource TitleTextStyle}"/>
+                    </Style>
+                    <Style TargetType="TextBlock" x:Key="BookTextStyle">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="Margin" Value="10"/>
+                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                        <Setter Property="TextAlignment" Value="Start"/>
+                        <Setter Property="Style" Value="{StaticResource BodyTextBlockStyle}"/>
+                    </Style>
                 </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -52,22 +50,18 @@
                     <Button Content="+ Read List" FontSize="16" FontWeight="SemiBold" Margin="10,5"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="readlist"
                             Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
-                            IsEnabled="{x:Bind Detail.CanAddReadList, Mode=OneWay}">
-                    </Button>
+                            IsEnabled="{x:Bind Detail.CanAddReadList, Mode=OneWay}"/>
                     <Button Content="Buy" FontSize="16" FontWeight="SemiBold" Margin="10,5"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="buy"
                             Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
-                            IsEnabled="{x:Bind Detail.CanBuy, Mode=OneWay}">
-                    </Button>
+                            IsEnabled="{x:Bind Detail.CanBuy, Mode=OneWay}"/>
                     <Button Content="+ Wish List" FontSize="16" FontWeight="SemiBold" Margin="10,5"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="wishlist"
                             Style="{StaticResource AccentButtonStyle}" Click="Button_Click"
-                            IsEnabled="{x:Bind Detail.CanAddWishList, Mode=OneWay}">
-                    </Button>
+                            IsEnabled="{x:Bind Detail.CanAddWishList, Mode=OneWay}"/>
                     <Button Content="Preview" FontSize="16" FontWeight="SemiBold" Margin="10,5"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Tag="preview"
-                            Style="{StaticResource AccentButtonStyle}" Click="Button_Click">
-                    </Button>
+                            Style="{StaticResource AccentButtonStyle}" Click="Button_Click"/>
                 </StackPanel>
 
                 <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical" Margin="20,40"
@@ -195,6 +189,11 @@
 
                 </StackPanel>
 
+                <controls:InAppNotification x:Name="notification" ShowDismissButton="True"
+                                            AnimationDuration="00:00:0.2" VerticalOffset="100"
+                                            HorizontalOffset="0" StackMode="Replace"
+                                            Grid.ColumnSpan="4"/>
+                
             </Grid>
 
         </ScrollViewer>

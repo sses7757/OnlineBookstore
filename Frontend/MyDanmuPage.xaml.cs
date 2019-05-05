@@ -83,7 +83,9 @@ namespace Frontend
                                                              orgContent);
             if (newContent != null && newContent.Length > 0 && newContent != orgContent)
             {
-                // TODO network edit
+                var success = await NetworkSet.ChangeDanmu(danmu.ID, false, newContent);
+                if (!success)
+                    return;
                 danmu.Content = newContent;
                 danmu.EditTime = DateTime.Now;
                 danmu.OnPropertyChanged("Content");
@@ -91,9 +93,12 @@ namespace Frontend
             }
         }
 
-        private void Delete_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void Delete_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            // TODO network delete
+            var danmu = args.SwipeControl.DataContext as FullDanmu;
+            var success = await NetworkSet.ChangeDanmu(danmu.ID, true);
+            if (!success)
+                return;
             this.Danmus.Remove(args.SwipeControl.DataContext as FullDanmu);
         }
     }

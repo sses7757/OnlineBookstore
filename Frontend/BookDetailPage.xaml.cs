@@ -184,18 +184,92 @@ namespace Frontend
             // TODO add edit info button
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            switch((sender as Button).Tag as string)
+            var bookId = this.detail.BookId;
+            switch ((sender as Button).Tag as string)
             {
                 case "buy":
-                    // TODO
+                    string buyURL = await NetworkSet.BuyBook(bookId);
+                    if (buyURL == null || buyURL.Length <= 4)
+                        return;
+                    ContentDialog dialog = new ContentDialog()
+                    {
+                        Content = new Image()
+                        {
+                            Stretch = Stretch.Uniform,
+                            Source = await buyURL.ToQRCode()
+                        },
+                        Title = "Buying Book",
+                        IsSecondaryButtonEnabled = true,
+                        PrimaryButtonText = "I've paid",
+                        SecondaryButtonText = "Cancel"
+                    };
+                    if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                    { // click finish paying
+                        var finish = await NetworkSet.CheckBuyComplete(bookId);
+                        if (finish)
+                        {
+                            this.detail.CanBuy = false;
+                            this.Detail = detail;
+                        }
+                        else
+                        {
+                            notification.Show("Payment failure, please try again later", 4000);
+                        }
+                    }
+                    else
+                    {
+                        while (!await NetworkSet.CancleTransaction(bookId)) { }
+                        notification.Show("Transaction cancled", 4000);
+                    }
+                    break;
                 case "readlist":
-
+                    var ids = await NetworkGet.GetMyReadListsWithout(bookId);
+                    List<string> titles = new List<string>(ids.Length);
+                    foreach (int id in ids)
+                    {
+                        var readlist = await NetworkGet.GetTitleDescription(false, id);
+                        titles.Add(readlist.Title);
+                    }
+                    var combo = new ComboBox()
+                    {
+                        FontSize = 18,
+                        ItemsSource = titles,
+                        SelectedIndex = 0
+                    };
+                    dialog = new ContentDialog()
+                    {
+                        Content = combo,
+                        Title = "Add Book to Read List",
+                        IsSecondaryButtonEnabled = true,
+                        PrimaryButtonText = "Confirm",
+                        SecondaryButtonText = "Cancel"
+                    };
+                    if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                    {
+                        var successful = await NetworkSet.ChangeReadList(ids[combo.SelectedIndex],
+                                                        ReadListChangeType.AddBook,
+                                                        bookId, null);
+                        if (successful)
+                        {
+                            this.detail.CanAddReadList = false;
+                            this.Detail = detail;
+                            notification.Show("Success in adding book to your read list", 4000);
+                        }
+                    }
+                    break;
                 case "wishlist":
-
+                    var success = await NetworkSet.ChangeWishlist(bookId, true);
+                    if (success)
+                    {
+                        this.detail.CanAddWishList = false;
+                        this.Detail = detail;
+                        notification.Show("Success in adding book to your wish list", 4000);
+                    }
+                    break;
                 case "preview":
-
+                    // TODO read book
                 default:
                     return;
             }

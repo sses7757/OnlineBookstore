@@ -68,5 +68,9 @@
                            Text="Loading..." Foreground="White"/>
             </StackPanel>
         </controls:Loading>
+
+        <controls:InAppNotification x:Name="notification" ShowDismissButton="True"
+                                    AnimationDuration="00:00:0.2" VerticalOffset="100"
+                                    HorizontalOffset="0" StackMode="Replace"/>
     </Grid>
 </Page>

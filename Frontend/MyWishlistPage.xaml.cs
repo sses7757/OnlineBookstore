@@ -95,15 +95,50 @@ namespace Frontend
             }
         }
 
-        private void Buy_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void Buy_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            // TODO network buy
+            var bookId = (args.SwipeControl.DataContext as BookDetail).BookId;
+            string buyURL = await NetworkSet.BuyBook(bookId);
+            if (buyURL == null || buyURL.Length <= 4)
+                return;
+            ContentDialog dialog = new ContentDialog()
+            {
+                Content = new Image()
+                {
+                    Stretch = Stretch.Uniform,
+                    Source = await buyURL.ToQRCode()
+                },
+                Title = "Buying Book",
+                IsSecondaryButtonEnabled = true,
+                PrimaryButtonText = "I've paid",
+                SecondaryButtonText = "Cancel"
+            };
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            { // click finish paying
+                var finish = await NetworkSet.CheckBuyComplete(bookId);
+                if (finish)
+                {
+                    this.WishBooks.Remove(args.SwipeControl.DataContext as BookDetail);
+                }
+                else
+                {
+                    notification.Show("Payment failure, please try again later", 4000);
+                }
+            }
+            else
+            {
+                while(!await NetworkSet.CancleTransaction(bookId)) { }
+                notification.Show("Transaction cancled", 4000);
+            }
         }
 
-        private void Delete_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        private async void Delete_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            // TODO network delete
-            this.WishBooks.Remove(args.SwipeControl.DataContext as BookDetail);
+            var book = args.SwipeControl.DataContext as BookDetail;
+            var success = await NetworkSet.ChangeWishlist(book.BookId, false);
+            if (!success)
+                return;
+            this.WishBooks.Remove(book);
         }
     }
 }

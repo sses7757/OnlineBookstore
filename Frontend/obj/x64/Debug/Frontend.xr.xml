@@ -184,6 +184,14 @@
       <RootProperty Name="Margin" />
     </RootType>
     <RootType FullName="Frontend.BillboardPage" />
+    <RootType FullName="Microsoft.Toolkit.Uwp.UI.Controls.InAppNotification">
+      <RootProperty Name="ShowDismissButton" />
+      <RootProperty Name="AnimationDuration" />
+      <RootProperty Name="VerticalOffset" />
+      <RootProperty Name="HorizontalOffset" />
+      <RootProperty Name="StackMode" />
+      <RootEvent Name="Closed" />
+    </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Border">
       <RootProperty Name="BorderBrush" />
       <RootProperty Name="BorderThickness" />
@@ -310,11 +318,12 @@
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.TextBox">
       <RootProperty Name="HorizontalAlignment" />
-      <RootProperty Name="Width" />
+      <RootProperty Name="MinWidth" />
       <RootProperty Name="FontSize" />
       <RootProperty Name="Header" />
       <RootProperty Name="PlaceholderText" />
       <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="Width" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.CheckBox">
       <RootProperty Name="Content" />
@@ -359,18 +368,11 @@
     <RootType FullName="Windows.UI.Xaml.Controls.PasswordBox">
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="VerticalAlignment" />
-      <RootProperty Name="Width" />
+      <RootProperty Name="MinWidth" />
       <RootProperty Name="Header" />
       <RootProperty Name="PlaceholderText" />
       <RootProperty Name="FontSize" />
-    </RootType>
-    <RootType FullName="Microsoft.Toolkit.Uwp.UI.Controls.InAppNotification">
-      <RootProperty Name="ShowDismissButton" />
-      <RootProperty Name="AnimationDuration" />
-      <RootProperty Name="VerticalOffset" />
-      <RootProperty Name="HorizontalOffset" />
-      <RootProperty Name="StackMode" />
-      <RootEvent Name="Closed" />
+      <RootProperty Name="Width" />
     </RootType>
     <RootType FullName="Frontend.LoginPage" />
     <RootType FullName="Windows.UI.Xaml.Controls.NavigationView">

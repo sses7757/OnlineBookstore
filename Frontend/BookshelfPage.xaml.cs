@@ -73,7 +73,7 @@ namespace Frontend
         /// </summary>
         private void GridView_ItemClick(object sender, PointerRoutedEventArgs e)
         {
-            // TODO
+            // TODO read book
         }
     }
 }

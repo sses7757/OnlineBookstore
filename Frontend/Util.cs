@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using QRCoder;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -18,7 +20,7 @@ namespace Frontend
         RemoveReadList,
         DeleteBook,
         ChangeTitle,
-        ChangeContent
+        ChangeDescription
     }
 
 
@@ -648,6 +650,10 @@ namespace Frontend
         internal int FollowAmount { set; get; }
         internal bool Finished { get; private set; } = false;
 
+        internal int? ID {
+            get => this.query.BookListId;
+        }
+
         internal QueryObject query;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -687,6 +693,10 @@ namespace Frontend
             };
             NetworkGet.GetTitleDescription(this, isBillboard, id);
             //_ = this.ReloadBooks(isBillboard, id);
+        }
+
+        public BookDetailCollection()
+        {
         }
 
         internal async Task<bool> ReloadBooks(bool isBillboard, int id, int count = Util.ADD_AMOUNT)
@@ -973,6 +983,33 @@ namespace Frontend
                 return inputTextBox.Text;
             else
                 return previousContent;
+        }
+
+        public static async Task<BitmapImage> ToQRCode(this string str)
+        {
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(str, QRCodeGenerator.ECCLevel.Q);
+
+            //Create byte/raw bitmap qr code
+            BitmapByteQRCode qrCodeBmp = new BitmapByteQRCode(qrCodeData);
+            byte[] qrCodeImageBmp = qrCodeBmp.GetGraphic(20);
+            InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream();
+            DataWriter writer = new DataWriter(stream.GetOutputStreamAt(0));
+            writer.WriteBytes(qrCodeImageBmp);
+            await writer.StoreAsync();
+            var image = new BitmapImage();
+            await image.SetSourceAsync(stream);
+            return image;
+        }
+
+        public static bool IsWebUri(this Uri uri)
+        {
+            if (uri != null)
+            {
+                var str = uri.ToString().ToLower();
+                return str.StartsWith("http://") || str.StartsWith("https://");
+            }
+            return false;
         }
     }
 
