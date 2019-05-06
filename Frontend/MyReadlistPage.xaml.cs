@@ -154,7 +154,7 @@ namespace Frontend
             }
             var success = await NetworkSet.ChangeReadList(books.ID.Value,
                                             ReadListChangeType.DeleteBook,
-                                            (args.SwipeControl.DataContext as BookDetail).BookId);
+                                            (args.SwipeControl.DataContext as BookDetail).ID);
             if (!success)
                 return;
             books.Books.Remove(args.SwipeControl.DataContext as BookDetail);
@@ -172,7 +172,7 @@ namespace Frontend
         {
             var parent = sender as ListViewBase;
             var dataToPass = e.ClickedItem as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.ID))
             {
                 var collectionParent = parent.GetParentUpto(6) as ListViewItemPresenter;
                 parent.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");

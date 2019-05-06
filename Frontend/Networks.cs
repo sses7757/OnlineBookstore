@@ -177,7 +177,7 @@ namespace Frontend
             // TODO
             await Task.Delay(4000);
             Util.UserId = 1111;
-            Util.isAdmin = true;
+            Util.IsAdmin = true;
             return LoginStatus.Success;
         }
         public static async Task<string[]> GetMainLabels()
@@ -216,14 +216,14 @@ namespace Frontend
 
         public static async Task<bool> GetBookSummary(BookSummary book)
         {
-            if (!IsValidID(book.BookId))
+            if (!IsValidID(book.ID))
             {
                 Console.Error.WriteLine("Book id wrong");
                 return false;
             }
             var query = new QueryObject("GetBookSummary")
             {
-                BookId = book.BookId
+                BookId = book.ID
             };
             var json = query.ToString();
             // TODO
@@ -240,14 +240,14 @@ namespace Frontend
 
         public static async Task<bool> GetBookQuasiDetail(BookDetail book)
         {
-            if (!IsValidID(book.BookId))
+            if (!IsValidID(book.ID))
             {
                 Console.Error.WriteLine("Book id wrong");
                 return false;
             }
             var query = new QueryObject("GetBookQuasiDetail")
             {
-                BookId = book.BookId
+                BookId = book.ID
             };
             var json = query.ToString();
             // TODO only two level label
@@ -273,7 +273,7 @@ namespace Frontend
         {
             var query = new QueryObject("GetBookDetail")
             {
-                BookId = book.BookId
+                BookId = book.ID
             };
             var json = query.ToString();
             // TODO get book details Util.UserId
@@ -316,7 +316,7 @@ namespace Frontend
         internal static async Task<bool> GetReviewContents(BookDetail book, bool setFinish = false, int from = 0,
                                                            int count = Util.REVIEW_AMOUNT_ONE_TIME)
         {
-            var reviewIds = await GetBookReviews(book.BookId, from, count);
+            var reviewIds = await GetBookReviews(book.ID, from, count);
             foreach (var rid in reviewIds)
             {
                 var review = new Review(rid);
@@ -610,12 +610,12 @@ namespace Frontend
             return ids.ToArray();
         }
 
-        public static async Task<int[]> GetDanmuOfBook(int bookId, int page)
+        public static async Task<int[]> GetDanmuOfBook(int bookId, uint page)
         {
             var query = new QueryObject("GetDanmuOfBook")
             {
                 BookId = bookId,
-                Page = page
+                Page = (int)page
             };
             var json = query.ToString();
             // TODO 
@@ -637,7 +637,8 @@ namespace Frontend
             var json = query.ToString();
             // TODO 
             await Task.Delay(100);
-            danmu.Content = new string[] { "6666666666666666666", "test test test test test" }[new Random().Next(2)];
+            danmu.Content = new string[] { "6666666666666666666", "test test test test test" }
+                                      [new Random().Next(2)];
             return true;
         }
 
@@ -694,8 +695,8 @@ namespace Frontend
             };
             var json = query.ToString();
             // TODO 
-            await Task.Delay(1000);
-            return "file:///";
+            await Task.Delay(100);
+            return "ms-appx:///Assets/pdffile.pdf";
         }
 
         public static async Task<string> DownloadBook(int bookId)
@@ -706,8 +707,9 @@ namespace Frontend
             };
             var json = query.ToString();
             // TODO 
-            await Task.Delay(1000);
-            return "file:///";
+            await Task.Delay(100);
+            return "http://www.adobe.com/content/dam/Adobe/en/accessibility/" +
+                   "products/acrobat/pdfs/acrobat-x-accessible-pdf-from-word.pdf";
         }
 
         public static async Task<string> GetBookKey(int bookId)
@@ -718,7 +720,7 @@ namespace Frontend
             };
             var json = query.ToString();
             // TODO 
-            await Task.Delay(1000);
+            await Task.Delay(100);
             return "asngaesgnaesiof";
         }
     }
@@ -779,7 +781,7 @@ namespace Frontend
             // TODO
             await Task.Delay(2000);
             Util.UserId = -1;
-            Util.isAdmin = false;
+            Util.IsAdmin = false;
             return true;
         }
 

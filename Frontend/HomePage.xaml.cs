@@ -84,7 +84,7 @@ namespace Frontend
         {
             var item = sender as StackPanel;
             var dataToPass = item.DataContext as BookSummary;
-            if (NetworkGet.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.ID))
             {
                 switch ((BookSummaryCollectionType)item.Tag)
                 {

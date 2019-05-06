@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frontend"
     xmlns:sys="using:System"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,15 +12,26 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <ScrollViewer ZoomMode="Enabled">
-            <ItemsControl ItemsSource="{x:Bind PdfPages, Mode=OneWay}">
+        <ScrollViewer ZoomMode="Enabled" Background="Gray"
+                      ViewChanged="ScrollViewer_ViewChanged"
+                      x:Name="scroller">
+            <ItemsControl ItemsSource="{x:Bind PdfPages, Mode=OneWay}" x:Name="pages">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="BitmapImage">
-                        <Image Source="{x:Bind }" Margin="0,4" />
+                        <Image Source="{x:Bind }" Margin="0,4"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+
+        <canvas:CanvasAnimatedControl x:Name="animatedControl"
+                                      Update="AnimatedControl_Update"
+                                      Draw="AnimatedControl_Draw"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Top"
+                                      Margin="0,20" MinHeight="200" Height="400"
+                                      Visibility="{x:Bind local:Util.DanmuVisibility,
+                                                    Mode=OneTime}"/>
 
         <controls:Loading x:Name="loadingControl" HorizontalContentAlignment="Center"
                           VerticalContentAlignment="Center" IsLoading="True">

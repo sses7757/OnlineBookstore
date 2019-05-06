@@ -70,7 +70,7 @@ namespace Frontend
         private void StackPanel_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             var dataToPass = (BookSummary)((StackPanel)sender).DataContext;
-            if (NetworkGet.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.ID))
             {
                 relatedBookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "relateBookImage");
                 this._navigateItem = dataToPass;
@@ -186,7 +186,7 @@ namespace Frontend
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var bookId = this.detail.BookId;
+            var bookId = this.detail.ID;
             switch ((sender as Button).Tag as string)
             {
                 case "buy":
@@ -269,7 +269,9 @@ namespace Frontend
                     }
                     break;
                 case "preview":
-                    // TODO read book
+                    var pdfUrl = await NetworkGet.GetBookPreview(bookId);
+                    Util.main.NavigateToReadBook(bookId, pdfUrl);
+                    break;
                 default:
                     return;
             }

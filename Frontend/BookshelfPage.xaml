@@ -14,10 +14,10 @@
         <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
             <controls:AdaptiveGridView Padding="150,20" Style="{StaticResource AGVStyle}"
                                        ItemsSource="{x:Bind ShelfBooks.Books, Mode=OneWay}"
-                                       DesiredWidth="150">
+                                       DesiredWidth="150" ItemClick="AdaptiveGridView_ItemClick">
                 <controls:AdaptiveGridView.ItemTemplate>
                     <DataTemplate x:DataType="local:BookSummary">
-                        <StackPanel Margin="14,10" MaxWidth="170" PointerReleased="GridView_ItemClick"
+                        <StackPanel Margin="14,10" MaxWidth="170"
                                     Tag="{x:Bind local:BookSummaryCollectionType.TopBooks}"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}" x:Name="TBImage"/>
@@ -41,6 +41,10 @@
             </StackPanel>
         </controls:Loading>
 
+        <controls:InAppNotification x:Name="notification" ShowDismissButton="True"
+                                    AnimationDuration="00:00:0.2" VerticalOffset="100"
+                                    HorizontalOffset="0" StackMode="Replace"/>
+        
     </Grid>
     
 </Page>

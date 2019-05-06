@@ -48,7 +48,7 @@ namespace Frontend
         private void BookCover_Pointed(object sender, PointerRoutedEventArgs e)
         {
             var dataToPass = (sender as FrameworkElement).DataContext as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.ID))
             {
                 bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
                 this._navigateItem = dataToPass;

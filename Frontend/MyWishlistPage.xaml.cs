@@ -69,7 +69,7 @@ namespace Frontend
         private void Book_Pointed(object sender, ItemClickEventArgs e)
         {
             var dataToPass = e.ClickedItem as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.ID))
             {
                 bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
                 this._navigateItem = dataToPass;
@@ -97,7 +97,7 @@ namespace Frontend
 
         private async void Buy_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            var bookId = (args.SwipeControl.DataContext as BookDetail).BookId;
+            var bookId = (args.SwipeControl.DataContext as BookDetail).ID;
             string buyURL = await NetworkSet.BuyBook(bookId);
             if (buyURL == null || buyURL.Length <= 4)
                 return;
@@ -135,7 +135,7 @@ namespace Frontend
         private async void Delete_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
             var book = args.SwipeControl.DataContext as BookDetail;
-            var success = await NetworkSet.ChangeWishlist(book.BookId, false);
+            var success = await NetworkSet.ChangeWishlist(book.ID, false);
             if (!success)
                 return;
             this.WishBooks.Remove(book);

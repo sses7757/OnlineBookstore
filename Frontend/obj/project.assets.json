@@ -19388,24 +19388,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lenovo\\.nuget\\packages\\": {},
+    "C:\\Users\\skk77\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft SDKs\\UWPNuGetPackages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lenovo\\OneDrive\\Textbook\\数据库\\project\\OnlineBookstore\\Frontend\\Frontend.csproj",
+      "projectUniqueName": "C:\\Users\\skk77\\OneDrive\\Textbook\\数据库\\project\\OnlineBookstore\\Frontend\\Frontend.csproj",
       "projectName": "Frontend",
-      "projectPath": "C:\\Users\\Lenovo\\OneDrive\\Textbook\\数据库\\project\\OnlineBookstore\\Frontend\\Frontend.csproj",
-      "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lenovo\\OneDrive\\Textbook\\数据库\\project\\OnlineBookstore\\Frontend\\obj\\",
+      "projectPath": "C:\\Users\\skk77\\OneDrive\\Textbook\\数据库\\project\\OnlineBookstore\\Frontend\\Frontend.csproj",
+      "packagesPath": "C:\\Users\\skk77\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\skk77\\OneDrive\\Textbook\\数据库\\project\\OnlineBookstore\\Frontend\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft SDKs\\UWPNuGetPackages\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\skk77\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

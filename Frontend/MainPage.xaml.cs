@@ -91,7 +91,7 @@ namespace Frontend
         private void NavView_Navigate(string navItemTag, NavigationTransitionInfo info, bool Override = true, object pass = null)
         {
             // show admin toggle or not
-            ShowAdmin(Util.isAdmin);
+            ShowAdmin(Util.IsAdmin);
 
             Type _page = null;
             if (navItemTag == "settings")
@@ -121,7 +121,7 @@ namespace Frontend
         private void NavView_Navigate(Type toPage, NavigationTransitionInfo info, bool Override = true, object pass = null)
         {
             // show admin toggle or not
-            ShowAdmin(Util.isAdmin);
+            ShowAdmin(Util.IsAdmin);
 
             // Get the page type before navigation so you can prevent duplicate entries in the backstack.
             var preNavPageType = ContentFrame.CurrentSourcePageType;
@@ -247,6 +247,11 @@ namespace Frontend
                 if (navigate)
                     NavView.SelectedItem = NavView.MenuItems[NavView.MenuItems.Count - 1];
             }
+        }
+
+        internal void NavigateToReadBook(int bookId, string uri, string password = "")
+        {
+            NavView_Navigate(typeof(ReadPage), null, true, (password, uri, bookId));
         }
 
         internal void NavigateToSignUp()

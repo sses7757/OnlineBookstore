@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Graphics.Canvas.Text;
+using Newtonsoft.Json;
 using QRCoder;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -35,18 +37,17 @@ namespace Frontend
         }
 
         internal int BookId { private set; get; }
-        internal int PageNum { private set; get; }
-        internal ObservableCollection<Danmu> Danmus { private set; get; } = new ObservableCollection<Danmu>();
+        internal uint PageNum { private set; get; }
+        internal List<Danmu> Danmus { private set; get; } = new List<Danmu>();
         internal bool Finish { private set; get; } = false;
 
-        public DanmuCollection(int bookId, int page)
+        public DanmuCollection(int bookId, uint page)
         {
             this.BookId = bookId;
             this.PageNum = page;
-            this.Reload();
         }
 
-        internal async void Reload()
+        internal async Task Reload()
         {
             this.Danmus.Clear();
             this.Finish = false;
@@ -541,7 +542,7 @@ namespace Frontend
             BuyAmount = DanmuAmount = PreviewAmount = ReviewAmount = PageCount = 0;
             CanAddWishList = CanAddReadList = CanBuy = true;
             Reviews = new ObservableCollection<Review>();
-            RelatedBooks = new BookSummaryCollection(BookSummaryCollection.OtherType.RelatedBooks, BookId);
+            RelatedBooks = new BookSummaryCollection(BookSummaryCollection.OtherType.RelatedBooks, ID);
             _ = NetworkGet.GetBookDetail(this);
         }
 
@@ -865,7 +866,7 @@ namespace Frontend
 
     public class BookSummary
     {
-        internal int BookId { set; get; }
+        internal int ID { set; get; }
         internal string BookName { set; get; }
         internal string BookFullName { set; get; }
         internal BitmapImage BookCover { set; get; }
@@ -874,7 +875,7 @@ namespace Frontend
         internal BookSummary(BookSummary book)
         {
             this.BookCover = book.BookCover;
-            this.BookId = book.BookId;
+            this.ID = book.ID;
             this.BookName = book.BookName;
             this.BookFullName = book.BookFullName;
             this.Author = book.Author;
@@ -882,7 +883,7 @@ namespace Frontend
 
         internal BookSummary(int BookId)
         {
-            this.BookId = BookId;
+            this.ID = BookId;
         }
     }
 
@@ -901,11 +902,23 @@ namespace Frontend
 
         internal const string WAIT_STR = "Waiting...";
 
-        internal static int UserId = -1;
-        internal static bool isAdmin = false;
         internal static MainPage main;
+        internal static int UserId { set; get; } = -1;
+        internal static bool IsAdmin { set; get; } = false;
+        internal static Color DanmuColor { set; get; } = Colors.Black;
+        internal static float DanmuSize { set; get; } = 20;
+        internal static float DanmuSpacing { set; get; } = 6;
+        internal static bool IsDanmuOn { set; get; } = true;
+        internal static Visibility DanmuVisibility { get => IsDanmuOn.ToVisibility(); }
+        internal static CanvasTextFormat DanmuTextFormat { get; }
+            = new CanvasTextFormat
+            {
+                HorizontalAlignment = CanvasHorizontalAlignment.Center,
+                VerticalAlignment = CanvasVerticalAlignment.Center,
+                Options = CanvasDrawTextOptions.NoPixelSnap
+            };
 
-        internal static ObservableCollection<Label> LABELS;
+    internal static ObservableCollection<Label> LABELS;
 
         internal static Visibility ToVisibility(this bool visible)
         {

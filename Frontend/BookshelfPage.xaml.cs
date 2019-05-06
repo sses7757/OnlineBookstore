@@ -71,9 +71,18 @@ namespace Frontend
         /// <summary>
         /// Navigate to read book page
         /// </summary>
-        private void GridView_ItemClick(object sender, PointerRoutedEventArgs e)
+        private async void AdaptiveGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            // TODO read book
+            var book = e.ClickedItem as BookSummary;
+            var pdfUrl = await NetworkGet.DownloadBook(book.ID);
+            var password = await NetworkGet.GetBookKey(book.ID);
+            if (password == null || password.Length == 0)
+            {
+                notification.Show("It seems that you do not own the book, " +
+                                  "please try again", 4000);
+                return;
+            }
+            Util.main.NavigateToReadBook(book.ID, pdfUrl, password);
         }
     }
 }

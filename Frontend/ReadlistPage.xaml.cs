@@ -102,7 +102,7 @@ namespace Frontend
         {
             var elem = sender as Grid;
             var dataToPass = elem.DataContext as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.BookId))
+            if (NetworkGet.IsValidID(dataToPass.ID))
             {
                 var parent = elem.GetParentUpto(Util.LEVEL_DataTemplate);
                 var collectionParent = parent.GetParentUpto(2);
