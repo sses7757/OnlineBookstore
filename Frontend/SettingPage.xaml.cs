@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,7 +26,72 @@ namespace Frontend
         public SettingPage()
         {
             this.InitializeComponent();
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+        }
+
+        private async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var combo = sender as ComboBox;
+            switch (combo.SelectedItem as string)
+            {
+                case "Black":
+                    Util.DanmuColor = Colors.Black;
+                    break;
+                case "Red":
+                    Util.DanmuColor = Colors.MediumVioletRed;
+                    break;
+                case "Green":
+                    Util.DanmuColor = Colors.DarkOliveGreen;
+                    break;
+                case "Blue":
+                    Util.DanmuColor = Colors.DarkSlateBlue;
+                    break;
+                case "Theme color":
+                    Util.DanmuColor = (Color)Application.Current.Resources["SystemAccentColor"];
+                    break;
+                case "Pick color":
+                    ColorPicker picker = new ColorPicker()
+                    {
+                        ColorSpectrumComponents = ColorSpectrumComponents.HueSaturation,
+                        ColorSpectrumShape = ColorSpectrumShape.Ring,
+                        IsColorPreviewVisible = true,
+                        IsColorChannelTextInputVisible = true,
+                        IsHexInputVisible = true,
+                        Color = Util.DanmuColor
+                    };
+                    ContentDialog dialog = new ContentDialog
+                    {
+                        Content = picker,
+                        Title = "Pick A Color",
+                        IsSecondaryButtonEnabled = true,
+                        PrimaryButtonText = "Confirm",
+                        SecondaryButtonText = "Cancel"
+                    };
+                    if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                    {
+                        Util.DanmuColor = picker.Color;
+                    }
+                    else
+                    {
+                        combo.SelectedIndex = 0;
+                        Util.DanmuColor = Colors.Black;
+                    }
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        private void ComboBox_TextSubmitted(ComboBox sender, ComboBoxTextSubmittedEventArgs args)
+        {
+            try
+            {
+                var size = int.Parse(sender.Text);
+                if (!sender.Items.Contains(size))
+                    sender.Items[0] = sender.Text;
+                Util.DanmuSize = size;
+            }
+            catch (Exception) { }
         }
     }
 }

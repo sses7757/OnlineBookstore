@@ -315,5 +315,18 @@ namespace Frontend
         {
             Connection.Test();
         }
+
+        private void About_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog()
+            {
+                Title = "About Us",
+                Content = "© Kebin Sun, Zhixiang Zhao, Yanchao Miao, Lei Niu\r\n" +
+                          "Group 309 of “CS307 Principle of Database System”\r\n" +
+                          $"'{DateTime.Now.ToShortDateString()}'",
+                PrimaryButtonText = "Close"
+            };
+            _ = dialog.ShowAsync();
+        }
     }
 }

@@ -92,7 +92,7 @@
             </NavigationViewItem>
         </NavigationView.MenuItems>
         <NavigationView.PaneFooter>
-            <NavigationViewItem Content="关于" x:Name="AboutBtn" Icon="Help"/>
+            <NavigationViewItem Content="About" PointerReleased="About_PointerReleased" Icon="Help"/>
         </NavigationView.PaneFooter>
         <Frame x:Name="ContentFrame" Margin="0,-15,0,0" Navigated="ContentFrame_Navigated"
                Navigating="ContentFrame_Navigating">
