@@ -108,9 +108,9 @@ namespace Frontend
 
         private readonly Dictionary<BookSummaryCollectionType, BookSummaryCollection> collections;
 
-        internal ObservableCollection<Label> Labels { set; get; } = new ObservableCollection<Label>();
+        private ObservableCollection<Label> Labels { set; get; } = new ObservableCollection<Label>();
 
-        internal ObservableCollection<BookSummary> GetCollections(BookSummaryCollectionType t)
+        private ObservableCollection<BookSummary> GetCollections(BookSummaryCollectionType t)
         {
             if (this.collections.ContainsKey(t))
                 return this.collections[t].Books;

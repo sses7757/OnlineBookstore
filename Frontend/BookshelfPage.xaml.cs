@@ -31,7 +31,7 @@ namespace Frontend
             this.WaitLoading();
         }
 
-        internal BookSummaryCollection ShelfBooks { set; get; }
+        private BookSummaryCollection ShelfBooks { set; get; }
             = new BookSummaryCollection(BookSummaryCollection.OtherType.Bookshelf);
 
         private async void WaitLoading()

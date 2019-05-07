@@ -29,7 +29,37 @@ namespace Frontend
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
-        internal SearchInfo Info { set; get; }
+        private SearchInfo Info { set; get; }
+
+        private void BindBooks()
+        {
+            directBooks.Books = Info.Books;
+            billboardsList.Booklist = Info.Billboards;
+            readlistsList.Booklist = Info.ReadLists;
+            directBooks.RefreshRequest = this.RefreshRequested;
+            billboardsList.RefreshRequest = this.RefreshRequested;
+            readlistsList.RefreshRequest = this.RefreshRequested;
+        }
+
+        private void RebindBooks()
+        {
+            directBooks = new CustomControls.BookCollectionControl()
+            {
+                PaddingX = 125,
+                IsBillboard = false
+            };
+            billboardsList = new CustomControls.BookListsControl()
+            {
+                PaddingX = 100,
+                IsBillboard = true
+            };
+            readlistsList = new CustomControls.BookListsControl()
+            {
+                PaddingX = 100,
+                IsBillboard = false
+            };
+            BindBooks();
+        }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -39,11 +69,12 @@ namespace Frontend
             if (Info == null || Info.QueryText == null)
             {
                 Info = para;
-                return;
+                BindBooks();
             }
-            if (para.QueryText != Info.QueryText)
+            else if (para.QueryText != Info.QueryText)
             {
                 Info = para;
+                RebindBooks();
                 Tabs.SelectedIndex = 0;
                 this.Tabs_SelectionChanged(Tabs, null);
             }
@@ -160,7 +191,7 @@ namespace Frontend
             Info.LabelFilterChanged();
         }
 
-        private void RefreshRequested(RefreshContainer sender, RefreshRequestedEventArgs args)
+        private void RefreshRequested()
         {
             Info.Refresh(true);
         }
@@ -178,198 +209,6 @@ namespace Frontend
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Info.OnPropertyChanged(null);
-        }
-
-        private (ContentType? type, BookDetail item, BookDetailCollection parent) _nav;
-
-        private void ClearNav()
-        {
-            this._nav.parent = null;
-            this._nav.item = null;
-            this._nav.type = null;
-        }
-
-        /// <summary>
-        /// Navigate to detail page
-        /// </summary>
-        private void Direct_Book_Pointed(object sender, PointerRoutedEventArgs e)
-        {
-            var dataToPass = (sender as FrameworkElement).DataContext as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.ID))
-            {
-                bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
-                this._nav.item = dataToPass;
-                this._nav.type = ContentType.Books;
-                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
-            }
-        }
-
-        /// <summary>
-        /// Navigate back from detail page
-        /// </summary>
-        private async void Direct_BookGrid_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!this._nav.type.HasValue || this._nav.type.Value != ContentType.Books ||
-                this._nav.item == null)
-                return;
-            ConnectedAnimation animation =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
-            if (animation != null)
-            {
-                animation.Configuration = new DirectConnectedAnimationConfiguration();
-                bookGrid.ScrollIntoView(this._nav.item);
-                await bookGrid.TryStartConnectedAnimationAsync(animation, this._nav.item, "bookCover");
-            }
-            this.ClearNav();
-        }
-
-        /// <summary>
-        /// Show all button of billboards, navigate to book list page
-        /// </summary>
-        private void Billboard_Hyperlink_Click(object sender, RoutedEventArgs e)
-        {
-            var elem = sender as UIElement;
-            var parent = elem.GetParentUpto(2);
-            if (parent == null || !(parent is ListViewItemPresenter))
-                return;
-            var collection = (parent as ListViewItemPresenter).DataContext as BookDetailCollection;
-            Util.main.NavigateToBooklist(collection.Title, collection.Description, collection.query);
-        }
-
-        /// <summary>
-        /// Book in billboard pressed, Navigate to detail page
-        /// </summary>
-        private void Billboard_Book_Pointed(object sender, PointerRoutedEventArgs e)
-        {
-            var elem = sender as Grid;
-            var dataToPass = elem.DataContext as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.ID))
-            {
-                var parent = elem.GetParentUpto(Util.LEVEL_DataTemplate);
-                var collectionParent = parent.GetParentUpto(2);
-                if (parent == null || !(parent is ListView) ||
-                    collectionParent == null || !(collectionParent is ListViewItemPresenter))
-                    return;
-
-                (parent as ListView).PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
-                var service = ConnectedAnimationService.GetForCurrentView();
-                service.DefaultDuration = TimeSpan.FromSeconds(0.45);
-
-                this._nav.item = dataToPass;
-                this._nav.parent = (collectionParent as ListViewItemPresenter).DataContext
-                                            as BookDetailCollection;
-                this._nav.type = ContentType.Billboards;
-                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
-            }
-        }
-
-        /// <summary>
-        /// Navigate back from detail page
-        /// </summary>
-        private async void Billboard_Grid_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!this._nav.type.HasValue || this._nav.type.Value != ContentType.Billboards ||
-                this._nav.parent == null || this._nav.item == null)
-                return;
-            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
-            if (animation == null)
-                return;
-            animation.Configuration = new DirectConnectedAnimationConfiguration();
-
-            if (!(sender is ListViewBase allGrid))
-            {
-                animation.Cancel();
-                return;
-            }
-            allGrid.ScrollIntoView(this._nav.parent);
-            if (!(allGrid.ContainerFromItem(this._nav.parent) is GridViewItem container))
-            {
-                animation.Cancel();
-                return;
-            }
-            if (!((container.ContentTemplateRoot as Grid).Children
-                           [(container.ContentTemplateRoot as Grid).Children.Count - 1] is ListView boardlist))
-            {
-                animation.Cancel();
-                return;
-            }
-            await boardlist.TryStartConnectedAnimationAsync(animation, this._nav.item, "bookCover");
-
-            this.ClearNav();
-        }
-
-        /// <summary>
-        /// Show all button of read list, navigate to book list page
-        /// </summary>
-        private void ReadList_Hyperlink_Click(object sender, RoutedEventArgs e)
-        {
-            var elem = sender as UIElement;
-            var parent = elem.GetParentUpto(2);
-            if (parent == null || !(parent is ListViewItemPresenter))
-                return;
-            var collection = (parent as ListViewItemPresenter).DataContext as BookDetailCollection;
-            Util.main.NavigateToBooklist(collection.Title, collection.Description, collection.query);
-        }
-
-        /// <summary>
-        /// Book in read list pressed, Navigate to detail page
-        /// </summary>
-        private void ReadList_Book_Pointed(object sender, PointerRoutedEventArgs e)
-        {
-            var elem = sender as Grid;
-            var dataToPass = elem.DataContext as BookDetail;
-            if (NetworkGet.IsValidID(dataToPass.ID))
-            {
-                var parent = elem.GetParentUpto(Util.LEVEL_DataTemplate);
-                var collectionParent = parent.GetParentUpto(2);
-                if (parent == null || !(parent is ListView) ||
-                    collectionParent == null || !(collectionParent is ListViewItemPresenter))
-                    return;
-
-                (parent as ListView).PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
-                var service = ConnectedAnimationService.GetForCurrentView();
-                service.DefaultDuration = TimeSpan.FromSeconds(0.45);
-
-                this._nav.item = dataToPass;
-                this._nav.parent = (collectionParent as ListViewItemPresenter).DataContext
-                                    as BookDetailCollection;
-                Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
-            }
-        }
-
-        /// <summary>
-        /// Navigate back from detail page
-        /// </summary>
-        private async void ReadList_Grid_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!this._nav.type.HasValue || this._nav.type.Value != ContentType.ReadLists ||
-                this._nav.parent == null || this._nav.item == null)
-                return;
-            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation(Util.FROM_BOOK_DETAIL);
-            if (animation == null)
-                return;
-            animation.Configuration = new DirectConnectedAnimationConfiguration();
-
-            if (!(sender is ListViewBase allGrid))
-            {
-                animation.Cancel();
-                return;
-            }
-            allGrid.ScrollIntoView(this._nav.parent);
-            if (!(allGrid.ContainerFromItem(this._nav.parent) is GridViewItem container))
-            {
-                animation.Cancel();
-                return;
-            }
-            if (!((container.ContentTemplateRoot as Grid).Children
-                           [(container.ContentTemplateRoot as Grid).Children.Count - 1] is ListView boardlist))
-            {
-                animation.Cancel();
-                return;
-            }
-            await boardlist.TryStartConnectedAnimationAsync(animation, this._nav.item, "bookCover");
-
-            this.ClearNav();
         }
     }
 }

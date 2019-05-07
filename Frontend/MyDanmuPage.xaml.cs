@@ -32,7 +32,7 @@ namespace Frontend
             this.Refresh();
         }
 
-        internal ObservableCollection<FullDanmu> Danmus { private set; get; } =
+        private ObservableCollection<FullDanmu> Danmus { set; get; } =
              new ObservableCollection<FullDanmu>();
 
         internal static string NamePageToString(string bookName, int page)

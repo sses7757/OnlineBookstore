@@ -58,10 +58,11 @@ namespace Frontend
 
         private int bookId = -1;
         private string privateKey;
-        internal Uri Source { private set; get; }
-        internal ObservableCollection<BitmapImage> PdfPages {
+
+        private Uri Source { set; get; }
+        private ObservableCollection<BitmapImage> PdfPages {
             get;
-            private set;
+            set;
         } = new ObservableCollection<BitmapImage>();
 
 
@@ -236,7 +237,7 @@ namespace Frontend
         /// Set all the bullets in the bullet screen to obsolete
         /// Reload comments to bullet screen        
         /// </summary>
-        internal void ReloadComments(uint pagePos)
+        private void ReloadComments(uint pagePos)
         {
             bulletScreen.Bullets.ForEach(o => o.IsObsolete = true);
             LoadComments(pagePos);
@@ -297,10 +298,10 @@ namespace Frontend
     /// Bullet Screen
     /// draw and update bullet in bulk
     /// </summary>
-    public class BulletScreen
+    internal class BulletScreen
     {
         internal List<CommentBullet> Bullets { get; set; }
-        public BulletScreen()
+        internal BulletScreen()
         {
             Bullets = new List<CommentBullet>();
         }
@@ -331,12 +332,12 @@ namespace Frontend
         }
     }
 
-    public class CommentBullet
+    internal class CommentBullet
     {
         // Default speed
         private readonly float MoveSpeed = 0.002f;
 
-        public CommentBullet(Vector2 pos, LiveComment liveComment)
+        internal CommentBullet(Vector2 pos, LiveComment liveComment)
         {
             MoveSpeed += liveComment.Width / 1000000;
             Position = pos;
@@ -344,14 +345,14 @@ namespace Frontend
             IsObsolete = false;
         }
 
-        public LiveComment CommentItem { get; set; }
-        public Vector2 Position { get; set; }
-        public bool IsObsolete { get; set; }
+        internal LiveComment CommentItem { get; set; }
+        internal Vector2 Position { get; set; }
+        internal bool IsObsolete { get; set; }
 
         /// <summary>
         /// Draw the bullet
         /// </summary>
-        public void Draw(CanvasDrawingSession ds, Matrix3x2 transform)
+        internal void Draw(CanvasDrawingSession ds, Matrix3x2 transform)
         {
             var pos = Vector2.Transform(Position, transform);
             // Set center position of bullet
@@ -371,13 +372,13 @@ namespace Frontend
         /// <summary>
         /// move bullet to left 
         /// </summary>
-        public void Update()
+        internal void Update()
         {
             Position = new Vector2(Position.X - MoveSpeed, Position.Y);
         }
     }
 
-    public class LiveComment
+    internal class LiveComment
     {
         internal Guid ID { get; private set; }
 
@@ -388,7 +389,7 @@ namespace Frontend
         internal float Width { get => this.danmu.Content.Length * Util.DanmuSize; }
         internal float Height { get => Util.DanmuSize + Util.DanmuSpacing; }
 
-        public LiveComment(Danmu danmu, uint pagenum)
+        internal LiveComment(Danmu danmu, uint pagenum)
         {
             this.ID = Guid.NewGuid();
             this.danmu = danmu;

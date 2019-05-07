@@ -138,6 +138,12 @@
     <Compile Include="BookshelfPage.xaml.cs">
       <DependentUpon>BookshelfPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\BookCollectionControl.xaml.cs">
+      <DependentUpon>BookCollectionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\BookListsControl.xaml.cs">
+      <DependentUpon>BookListsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
@@ -257,6 +263,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CustomControls\BookCollectionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomControls\BookListsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -313,9 +327,7 @@
       <Version>1.3.5</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CustomControls\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

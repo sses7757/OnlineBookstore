@@ -32,7 +32,7 @@ namespace Frontend
             this.Refresh();
         }
 
-        internal ObservableCollection<BookDetail> WishBooks = new ObservableCollection<BookDetail>();
+        private ObservableCollection<BookDetail> WishBooks { set; get; } = new ObservableCollection<BookDetail>();
 
         private async void Refresh()
         {

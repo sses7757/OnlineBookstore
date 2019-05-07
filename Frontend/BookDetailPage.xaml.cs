@@ -98,7 +98,7 @@ namespace Frontend
         }
 
         private BookDetail detail;
-        internal BookDetail Detail {
+        private BookDetail Detail {
             get { return detail; }
             set { detail = value; OnPropertyChanged(); }
         }

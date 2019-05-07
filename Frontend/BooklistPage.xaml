@@ -2,60 +2,15 @@
     x:Class="Frontend.BooklistPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Frontend"
-    xmlns:sys="using:System"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:localControl="using:Frontend.CustomControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <RefreshContainer RefreshRequested="RefreshRequested" PullDirection="BottomToTop">
-        <controls:AdaptiveGridView Style="{StaticResource AGVStyle}"
-                                   Padding="140,0" ItemsSource="{x:Bind Books.Books, Mode=OneWay}"
-                                   x:Name="bookGrid" Loaded="BookGrid_Loaded">
-            <controls:AdaptiveGridView.Header>
-                <controls:ScrollHeader Mode="QuickReturn">
-                    <StackPanel Background="White">
-                        <TextBlock Text=" " Style="{StaticResource TitleTextStyle}"/>
-                        <TextBlock Text="{x:Bind Books.Title, Mode=OneWay}"
-                                   Style="{StaticResource TitleTextStyle}"/>
-                        <TextBlock Text="{x:Bind Books.Description, Mode=OneWay}"
-                                   Style="{StaticResource DescriptionTextStyle}"/>
-                        <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
-                        <TextBlock Text=" "/>
-                    </StackPanel>
-                </controls:ScrollHeader>
-            </controls:AdaptiveGridView.Header>
-            <controls:AdaptiveGridView.ItemTemplate>
-                <DataTemplate x:DataType="local:BookDetail">
-                    <Grid Margin="10" PointerReleased="BookCover_Pointed" MaxHeight="180"
-                          HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="3*"/>
-                        </Grid.ColumnDefinitions>
-                        <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
-                               x:Name="bookCover" Grid.Column="0"/>
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="{x:Bind BookName}" Style="{StaticResource HorizontalBookNameTextStyle}"/>
-                            <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
-                                <RatingControl Value="{x:Bind OverallRating}" IsReadOnly="True"
-                                               VerticalAlignment="Center" Margin="10,0,10,-8"/>
-                                <TextBlock Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"
-                                           Style="{StaticResource HorizontalBookTextStyle}"/>
-                            </StackPanel>
-                            <TextBlock Text="{x:Bind sys:String.Format('Author:\\t{0}', Author)}"
-                                       Style="{StaticResource HorizontalBookTextStyle}"/>
-                            <TextBlock Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"
-                                       Style="{StaticResource HorizontalBookTextStyle}"/>
-                            <TextBlock Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"
-                                       Style="{StaticResource HorizontalBookTextStyle}"/>
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </controls:AdaptiveGridView.ItemTemplate>
-        </controls:AdaptiveGridView>
-    </RefreshContainer>
+    <Grid>
+        <localControl:BookCollectionControl x:Name="bookCollection" PaddingX="120"
+                                            IsBillboard="{x:Bind IsBillboard, Mode=OneWay}"/>
+    </Grid>
 
 </Page>

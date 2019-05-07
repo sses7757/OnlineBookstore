@@ -712,10 +712,10 @@ namespace Frontend
 
         internal async Task<bool> ReloadBooks()
         {
-            return await this.ReloadBooks(this.query, this.Title);
+            return await this.ReloadBooks(this.query);
         }
 
-        internal async Task<bool> ReloadBooks(QueryObject newQuery, string newTitle)
+        internal async Task<bool> ReloadBooks(QueryObject newQuery, string newTitle = null, string newDesc = null)
         {
             if (newQuery.SearchType == null)
             {
@@ -723,7 +723,10 @@ namespace Frontend
             }
             this.Books.Clear();
             this.query = newQuery;
-            this.Title = newTitle;
+            if (newTitle != null)
+                this.Title = newTitle;
+            if (newDesc != null)
+                this.Description = newDesc;
             this.OnPropertyChanged("Title");
             this.Finished = false;
             var ids = await NetworkGet.GetFromQuery(this.query, 0, Util.INIT_AMOUNT);

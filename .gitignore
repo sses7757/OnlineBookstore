@@ -4,4 +4,5 @@
 
 /.vs
 /FrontEnd/.vs/FrontEnd/v16
-/Frontend/bin/x64/Debug/AppX
+/Frontend/bin
+/Frontend/obj
