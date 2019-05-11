@@ -1,49 +1,56 @@
-﻿<Page
-    x:Class="Frontend.ReadPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Frontend"
-    xmlns:sys="using:System"
-    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+﻿<Page x:Class="Frontend.ReadPage"
+	  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	  xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	  xmlns:local="using:Frontend"
+	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	  xmlns:sys="using:System"
+	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+	  mc:Ignorable="d">
 
-    <Grid>
-        <ScrollViewer ZoomMode="Enabled" Background="Gray"
-                      ViewChanged="ScrollViewer_ViewChanged"
-                      x:Name="scroller">
-            <ItemsControl ItemsSource="{x:Bind PdfPages, Mode=OneWay}" x:Name="pages">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="BitmapImage">
-                        <Image Source="{x:Bind }" Margin="0,4"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+	<Grid>
+		<ScrollViewer x:Name="scroller"
+					  Background="Gray"
+					  ViewChanged="ScrollViewer_ViewChanged"
+					  ZoomMode="Enabled">
+			<ItemsControl x:Name="pages" ItemsSource="{x:Bind PdfPages, Mode=OneWay}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="BitmapImage">
+						<Image Margin="0,4" Source="{x:Bind}"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
 
-        <canvas:CanvasAnimatedControl x:Name="animatedControl"
-                                      Update="AnimatedControl_Update"
-                                      Draw="AnimatedControl_Draw"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Top"
-                                      Margin="0,20" MinHeight="200" Height="400"
-                                      Visibility="{x:Bind local:Util.DanmuVisibility,
-                                                    Mode=OneTime}"/>
+		<canvas:CanvasAnimatedControl x:Name="animatedControl"
+									  Height="400"
+									  MinHeight="200"
+									  Margin="0,20"
+									  HorizontalAlignment="Stretch"
+									  VerticalAlignment="Top"
+									  Draw="AnimatedControl_Draw"
+									  Update="AnimatedControl_Update"
+									  Visibility="{x:Bind local:Util.DanmuVisibility, Mode=OneTime}"/>
 
-        <controls:Loading x:Name="loadingControl" HorizontalContentAlignment="Center"
-                          VerticalContentAlignment="Center" IsLoading="True">
-            <controls:Loading.Background>
-                <SolidColorBrush Color="Black" Opacity="0.7" />
-            </controls:Loading.Background>
-            <StackPanel Orientation="Horizontal" Spacing="15">
-                <ProgressRing IsActive="True" Height="35" Width="35"
-                              Foreground="{ThemeResource SystemAccentColorLight1}"/>
-                <TextBlock Style="{StaticResource TitleTextStyle}" Margin="0"
-                           Text="Loading..." Foreground="White"/>
-            </StackPanel>
-        </controls:Loading>
-    </Grid>
+		<controls:Loading x:Name="loadingControl"
+						  HorizontalContentAlignment="Center"
+						  VerticalContentAlignment="Center"
+						  IsLoading="True">
+			<controls:Loading.Background>
+				<SolidColorBrush Opacity="0.7" Color="Black"/>
+			</controls:Loading.Background>
+			<StackPanel Orientation="Horizontal" Spacing="15">
+				<ProgressRing Width="35"
+							  Height="35"
+							  Foreground="{ThemeResource SystemAccentColorLight1}"
+							  IsActive="True"/>
+				<TextBlock Margin="0"
+						   Foreground="White"
+						   Style="{StaticResource TitleTextStyle}"
+						   Text="Loading..."/>
+			</StackPanel>
+		</controls:Loading>
+	</Grid>
 </Page>

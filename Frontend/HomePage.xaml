@@ -1,165 +1,206 @@
-﻿<Page
-    x:Class="Frontend.HomePage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Frontend"
-    xmlns:sys="using:System"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Grid>
-        <ScrollViewer x:Name="scroller">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="5*" MinWidth="400"/>
-                    <ColumnDefinition Width="2.5*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+﻿<Page x:Class="Frontend.HomePage"
+	  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	  xmlns:local="using:Frontend"
+	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	  xmlns:sys="using:System"
+	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+	  mc:Ignorable="d">
+	<Grid>
+		<ScrollViewer x:Name="scroller">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="5*" MinWidth="400"/>
+					<ColumnDefinition Width="2.5*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
 
-                <ListView Grid.Column="2" Margin="20,20" HorizontalAlignment="Stretch"
-                          SelectionMode="None" ItemsSource="{x:Bind Labels, Mode=OneWay}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:Label">
-                            <StackPanel HorizontalAlignment="Stretch">
-                                <controls:Expander VerticalAlignment="Top"
-                                                   Margin="0,10" HorizontalContentAlignment="Stretch"
-                                                   IsExpanded="False" ExpandDirection="Down"
-                                                   Header="{x:Bind Name, Mode=OneWay}"
-                                                   FontSize="18">
-                                    <GridView ItemsSource="{x:Bind AllSubs, Mode=OneWay}"
-                                              HorizontalAlignment="Stretch" SelectionMode="None">
-                                        <GridView.ItemTemplate>
-                                            <DataTemplate x:DataType="local:SubLabel">
-                                                <HyperlinkButton Content="{x:Bind Name, Mode=OneWay}"
-                                                                 Margin="5,0" FontSize="16"
-                                                                 Click="HyperlinkButton_Click_SubLabel"/>
-                                            </DataTemplate>
-                                        </GridView.ItemTemplate>
-                                    </GridView>
-                                    <controls:Expander.ContentOverlay>
-                                        <GridView ItemsSource="{x:Bind HotSubs, Mode=OneWay}"
-                                                  HorizontalAlignment="Stretch" SelectionMode="None">
-                                            <GridView.ItemTemplate>
-                                                <DataTemplate x:DataType="local:SubLabel">
-                                                    <HyperlinkButton Content="{x:Bind Name, Mode=OneWay}"
-                                                                     Margin="5,0" FontSize="16"
-                                                                     Click="HyperlinkButton_Click_SubLabel"/>
-                                                </DataTemplate>
-                                            </GridView.ItemTemplate>
-                                        </GridView>
-                                    </controls:Expander.ContentOverlay>
-                                </controls:Expander>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+				<ListView Grid.Column="2"
+						  Margin="20,20"
+						  HorizontalAlignment="Stretch"
+						  ItemsSource="{x:Bind Labels, Mode=OneWay}"
+						  SelectionMode="None">
+					<ListView.ItemTemplate>
+						<DataTemplate x:DataType="local:Label">
+							<StackPanel HorizontalAlignment="Stretch">
+								<controls:Expander Margin="0,10"
+												   VerticalAlignment="Top"
+												   HorizontalContentAlignment="Stretch"
+												   ExpandDirection="Down"
+												   FontSize="18"
+												   Header="{x:Bind Name, Mode=OneWay}"
+												   IsExpanded="False">
+									<GridView HorizontalAlignment="Stretch"
+											  ItemsSource="{x:Bind AllSubs, Mode=OneWay}"
+											  SelectionMode="None">
+										<GridView.ItemTemplate>
+											<DataTemplate x:DataType="local:SubLabel">
+												<HyperlinkButton Margin="5,0"
+																 Click="HyperlinkButton_Click_SubLabel"
+																 Content="{x:Bind Name, Mode=OneWay}"
+																 FontSize="16"/>
+											</DataTemplate>
+										</GridView.ItemTemplate>
+									</GridView>
+									<controls:Expander.ContentOverlay>
+										<GridView HorizontalAlignment="Stretch"
+												  ItemsSource="{x:Bind HotSubs, Mode=OneWay}"
+												  SelectionMode="None">
+											<GridView.ItemTemplate>
+												<DataTemplate x:DataType="local:SubLabel">
+													<HyperlinkButton Margin="5,0"
+																	 Click="HyperlinkButton_Click_SubLabel"
+																	 Content="{x:Bind Name, Mode=OneWay}"
+																	 FontSize="16"/>
+												</DataTemplate>
+											</GridView.ItemTemplate>
+										</GridView>
+									</controls:Expander.ContentOverlay>
+								</controls:Expander>
+							</StackPanel>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
 
-                <StackPanel Grid.Column="1" HorizontalAlignment="Stretch">
+				<StackPanel Grid.Column="1" HorizontalAlignment="Stretch">
 
-                    <Grid HorizontalAlignment="Stretch" Margin="0,20,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Best Selling Books" Style="{StaticResource TitleTextStyle}"
-                                   Grid.Column="0" HorizontalAlignment="Left"/>
-                        <HyperlinkButton Grid.Column="1" Style="{StaticResource ShowAllBtnStyle}"
-                                         Click="HyperlinkButton_Click_Best"/>
-                    </Grid>
-                    <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
-                    <controls:AdaptiveGridView Style="{StaticResource AGVStyle}" DesiredWidth="140"
-                                               ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.TopBooks)}"
-                                               x:Name="TBGrid" Loaded="Grid_Loaded">
-                        <controls:AdaptiveGridView.ItemTemplate>
-                            <DataTemplate x:DataType="local:BookSummary">
-                                <StackPanel Margin="10,6" MaxWidth="160" PointerReleased="GridView_ItemClick"
-                                            Tag="{x:Bind local:BookSummaryCollectionType.TopBooks}"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
-                                           x:Name="TBImage"/>
-                                    <TextBlock Text="{x:Bind BookName}" Style="{StaticResource VerticalBookNameTextStyle}"/>
-                                    <TextBlock Text="{x:Bind Author}" Style="{StaticResource VerticalBookTextStyle}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </controls:AdaptiveGridView.ItemTemplate>
-                    </controls:AdaptiveGridView>
+					<Grid Margin="0,20,0,0" HorizontalAlignment="Stretch">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock Grid.Column="0"
+								   HorizontalAlignment="Left"
+								   Style="{StaticResource TitleTextStyle}"
+								   Text="Best Selling Books"/>
+						<HyperlinkButton Grid.Column="1"
+										 Click="HyperlinkButton_Click_Best"
+										 Style="{StaticResource ShowAllBtnStyle}"/>
+					</Grid>
+					<NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
+					<controls:AdaptiveGridView x:Name="TBGrid"
+											   DesiredWidth="140"
+											   ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.TopBooks)}"
+											   Loaded="Grid_Loaded"
+											   Style="{StaticResource AGVStyle}">
+						<controls:AdaptiveGridView.ItemTemplate>
+							<DataTemplate x:DataType="local:BookSummary">
+								<StackPanel MaxWidth="160"
+											Margin="10,6"
+											HorizontalAlignment="Center"
+											VerticalAlignment="Center"
+											PointerReleased="GridView_ItemClick"
+											Tag="{x:Bind local:BookSummaryCollectionType.TopBooks}">
+									<Image x:Name="TBImage"
+										   Source="{x:Bind BookCover}"
+										   Style="{StaticResource BookImageStyle}"/>
+									<TextBlock Style="{StaticResource VerticalBookNameTextStyle}" Text="{x:Bind BookName}"/>
+									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind Author}"/>
+								</StackPanel>
+							</DataTemplate>
+						</controls:AdaptiveGridView.ItemTemplate>
+					</controls:AdaptiveGridView>
 
-                    <Grid HorizontalAlignment="Stretch" Margin="0,20,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Newly Published Books" Style="{StaticResource TitleTextStyle}"
-                                   Grid.Column="0" HorizontalAlignment="Left"/>
-                        <HyperlinkButton Grid.Column="1" Style="{StaticResource ShowAllBtnStyle}"
-                                         Click="HyperlinkButton_Click_New"/>
-                    </Grid>
-                    <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
-                    <controls:AdaptiveGridView Style="{StaticResource AGVStyle}" DesiredWidth="140"
-                                               ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.NewBooks)}"
-                                               x:Name="NBGrid" Loaded="Grid_Loaded">
-                        <controls:AdaptiveGridView.ItemTemplate>
-                            <DataTemplate x:DataType="local:BookSummary">
-                                <StackPanel Margin="10,6" MaxWidth="160" PointerReleased="GridView_ItemClick"
-                                            Tag="{x:Bind local:BookSummaryCollectionType.NewBooks}"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
-                                           x:Name="NBImage"/>
-                                    <TextBlock Text="{x:Bind BookName}" Style="{StaticResource VerticalBookNameTextStyle}"/>
-                                    <TextBlock Text="{x:Bind Author}" Style="{StaticResource VerticalBookTextStyle}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </controls:AdaptiveGridView.ItemTemplate>
-                    </controls:AdaptiveGridView>
+					<Grid Margin="0,20,0,0" HorizontalAlignment="Stretch">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock Grid.Column="0"
+								   HorizontalAlignment="Left"
+								   Style="{StaticResource TitleTextStyle}"
+								   Text="Newly Published Books"/>
+						<HyperlinkButton Grid.Column="1"
+										 Click="HyperlinkButton_Click_New"
+										 Style="{StaticResource ShowAllBtnStyle}"/>
+					</Grid>
+					<NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
+					<controls:AdaptiveGridView x:Name="NBGrid"
+											   DesiredWidth="140"
+											   ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.NewBooks)}"
+											   Loaded="Grid_Loaded"
+											   Style="{StaticResource AGVStyle}">
+						<controls:AdaptiveGridView.ItemTemplate>
+							<DataTemplate x:DataType="local:BookSummary">
+								<StackPanel MaxWidth="160"
+											Margin="10,6"
+											HorizontalAlignment="Center"
+											VerticalAlignment="Center"
+											PointerReleased="GridView_ItemClick"
+											Tag="{x:Bind local:BookSummaryCollectionType.NewBooks}">
+									<Image x:Name="NBImage"
+										   Source="{x:Bind BookCover}"
+										   Style="{StaticResource BookImageStyle}"/>
+									<TextBlock Style="{StaticResource VerticalBookNameTextStyle}" Text="{x:Bind BookName}"/>
+									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind Author}"/>
+								</StackPanel>
+							</DataTemplate>
+						</controls:AdaptiveGridView.ItemTemplate>
+					</controls:AdaptiveGridView>
 
-                    <Grid HorizontalAlignment="Stretch" Margin="0,20,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Personalized Recommendation" Style="{StaticResource TitleTextStyle}"
-                                   Grid.Column="0" HorizontalAlignment="Left"/>
-                        <HyperlinkButton Grid.Column="1" Style="{StaticResource ShowAllBtnStyle}"
-                                         Click="HyperlinkButton_Click_Person"/>
-                    </Grid>
-                    <NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
-                    <controls:AdaptiveGridView Style="{StaticResource AGVStyle}" DesiredWidth="140"
-                                               ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.PersonalRecommands)}"
-                                               x:Name="PRGrid" Loaded="Grid_Loaded">
-                        <controls:AdaptiveGridView.ItemTemplate>
-                            <DataTemplate x:DataType="local:BookSummary">
-                                <StackPanel Margin="10,6" MaxWidth="160" PointerReleased="GridView_ItemClick"
-                                            Tag="{x:Bind local:BookSummaryCollectionType.PersonalRecommands}"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Image Source="{x:Bind BookCover}" Style="{StaticResource BookImageStyle}"
-                                           x:Name="PRImage"/>
-                                    <TextBlock Text="{x:Bind BookName}" Style="{StaticResource VerticalBookNameTextStyle}"/>
-                                    <TextBlock Text="{x:Bind Author}" Style="{StaticResource VerticalBookTextStyle}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </controls:AdaptiveGridView.ItemTemplate>
-                    </controls:AdaptiveGridView>
+					<Grid Margin="0,20,0,0" HorizontalAlignment="Stretch">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock Grid.Column="0"
+								   HorizontalAlignment="Left"
+								   Style="{StaticResource TitleTextStyle}"
+								   Text="Personalized Recommendation"/>
+						<HyperlinkButton Grid.Column="1"
+										 Click="HyperlinkButton_Click_Person"
+										 Style="{StaticResource ShowAllBtnStyle}"/>
+					</Grid>
+					<NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
+					<controls:AdaptiveGridView x:Name="PRGrid"
+											   DesiredWidth="140"
+											   ItemsSource="{x:Bind GetCollections(local:BookSummaryCollectionType.PersonalRecommands)}"
+											   Loaded="Grid_Loaded"
+											   Style="{StaticResource AGVStyle}">
+						<controls:AdaptiveGridView.ItemTemplate>
+							<DataTemplate x:DataType="local:BookSummary">
+								<StackPanel MaxWidth="160"
+											Margin="10,6"
+											HorizontalAlignment="Center"
+											VerticalAlignment="Center"
+											PointerReleased="GridView_ItemClick"
+											Tag="{x:Bind local:BookSummaryCollectionType.PersonalRecommands}">
+									<Image x:Name="PRImage"
+										   Source="{x:Bind BookCover}"
+										   Style="{StaticResource BookImageStyle}"/>
+									<TextBlock Style="{StaticResource VerticalBookNameTextStyle}" Text="{x:Bind BookName}"/>
+									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind Author}"/>
+								</StackPanel>
+							</DataTemplate>
+						</controls:AdaptiveGridView.ItemTemplate>
+					</controls:AdaptiveGridView>
 
-                </StackPanel>
+				</StackPanel>
 
-            </Grid>
-        </ScrollViewer>
+			</Grid>
+		</ScrollViewer>
 
-        <controls:Loading x:Name="loadingControl" HorizontalContentAlignment="Center"
-                          VerticalContentAlignment="Center" IsLoading="True">
-            <controls:Loading.Background>
-                <SolidColorBrush Color="Black" Opacity="0.7" />
-            </controls:Loading.Background>
-            <StackPanel Orientation="Horizontal" Spacing="15">
-                <ProgressRing IsActive="True" Height="35" Width="35"
-                              Foreground="{ThemeResource SystemAccentColorLight1}"/>
-                <TextBlock Style="{StaticResource TitleTextStyle}" Margin="0"
-                           Text="Loading..." Foreground="White"/>
-            </StackPanel>
-        </controls:Loading>
+		<controls:Loading x:Name="loadingControl"
+						  HorizontalContentAlignment="Center"
+						  VerticalContentAlignment="Center"
+						  IsLoading="True">
+			<controls:Loading.Background>
+				<SolidColorBrush Opacity="0.7" Color="Black"/>
+			</controls:Loading.Background>
+			<StackPanel Orientation="Horizontal" Spacing="15">
+				<ProgressRing Width="35"
+							  Height="35"
+							  Foreground="{ThemeResource SystemAccentColorLight1}"
+							  IsActive="True"/>
+				<TextBlock Margin="0"
+						   Foreground="White"
+						   Style="{StaticResource TitleTextStyle}"
+						   Text="Loading..."/>
+			</StackPanel>
+		</controls:Loading>
 
-    </Grid>
+	</Grid>
 </Page>

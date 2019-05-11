@@ -1,112 +1,166 @@
-﻿<Page
-    x:Class="Frontend.MainPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Frontend"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <!--ItemInvoked="NavView_ItemInvoked"-->
-    <NavigationView x:Name="NavView"
-                    Loaded="NavView_Loaded"
-                    BackRequested="NavView_BackRequested"
-                    SelectionChanged="NavView_SelectionChanged"
-                    CompactModeThresholdWidth="0">
-        <NavigationView.Header>
-            <Grid Margin="-12,-4,0,4" Padding="12,0,0,0" Background="#FFE6E6E6" x:Name="mainHeader">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <TextBlock x:Name="WelcomeLabel1" Grid.Column="0" Style="{StaticResource TitleTextStyle}" FontSize="16"
-                           VerticalAlignment="Center" Text="Welcome to"/>
-                <Button Grid.Column="0" Content="test send" Click="Button_Click"/>
-                <TextBlock x:Name="WelcomeLabel2" Grid.Column="1" Style="{StaticResource TitleTextStyle}" FontSize="16"
-                           VerticalAlignment="Center" FontStyle="Italic" Text=" BookHub">
-                    <TextBlock.Foreground>
-                        <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                    </TextBlock.Foreground>
-                </TextBlock>
-                <CommandBar Grid.Column="2" HorizontalAlignment="Right"  VerticalAlignment="Center"
-                            DefaultLabelPosition="Right" Background="{x:Null}">
-                    <AppBarButton Label="Refresh" Icon="Refresh" Click="Refresh_Pressed"/>
-                    <AppBarSeparator x:Name="TopSeparator"/>
-                    <AppBarToggleButton x:Name="ToggleAdmin" Label="Admin" Icon="Admin"
-                                        Checked="Admin_Pressed" Unchecked="Admin_Pressed"/>
-                </CommandBar>
-            </Grid>
-        </NavigationView.Header>
-        <NavigationView.AutoSuggestBox>
-            <AutoSuggestBox x:Name="SearchMain" PlaceholderText="Search books, read lists, billboards, …"
-                            QueryIcon="Find" QuerySubmitted="SearchMain_QuerySubmitted"/>
-        </NavigationView.AutoSuggestBox>
-        <NavigationView.MenuItems>
-            <NavigationViewItemHeader Content="Discovery"/>
-            <NavigationViewItem Content="Home" Tag="home" x:Name="HomeBtn" Icon="Home">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="Searching" Tag="search" x:Name="SearchBtn" Icon="Find">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="Read list" Tag="readlist" x:Name="ReadlistBtn" Icon="AllApps">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="Billboard" Tag="billboard" x:Name="BillboardBtn" Icon="PreviewLink">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItemHeader Content="My Account"/>
-            <NavigationViewItem Content="Bookshelf" Tag="bookshelf" x:Name="BookshelfBtn" Icon="Library">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="My wish list" Tag="mywishlist" x:Name="MyWishlistBtn" Icon="Contact2">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="My danmu" Tag="mydanmu" x:Name="MyDanmuBtn" Icon="ContactInfo">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="My read list" Tag="myreadlist" x:Name="MyReadlistBtn" Icon="ContactPresence">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-            <NavigationViewItem Content="Login" Tag="login" x:Name="LoginBtn" Icon="Contact">
-                <NavigationViewItem.FocusVisualPrimaryBrush>
-                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-                </NavigationViewItem.FocusVisualPrimaryBrush>
-            </NavigationViewItem>
-        </NavigationView.MenuItems>
-        <NavigationView.PaneFooter>
-            <NavigationViewItem Content="About" PointerReleased="About_PointerReleased" Icon="Help"/>
-        </NavigationView.PaneFooter>
-        <Frame x:Name="ContentFrame" Margin="0,-15,0,0" Navigated="ContentFrame_Navigated"
-               Navigating="ContentFrame_Navigating">
-            <Frame.ContentTransitions>
-                <TransitionCollection>
-                    <NavigationThemeTransition>
-                        <NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                            <SlideNavigationTransitionInfo Effect="FromRight"/>
-                        </NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                    </NavigationThemeTransition>
-                </TransitionCollection>
-            </Frame.ContentTransitions>
-        </Frame>
-    </NavigationView>
+﻿<Page x:Class="Frontend.MainPage"
+	  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	  xmlns:local="using:Frontend"
+	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+	  mc:Ignorable="d">
+	<!--  ItemInvoked="NavView_ItemInvoked"  -->
+	<NavigationView x:Name="NavView"
+					BackRequested="NavView_BackRequested"
+					CompactModeThresholdWidth="0"
+					Loaded="NavView_Loaded"
+					SelectionChanged="NavView_SelectionChanged">
+		<NavigationView.Header>
+			<Grid x:Name="mainHeader"
+				  Margin="-12,-4,0,4"
+				  Padding="12,0,0,0"
+				  Background="#FFE6E6E6">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<TextBlock x:Name="WelcomeLabel1"
+						   Grid.Column="0"
+						   VerticalAlignment="Center"
+						   FontSize="16"
+						   Style="{StaticResource TitleTextStyle}"
+						   Text="Welcome to"/>
+				<Button Grid.Column="0"
+						Click="Button_Click"
+						Content="test send"/>
+				<TextBlock x:Name="WelcomeLabel2"
+						   Grid.Column="1"
+						   VerticalAlignment="Center"
+						   FontSize="16"
+						   FontStyle="Italic"
+						   Style="{StaticResource TitleTextStyle}"
+						   Text=" BookHub">
+					<TextBlock.Foreground>
+						<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+					</TextBlock.Foreground>
+				</TextBlock>
+				<CommandBar Grid.Column="2"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Center"
+							Background="{x:Null}"
+							DefaultLabelPosition="Right">
+					<AppBarButton Click="Refresh_Pressed"
+								  Icon="Refresh"
+								  Label="Refresh"/>
+					<AppBarSeparator x:Name="TopSeparator"/>
+					<AppBarToggleButton x:Name="ToggleAdmin"
+										Checked="Admin_Pressed"
+										Icon="Admin"
+										Label="Admin"
+										Unchecked="Admin_Pressed"/>
+				</CommandBar>
+			</Grid>
+		</NavigationView.Header>
+		<NavigationView.AutoSuggestBox>
+			<AutoSuggestBox x:Name="SearchMain"
+							PlaceholderText="Search books, read lists, billboards, …"
+							QueryIcon="Find"
+							QuerySubmitted="SearchMain_QuerySubmitted"/>
+		</NavigationView.AutoSuggestBox>
+		<NavigationView.MenuItems>
+			<NavigationViewItemHeader Content="Discovery"/>
+			<NavigationViewItem x:Name="HomeBtn"
+								Content="Home"
+								Icon="Home"
+								Tag="home">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="SearchBtn"
+								Content="Searching"
+								Icon="Find"
+								Tag="search">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="ReadlistBtn"
+								Content="Read list"
+								Icon="AllApps"
+								Tag="readlist">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="BillboardBtn"
+								Content="Billboard"
+								Icon="PreviewLink"
+								Tag="billboard">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItemHeader Content="My Account"/>
+			<NavigationViewItem x:Name="BookshelfBtn"
+								Content="Bookshelf"
+								Icon="Library"
+								Tag="bookshelf">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="MyWishlistBtn"
+								Content="My wish list"
+								Icon="Contact2"
+								Tag="mywishlist">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="MyDanmuBtn"
+								Content="My danmu"
+								Icon="ContactInfo"
+								Tag="mydanmu">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="MyReadlistBtn"
+								Content="My read list"
+								Icon="ContactPresence"
+								Tag="myreadlist">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+			<NavigationViewItem x:Name="LoginBtn"
+								Content="Login"
+								Icon="Contact"
+								Tag="login">
+				<NavigationViewItem.FocusVisualPrimaryBrush>
+					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+				</NavigationViewItem.FocusVisualPrimaryBrush>
+			</NavigationViewItem>
+		</NavigationView.MenuItems>
+		<NavigationView.PaneFooter>
+			<NavigationViewItem Content="About"
+								Icon="Help"
+								PointerReleased="About_PointerReleased"/>
+		</NavigationView.PaneFooter>
+		<Frame x:Name="ContentFrame"
+			   Margin="0,-15,0,0"
+			   Navigated="ContentFrame_Navigated"
+			   Navigating="ContentFrame_Navigating">
+			<Frame.ContentTransitions>
+				<TransitionCollection>
+					<NavigationThemeTransition>
+						<NavigationThemeTransition.DefaultNavigationTransitionInfo>
+							<SlideNavigationTransitionInfo Effect="FromRight"/>
+						</NavigationThemeTransition.DefaultNavigationTransitionInfo>
+					</NavigationThemeTransition>
+				</TransitionCollection>
+			</Frame.ContentTransitions>
+		</Frame>
+	</NavigationView>
 
 
 </Page>

@@ -19,28 +19,28 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Frontend
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
-    public sealed partial class BillboardPage : Page, IRefreshAdminInterface
-    {
-        public BillboardPage()
-        {
-            this.InitializeComponent();
-            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+	/// <summary>
+	/// 可用于自身或导航至 Frame 内部的空白页。
+	/// </summary>
+	public sealed partial class BillboardPage : Page, IRefreshAdminInterface
+	{
+		public BillboardPage()
+		{
+			this.InitializeComponent();
+			this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            listControl.Booklist = new BooklistCollection(true);
-            listControl.WaitLoading();
-        }
+			listControl.Booklist = new BooklistCollection(true);
+			listControl.WaitLoading();
+		}
 
-        public void RefreshButtonPressed()
-        {
-            listControl.Refresh(false);
-        }
+		public void RefreshButtonPressed()
+		{
+			listControl.Refresh(false);
+		}
 
-        public void AdminButtonPressed(bool isChecked)
-        {
-            // do nothing
-        }
-    }
+		public void AdminButtonPressed(bool isChecked)
+		{
+			// TODO show edit & add billboard
+		}
+	}
 }
