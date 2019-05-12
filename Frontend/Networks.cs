@@ -80,7 +80,7 @@ namespace Frontend
 		public string NewContent { set; get; }
 
 		public int? ReadListId { set; get; }
-		public BookListChangeType? ChangeType { set; get; }
+		public int? ChangeType { set; get; }
 		public int? AlteredBookId { set; get; }
 		public string AlteredText { set; get; }
 
@@ -975,7 +975,7 @@ namespace Frontend
 			var change = new ChangeObject("ChangeReadList")
 			{
 				ReadListId = readListId,
-				ChangeType = changeType,
+				ChangeType = (int)changeType,
 				AlteredBookId = alteredId,
 				AlteredText = alteredText
 			};
