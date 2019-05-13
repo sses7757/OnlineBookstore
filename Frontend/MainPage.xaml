@@ -117,15 +117,23 @@
 				</NavigationViewItem.FocusVisualPrimaryBrush>
 			</NavigationViewItem>
 			<NavigationViewItem x:Name="MyDanmuBtn"
-								Content="My danmu"
+								Content="Created bullet screen"
 								Icon="ContactInfo"
 								Tag="mydanmu">
 				<NavigationViewItem.FocusVisualPrimaryBrush>
 					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
 				</NavigationViewItem.FocusVisualPrimaryBrush>
 			</NavigationViewItem>
-			<NavigationViewItem x:Name="MyReadlistBtn"
-								Content="My read list"
+            <NavigationViewItem x:Name="MyFolloedlistBtn"
+								Content="Followed read list"
+								Icon="AddFriend"
+								Tag="myfollow">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="MyReadlistBtn"
+								Content="Created read list"
 								Icon="ContactPresence"
 								Tag="myreadlist">
 				<NavigationViewItem.FocusVisualPrimaryBrush>

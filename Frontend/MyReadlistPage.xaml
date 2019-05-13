@@ -4,170 +4,23 @@
 	  xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
 	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	  xmlns:local="using:Frontend"
+      xmlns:localControl="using:Frontend.CustomControls"
 	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	  xmlns:sys="using:System"
 	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	  mc:Ignorable="d">
 
 	<Grid>
-		<RefreshContainer PullDirection="BottomToTop" RefreshRequested="RefreshRequested">
-			<ListView Grid.Column="1"
-					  Margin="0"
-					  Padding="150,20,150,0"
-					  IsItemClickEnabled="False"
-					  ItemsSource="{x:Bind ReadLists, Mode=OneWay}"
-					  Loaded="ListView_Loaded"
-					  Style="{StaticResource ListStyle}">
-				<ListView.ItemTemplate>
-					<DataTemplate x:DataType="local:BookDetailCollection">
-						<SwipeControl Margin="0,15">
-							<SwipeControl.TopItems>
-								<SwipeItems Mode="Reveal">
-									<SwipeItem Background="LightGray"
-											   IconSource="{StaticResource DeleteIcon}"
-											   Invoked="DeleteList_Invoked"
-											   Text="Delete whole read list"/>
-								</SwipeItems>
-							</SwipeControl.TopItems>
 
-							<Grid Margin="0"
-								  Padding="15,10"
-								  HorizontalAlignment="Stretch"
-								  Style="{StaticResource BoardPanelStyle}">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="Auto"/>
-									<ColumnDefinition Width="*"/>
-								</Grid.ColumnDefinitions>
-								<Grid.RowDefinitions>
-									<RowDefinition Height="Auto"/>
-									<RowDefinition Height="Auto"/>
-									<RowDefinition Height="Auto"/>
-									<RowDefinition Height="Auto"/>
-									<RowDefinition Height="Auto"/>
-								</Grid.RowDefinitions>
+        <localControl:BookListsControl x:Name="listControl"
+									   HorizontalAlignment="Stretch"
+									   VerticalAlignment="Stretch"
+									   IsBillboard="False"
+									   PaddingX="120"
+                                       ShowTopSwipe="True"
+                                       ShowLeftSwipe="True"
+                                       IsTopSwipeFollow="False"
+                                       CanEdit="True"/>
 
-								<TextBlock Grid.Row="0"
-										   Grid.Column="0"
-										   Margin="0,15,0,0"
-										   Style="{StaticResource TitleTextStyle}"
-										   Text="{x:Bind Title, Mode=OneWay}"/>
-								<Button Grid.Row="0"
-										Grid.Column="1"
-										HorizontalAlignment="Right"
-										Background="{StaticResource AppBarBackgroundThemeBrush}"
-										Click="EditTitle_Invoked">
-									<FontIcon FontSize="18" Glyph="&#xE104;"/>
-								</Button>
-								<TextBlock Grid.Row="1"
-										   Grid.Column="0"
-										   Margin="0,10,0,0"
-										   FontWeight="SemiLight"
-										   Style="{StaticResource DescriptionTextStyle}"
-										   Text="{x:Bind sys:String.Format('{0} Followers', FollowAmount), Mode=OneWay}"/>
-								<TextBlock Grid.Row="1"
-										   Grid.Column="1"
-										   Margin="0,10,0,0"
-										   HorizontalAlignment="Right"
-										   FontWeight="SemiLight"
-										   Style="{StaticResource DescriptionTextStyle}"
-										   Text="{x:Bind local:MyDanmuPage.TimeToString(EditTime), Mode=OneWay}"/>
-								<TextBlock Grid.Row="2"
-										   Grid.Column="0"
-										   Margin="0,10"
-										   Style="{StaticResource DescriptionTextStyle}"
-										   Text="{x:Bind Description, Mode=OneWay}"/>
-								<Button Grid.Row="2"
-										Grid.Column="1"
-										HorizontalAlignment="Right"
-										Background="{StaticResource AppBarBackgroundThemeBrush}"
-										Click="EditDesc_Invoked">
-									<FontIcon FontSize="17" Glyph="&#xE104;"/>
-								</Button>
-								<NavigationViewItemSeparator Grid.Row="3"
-															 Grid.Column="0"
-															 Grid.ColumnSpan="2"
-															 Style="{StaticResource SeparatorStyle}"/>
-								<controls:AdaptiveGridView Grid.Row="4"
-														   Grid.Column="0"
-														   Grid.ColumnSpan="2"
-														   ItemClick="Book_Pointed"
-														   ItemsSource="{x:Bind Books, Mode=OneWay}"
-														   Style="{StaticResource AGVStyle}">
-									<controls:AdaptiveGridView.ItemTemplate>
-										<DataTemplate x:DataType="local:BookDetail">
-											<SwipeControl Margin="0,8">
-												<SwipeControl.LeftItems>
-													<SwipeItems Mode="Execute">
-														<SwipeItem IconSource="{StaticResource DeleteIcon}"
-																   Invoked="DeleteBook_Invoked"
-																   Text="Delete book"/>
-													</SwipeItems>
-												</SwipeControl.LeftItems>
-
-												<Grid MaxHeight="180"
-													  HorizontalAlignment="Center"
-													  VerticalAlignment="Center">
-													<Grid.ColumnDefinitions>
-														<ColumnDefinition Width="*"/>
-														<ColumnDefinition Width="3*"/>
-													</Grid.ColumnDefinitions>
-													<Image x:Name="bookCover"
-														   Grid.Column="0"
-														   Margin="0"
-														   Source="{x:Bind BookCover}"
-														   Style="{StaticResource BookImageStyle}"/>
-													<StackPanel Grid.Column="1">
-														<TextBlock Style="{StaticResource HorizontalBookNameTextStyle}"
-																   Text="{x:Bind BookName}"/>
-														<StackPanel Grid.Row="4"
-																	Grid.Column="1"
-																	Orientation="Horizontal">
-															<RatingControl Margin="10,0,10,-8"
-																		   VerticalAlignment="Center"
-																		   IsReadOnly="True"
-																		   Value="{x:Bind OverallRating}"/>
-															<TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-																	   Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
-														</StackPanel>
-														<TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-																   Text="{x:Bind sys:String.Format('Author:\\t{0}', Author)}"/>
-														<TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-																   Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"/>
-														<TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-																   Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"/>
-													</StackPanel>
-												</Grid>
-
-											</SwipeControl>
-										</DataTemplate>
-									</controls:AdaptiveGridView.ItemTemplate>
-								</controls:AdaptiveGridView>
-							</Grid>
-
-						</SwipeControl>
-					</DataTemplate>
-				</ListView.ItemTemplate>
-			</ListView>
-		</RefreshContainer>
-
-		<controls:Loading x:Name="loadingControl"
-						  HorizontalContentAlignment="Center"
-						  VerticalContentAlignment="Center"
-						  IsLoading="True">
-			<controls:Loading.Background>
-				<SolidColorBrush Opacity="0.7" Color="Black"/>
-			</controls:Loading.Background>
-			<StackPanel Orientation="Horizontal" Spacing="15">
-				<ProgressRing Width="35"
-							  Height="35"
-							  Foreground="{ThemeResource SystemAccentColorLight1}"
-							  IsActive="True"/>
-				<TextBlock Margin="0"
-						   Foreground="White"
-						   Style="{StaticResource TitleTextStyle}"
-						   Text="Loading..."/>
-			</StackPanel>
-		</controls:Loading>
-
-	</Grid>
+    </Grid>
 </Page>

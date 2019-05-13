@@ -98,7 +98,7 @@
 										   Source="{x:Bind BookCover}"
 										   Style="{StaticResource BookImageStyle}"/>
 									<TextBlock Style="{StaticResource VerticalBookNameTextStyle}" Text="{x:Bind BookName}"/>
-									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind Author}"/>
+									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind AuthorName}"/>
 								</StackPanel>
 							</DataTemplate>
 						</controls:AdaptiveGridView.ItemTemplate>
@@ -135,7 +135,7 @@
 										   Source="{x:Bind BookCover}"
 										   Style="{StaticResource BookImageStyle}"/>
 									<TextBlock Style="{StaticResource VerticalBookNameTextStyle}" Text="{x:Bind BookName}"/>
-									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind Author}"/>
+									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind AuthorName}"/>
 								</StackPanel>
 							</DataTemplate>
 						</controls:AdaptiveGridView.ItemTemplate>
@@ -172,7 +172,7 @@
 										   Source="{x:Bind BookCover}"
 										   Style="{StaticResource BookImageStyle}"/>
 									<TextBlock Style="{StaticResource VerticalBookNameTextStyle}" Text="{x:Bind BookName}"/>
-									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind Author}"/>
+									<TextBlock Style="{StaticResource VerticalBookTextStyle}" Text="{x:Bind AuthorName}"/>
 								</StackPanel>
 							</DataTemplate>
 						</controls:AdaptiveGridView.ItemTemplate>

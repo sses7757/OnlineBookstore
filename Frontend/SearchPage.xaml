@@ -299,7 +299,8 @@
 												   HorizontalAlignment="Stretch"
 												   VerticalAlignment="Stretch"
 												   IsBillboard="False"
-												   PaddingX="100"/>
+												   PaddingX="100"
+                                                   ShowTopSwipe="True"/>
 				</controls:TabViewItem>
 
 			</controls:TabView>

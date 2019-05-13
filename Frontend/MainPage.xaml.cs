@@ -1,19 +1,13 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Animations;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.System;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -40,17 +34,18 @@ namespace Frontend
 		}
 
 		// List of ValueTuple holding the Navigation Tag and the relative Navigation Page
-		private readonly List<(string Tag, Type Page)> _pages = new List<(string Tag, Type Page)>
+		private Dictionary<string, Type> Pages { get; } = new Dictionary<string, Type>
 		{
-			("home", typeof(HomePage)),
-			("search", typeof(SearchPage)),
-			("readlist", typeof(ReadlistPage)),
-			("billboard", typeof(BillboardPage)),
-			("bookshelf", typeof(BookshelfPage)),
-			("mydanmu", typeof(MyDanmuPage)),
-			("myreadlist", typeof(MyReadlistPage)),
-			("mywishlist", typeof(MyWishlistPage)),
-			("login", typeof(LoginPage)),
+			{ "home", typeof(HomePage) },
+			{ "search", typeof(SearchPage) },
+			{ "readlist", typeof(ReadlistPage) },
+			{ "billboard", typeof(BillboardPage) },
+			{ "bookshelf", typeof(BookshelfPage) },
+			{ "mydanmu", typeof(MyDanmuPage) },
+			{ "myreadlist", typeof(MyReadlistPage) },
+			{ "mywishlist", typeof(MyWishlistPage) },
+			{ "myfollow", typeof(MyFollowedListPage) },
+			{ "login", typeof(LoginPage) }
 		};
 
 		private void ShowSearch(bool visible)
@@ -72,6 +67,7 @@ namespace Frontend
 			BookshelfBtn.Visibility = v;
 			MyDanmuBtn.Visibility = v;
 			MyReadlistBtn.Visibility = v;
+			MyFolloedlistBtn.Visibility = v;
 			MyWishlistBtn.Visibility = v;
 		}
 
@@ -100,8 +96,8 @@ namespace Frontend
 			}
 			else
 			{
-				var item = _pages.FirstOrDefault(p => p.Tag.Equals(navItemTag));
-				_page = item.Page;
+				var item = Pages.FirstOrDefault(p => p.Key.Equals(navItemTag));
+				_page = item.Value;
 			}
 			// Get the page type before navigation so you can prevent duplicate entries in the backstack.
 			var preNavPageType = ContentFrame.CurrentSourcePageType;
@@ -200,8 +196,8 @@ namespace Frontend
 		{
 			NavView.IsBackEnabled = ContentFrame.CanGoBack;
 
-			var item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
-			if (item.Tag == null || item.Page == null)
+			var item = Pages.FirstOrDefault(p => p.Value == e.SourcePageType);
+			if (item.Key == null || item.Value == null)
 				return;
 
 			if (ContentFrame.SourcePageType == typeof(SettingPage))
@@ -230,7 +226,7 @@ namespace Frontend
 				WelcomeLabel2.Text = "";
 			}
 
-			NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First(n => n.Tag.Equals(item.Tag));
+			NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First(n => n.Tag.Equals(item.Key));
 		}
 
 		internal void NavigateToHomeAndShowMine(bool show, bool navigate = true)

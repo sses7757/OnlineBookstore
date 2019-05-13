@@ -2,11 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Frontend
@@ -80,7 +78,7 @@ namespace Frontend
 		public string NewContent { set; get; }
 
 		public int? ReadListId { set; get; }
-		public BookListChangeType? ChangeType { set; get; }
+		public int? ChangeType { set; get; }
 		public int? AlteredBookId { set; get; }
 		public string AlteredText { set; get; }
 
@@ -96,6 +94,7 @@ namespace Frontend
 
 		public int? Rating { set; get; }
 
+		public bool? IsFollowAction { set; get; }
 
 		public ChangeObject() { }
 
@@ -115,18 +114,11 @@ namespace Frontend
 		}
 	}
 
-	public enum LoginStatus
-	{
-		Success,
-		NoSuchUser,
-		WrongPassword
-	}
-
 	public class ReceiveObject
 	{
 		public bool Success { set; get; } = false;
 
-		public LoginStatus? LoginStatus { set; get; }
+		public int? LoginStatus { set; get; }
 		public int? UserId { set; get; }
 		public bool? IsAdmin { set; get; }
 		public string[] MainLabels { set; get; }
@@ -135,7 +127,7 @@ namespace Frontend
 		public string BookCoverUrl { set; get; }
 		public string BookName { set; get; }
 		public string BookFullName { set; get; }
-		public string Author { set; get; }
+		public string AuthorName { set; get; }
 		public string MainAndSubLabel { set; get; }
 		public double? Price { set; get; }
 		public int? Discount { set; get; }
@@ -163,6 +155,7 @@ namespace Frontend
 
 		public string Description { set; get; }
 		public int? FollowAmount { set; get; }
+		public bool? Followed { set; get; }
 
 		public int? PageNum { set; get; }
 
@@ -225,17 +218,25 @@ namespace Frontend
 
 		private async Task<int> Send(ArraySegment<byte> buffer)
 		{
-			return await this.socket.SendAsync(buffer, SocketFlags.None);
+			int sendLen = await this.socket.SendAsync(buffer, SocketFlags.None);
+			this.socket.Shutdown(SocketShutdown.Send);
+			return sendLen;
 		}
 
 		private async Task<int> Receive(ArraySegment<byte> buffer)
 		{
-			return await this.socket.ReceiveAsync(buffer, SocketFlags.None);
+			int receiveLen = await this.socket.ReceiveAsync(buffer, SocketFlags.None);
+			this.socket.Shutdown(SocketShutdown.Receive);
+			return receiveLen;
 		}
 
 		private void Close()
 		{
-			this.socket.Shutdown(SocketShutdown.Both);
+			try
+			{
+				this.socket.Shutdown(SocketShutdown.Both);
+			}
+			catch (Exception) { }
 			this.socket.Close();
 		}
 
@@ -264,7 +265,7 @@ namespace Frontend
 
 				receive = new byte[1<<14];
 				int recvLen = await Instance.Receive(receive);
-				Debug.WriteLine("Receivefinish, total {0} bytes.", recvLen);
+				Debug.WriteLine("Receive finish, total {0} bytes.", recvLen);
 
 				Instance.Close();
 			}
@@ -311,12 +312,7 @@ namespace Frontend
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			Util.UserId = recv.UserId.Value;
 			Util.IsAdmin = recv.IsAdmin.Value;
-			//return recv.LoginStatus.Value;
-			// TODO
-			await Task.Delay(4000);
-			Util.UserId = 1111;
-			Util.IsAdmin = true;
-			return LoginStatus.Success;
+			return (LoginStatus)recv.LoginStatus.Value;
 		}
 
 		public static async Task<string[]> GetMainLabels()
@@ -325,16 +321,7 @@ namespace Frontend
 			{
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.MainLabels;
-			// TODO
-			await Task.Delay(1000);
-			return new string[] { "Arts",
-								  "Biographies",
-								  "Business",
-								  "Calendars",
-								  "Sciences",
-								  "Bibles"
-			};
+			return recv.MainLabels;
 		}
 
 		public static async void GetSubLabels(Label label)
@@ -348,14 +335,6 @@ namespace Frontend
 			{
 				label.AllSubs.Add(new SubLabel(sub, label));
 				label.OnPropertyChanged("HotSubs");
-			}
-			// TODO
-			await Task.Delay(1000);
-			for (int i = 0; i < 15; ++i)
-			{
-				label.AllSubs.Add(new SubLabel("AA", label));
-				label.OnPropertyChanged("HotSubs");
-				await Task.Delay(200);
 			}
 		}
 
@@ -375,16 +354,7 @@ namespace Frontend
 									new Uri(recv.BookCoverUrl));
 			book.BookName = recv.BookName;
 			book.BookFullName = recv.BookFullName;
-			book.Author = recv.Author;
-			// TODO
-			await Task.Delay(Util.REFRESH_RATE);
-			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
-				new Uri("https://images-na.ssl-images-amazon.com/images/I/51JVLQdducL._SX392_BO1,204,203,200_.jpg"));
-				//new Uri("ms-appx:///Assets/tempBook.png"));
-			book.BookName = "An Introduction to Thermal Physics";
-			book.BookFullName = "An Introduction to Thermal Physics " +
-				"(Translation Version by Database System Principle Team 309)";
-			book.Author = "Daniel V. Schroeder";
+			book.AuthorName = recv.AuthorName;
 		}
 
 		public static async Task GetBookQuasiDetail(BookDetail book)
@@ -403,27 +373,11 @@ namespace Frontend
 									new Uri(recv.BookCoverUrl));
 			book.BookName = recv.BookName;
 			book.BookFullName = recv.BookFullName;
-			book.Author = recv.Author;
+			book.AuthorName = recv.AuthorName;
 			book.Labels = recv.MainAndSubLabel;
 			book.Price = recv.Price.Value;
 			book.Discount = recv.Discount.Value;
 			book.OverallRating = recv.OverallRating.Value;
-			// TODO only two level label
-			await Task.Delay(Util.REFRESH_RATE);
-			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
-				new Uri("https://images-na.ssl-images-amazon.com/images/I/51JVLQdducL._SX392_BO1,204,203,200_.jpg"));
-			//new Uri("ms-appx:///Assets/tempBook.png"));
-			book.BookName = "An Introduction to Thermal Physics";
-			book.BookFullName = "An Introduction to Thermal Physics " +
-				"(Translation Version by Database System Principle Team 309)";
-			book.Author = "Daniel V. Schroeder";
-			await Task.Delay(100);
-			book.Labels = "Science-Physics";
-			await Task.Delay(100);
-			book.Price = 48.67;
-			book.Discount = 85;
-			await Task.Delay(100);
-			book.OverallRating = 4.6;
 		}
 
 		public static async Task GetBookDetail(BookDetail book)
@@ -450,39 +404,6 @@ namespace Frontend
 			book.CanAddReadList = recv.CanAddReadList.Value;
 			book.CanAddWishList = recv.CanAddWishList.Value;
 			book.CanBuy = recv.CanBuy.Value;
-			// TODO get book details Util.UserId
-			await Task.Delay(1000);
-			book.BookDescription = "The authors present the complete guide to ANSI standard C language programming." +
-				" Written by the developers of C, this new version helps readers keep up with the finalized ANSI " +
-				"standard for C while showing how to take advantage of C's rich set of operators, economy of expression, " +
-				"improved control flow, and data structures. The 2/E has been completely rewritten with additional" +
-				" examples and problem sets to clarify the implementation of difficult language constructs. " +
-				"For years, C programmers have let K&R guide them to building well-structured and efficient programs." +
-				" Now this same help is available to those working with ANSI compilers. Includes detailed coverage of" +
-				" the C language plus the official C language reference manual for at-a-glance help with syntax notation," +
-				" declarations, ANSI changes, scope rules, and the list goes on and on.";
-			await Task.Delay(100);
-			book.Labels = "Science-Physics-Thermal physics";
-			await Task.Delay(100);
-			book.OtherAuthors = "Database System Principle Team 309 (translators)";
-			await Task.Delay(100);
-			book.PublishInfo = "Pearson / 1999-08-28 / 1st edition";
-			await Task.Delay(100);
-			book.Price = 48.67;
-			book.Discount = 85;
-			await Task.Delay(100);
-			book.ISBN = "978-0131103627";
-			await Task.Delay(100);
-			book.BuyAmount = 120;
-			book.DanmuAmount = 200;
-			book.PreviewAmount = 1005;
-			book.ReviewAmount = 25;
-			book.PageCount = 462;
-			book.OverallRating = 4.6;
-			book.CanAddReadList = true;
-			book.CanAddWishList = book.CanBuy = false;
-			await book.RelatedBooks.Reload();
-			await GetReviewContents(book);
 			book.finished = true;
 		}
 
@@ -509,15 +430,7 @@ namespace Frontend
 				Count = count
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO get book reviews (from -> from + count)
-			await Task.Delay(100);
-			var ids = new List<int>();
-			for (int i = from; i < count + from; ++i)
-			{
-				ids.Add(i + 479);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
 
 		public static async Task GetReview(Review review)
@@ -532,36 +445,6 @@ namespace Frontend
 			review.Rating = recv.Rating.Value;
 			review.Content = recv.Content;
 			review.Title = recv.Title;
-			// TODO get review content from id
-			await Task.Delay(500);
-			if (new Random().Next(0, 6) < 5)
-			{
-				review.UserName = "Steven";
-				review.PublishDate = new DateTime(2019, 3, 24, 0, 45, 4);
-				review.Rating = 5;
-				review.Title = "A Fansinating Book";
-				review.Content = "I'm not new to programming; in fact " +
-					"I've been doing it professionally for the past decade." +
-					" Although I've played around in quite a few different languages, " +
-					"most of my work over the last 6 years has been in .NET (C# mainly)." +
-					" I have always had an interest in C because I love its simplicity." +
-					" Also, it's a language which brings one closer to the machine, " +
-					"stripping away many of the abstractions that higher level languages provide." +
-					" Higher level languages (such as Java, C#, Python, etc.) are massive and " +
-					"powerful with HUGE frameworks, but I'm attracted to simple things.";
-			}
-			else
-			{
-				review.UserName = "Anis";
-				review.PublishDate = DateTime.Now;
-				review.Rating = 1;
-				review.Title = "Disappointed";
-				review.Content = "Print Type is very bad. Looks like old news paper printed on 80's." +
-					" Too much description, may be good for beginners students but not for you if" +
-					" want to understand the concept of C Pointer, Structure, Union, etc. in few lines." +
-					" I found may online tutorials better than this book. Just read the book less -" +
-					" than hours and returned; Paid $7.53 shipping fee....bad.";
-			}
 		}
 
 		public static async Task<int[]> GetBookListBooks(bool isBillboard, int id, int from = 0,
@@ -575,15 +458,7 @@ namespace Frontend
 				Count = count
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO get book reviews (from -> from + count)
-			await Task.Delay(100);
-			var ids = new List<int>();
-			for (int i = from; i < (count == int.MaxValue ? 12 : count) + from; ++i)
-			{
-				ids.Add(i + 1657);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
 
 		public static async Task<int[]> GetShelfBooks()
@@ -592,18 +467,8 @@ namespace Frontend
 			{
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO 
-			await Task.Delay(100);
-			var ids = new List<int>();
-			for (int i = 0; i < 18; ++i)
-			{
-				ids.Add(i + 768);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
-
-		private const int delay = 1000;
 
 		public static async Task<int[]> GetFromQuery(QueryObject query, int from = 0, int count = int.MaxValue)
 		{
@@ -611,16 +476,8 @@ namespace Frontend
 			newQuery.Type = "GetFromQuery";
 			newQuery.From = from;
 			newQuery.Count = count;
-			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO get ids
-			await Task.Delay(delay);
-			List<int> ids = new List<int>();
-			for (int i = from + 1; i <= (count == int.MaxValue ? 18 : count) + from; ++i)
-			{
-				ids.Add(i + 235);
-			}
-			return ids.ToArray();
+			var recv = await Connection.SendAndReceive.GlobalLock(newQuery);
+			return recv.IDs;
 		}
 
 		internal readonly static QueryObject NewBooks =
@@ -710,15 +567,7 @@ namespace Frontend
 				Count = count
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO get book ids only 7
-			await Task.Delay(100);
-			List<int> ids = new List<int>();
-			for (int i = from; i < from + count; ++i)
-			{
-				ids.Add(i + 564);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
 
 		public static async Task<BookDetailCollection> GetTitleDescription(bool isBillboard, int id)
@@ -734,13 +583,6 @@ namespace Frontend
 				Title = recv.Title,
 				Description = recv.Description
 			};
-			// TODO
-			await Task.Delay(delay);
-			collection = new BookDetailCollection
-			{
-				Title = "Test billboard title",
-				Description = "Test billboard descriptions: test test test test test test"
-			};
 			return collection;
 		}
 
@@ -753,22 +595,13 @@ namespace Frontend
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			collection.Title = recv.Title;
+			collection.Description = recv.Description;
+			if (isBillboard)
+				return;
 			collection.CreateUser = recv.CreateUser;
 			collection.EditTime = recv.TimeStap.Value.GetTime();
-			collection.Description = recv.Description;
 			collection.FollowAmount = recv.FollowAmount.Value;
-			// TODO
-			await Task.Delay(delay);
-			collection.Title = "Test billboard title";
-			collection.CreateUser = "Test user name";
-			collection.EditTime = DateTime.Now;
-			collection.Description = "Test billboard descriptions: test test test test test test";
-			collection.FollowAmount = 324;
-			collection.OnPropertyChanged("Title");
-			collection.OnPropertyChanged("CreateUser");
-			collection.OnPropertyChanged("EditTime");
-			collection.OnPropertyChanged("Description");
-			collection.OnPropertyChanged("FollowAmount");
+			collection.Followed = recv.Followed.Value;
 		}
 
 		public static async Task<int[]> GetMyWishlist()
@@ -777,15 +610,7 @@ namespace Frontend
 			{
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO 
-			await Task.Delay(100);
-			List<int> ids = new List<int>();
-			for (int i = 0; i < 11; ++i)
-			{
-				ids.Add(i + 789);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
 
 		public static async Task<int[]> GetMyDanmus()
@@ -794,15 +619,7 @@ namespace Frontend
 			{
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO 
-			await Task.Delay(100);
-			List<int> ids = new List<int>();
-			for (int i = 0; i < 35; ++i)
-			{
-				ids.Add(i + 123);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
 
 		public static async Task<int[]> GetDanmuOfBook(int bookId, uint page)
@@ -813,15 +630,7 @@ namespace Frontend
 				Page = (int)page
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO 
-			await Task.Delay(100);
-			List<int> ids = new List<int>();
-			for (int i = 0; i < 20; ++i)
-			{
-				ids.Add(i + 123);
-			}
-			return ids.ToArray();
+			return recv.IDs;
 		}
 
 		public static async Task GetDanmuContent(Danmu danmu)
@@ -832,10 +641,6 @@ namespace Frontend
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			danmu.Content = recv.Content;
-			// TODO 
-			await Task.Delay(100);
-			danmu.Content = new string[] { "6666666666666666666", "test test test test test" }
-									  [new Random().Next(2)];
 		}
 
 		public static async Task GetFullDanmuContent(FullDanmu danmu)
@@ -848,29 +653,24 @@ namespace Frontend
 			danmu.Content = recv.Content;
 			danmu.BookName = recv.BookName;
 			danmu.EditTime = recv.TimeStap.Value.GetTime();
-			// TODO 
-			await Task.Delay(100);
-			danmu.BookName = "Test book name";
-			danmu.PageNum = 13;
-			danmu.EditTime = DateTime.Now;
-			danmu.Content = new string[] { "6666666666666666666", "test test test test test" }[new Random().Next(2)];
 		}
 
-		public static async Task<int[]> GetMyReadLists()
+		public static async Task<int[]> GetMyCreatedReadLists()
 		{
-			var query = new QueryObject("GetMyReadLists")
+			var query = new QueryObject("GetMyCreatedReadLists")
 			{
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO 
-			await Task.Delay(100);
-			List<int> ids = new List<int>();
-			for (int i = 0; i < 3; ++i)
+			return recv.IDs;
+		}
+
+		public static async Task<int[]> GetMyFollowedReadLists()
+		{
+			var query = new QueryObject("GetMyFollowedReadLists")
 			{
-				ids.Add(i + 456);
-			}
-			return ids.ToArray();
+			};
+			var recv = await Connection.SendAndReceive.GlobalLock(query);
+			return recv.IDs;
 		}
 
 		public static async Task<int[]> GetMyReadListsWithout(int bookId)
@@ -880,10 +680,7 @@ namespace Frontend
 				BookId = bookId
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.IDs;
-			// TODO 
-			await Task.Delay(1000);
-			return new int[] { 323, 348, 978 };
+			return recv.IDs;
 		}
 
 		public static async Task<string> GetBookPreview(int bookId)
@@ -893,10 +690,7 @@ namespace Frontend
 				BookId = bookId
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.URL;
-			// TODO 
-			await Task.Delay(100);
-			return "ms-appx:///Assets/pdffile.pdf";
+			return recv.URL;
 		}
 
 		public static async Task<string> DownloadBook(int bookId)
@@ -906,11 +700,7 @@ namespace Frontend
 				BookId = bookId
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.URL;
-			// TODO 
-			await Task.Delay(100);
-			return "http://www.adobe.com/content/dam/Adobe/en/accessibility/" +
-				   "products/acrobat/pdfs/acrobat-x-accessible-pdf-from-word.pdf";
+			return recv.URL;
 		}
 
 		public static async Task<string> GetBookKey(int bookId)
@@ -920,10 +710,7 @@ namespace Frontend
 				BookId = bookId
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			//return recv.PrivateKey;
-			// TODO 
-			await Task.Delay(100);
-			return "asngaesgnaesiof";
+			return recv.PrivateKey;
 		}
 	}
 
@@ -975,7 +762,7 @@ namespace Frontend
 			var change = new ChangeObject("ChangeReadList")
 			{
 				ReadListId = readListId,
-				ChangeType = changeType,
+				ChangeType = (int)changeType,
 				AlteredBookId = alteredId,
 				AlteredText = alteredText
 			};
@@ -1062,6 +849,17 @@ namespace Frontend
 			var change = new ChangeObject("CancleTransaction")
 			{
 				BookId = bookId,
+			};
+			var recv = await Connection.SendAndReceive.GlobalLock(change);
+			return recv.Success;
+		}
+
+		internal static async Task<bool> FollowReadList(int readListId, bool isFollowAction)
+		{
+			var change = new ChangeObject("FollowReadList")
+			{
+				ReadListId = readListId,
+				IsFollowAction = isFollowAction,
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;

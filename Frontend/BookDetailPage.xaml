@@ -241,7 +241,7 @@
 										<TextBlock Margin="0,3,0,0"
 												   FontSize="13"
 												   Style="{StaticResource VerticalBookTextStyle}"
-												   Text="{x:Bind Author}"/>
+												   Text="{x:Bind AuthorName}"/>
 									</StackPanel>
 								</DataTemplate>
 							</controls:AdaptiveGridView.ItemTemplate>

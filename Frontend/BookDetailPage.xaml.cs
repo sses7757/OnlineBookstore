@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
@@ -138,11 +131,11 @@ namespace Frontend
 			var str = "";
 			if (detail.OtherAuthors == null || detail.OtherAuthors.Trim().Length == 0)
 			{
-				str += detail.Author;
+				str += detail.AuthorName;
 			}
 			else
 			{
-				str += detail.Author + "; " + detail.OtherAuthors;
+				str += detail.AuthorName + "; " + detail.OtherAuthors;
 			}
 			return str;
 		}

@@ -16,17 +16,6 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Frontend
 {
-	public enum BookListChangeType
-	{
-		AddBook,
-		RemoveList,
-		DeleteBook,
-		ChangeTitle,
-		ChangeDescription
-	}
-
-
-
 	public class DanmuCollection : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -92,49 +81,6 @@ namespace Frontend
 		{
 			this.ID = id;
 		}
-	}
-
-
-	internal enum ContentType
-	{
-		Books,
-		Billboards,
-		ReadLists
-	}
-
-	internal enum BooksOrderType
-	{
-		Recommend,
-		Time,
-		Rating,
-		Price,
-		Discount,
-		ReviewAmount,
-		BuyAmount,
-		DanmuAmount,
-		PreviewAmount,
-		PageCount
-	}
-
-	internal enum BillboardsOrderType
-	{
-		Recommend,
-		Time
-	}
-
-	internal enum ReadlistsOrderType
-	{
-		Recommend,
-		Time,
-		FollowAmount
-	}
-
-	internal enum TimeSpanType
-	{
-		All,
-		Year,
-		Month,
-		Week
 	}
 
 	internal class SearchInfo : INotifyPropertyChanged
@@ -575,6 +521,10 @@ namespace Frontend
 		private readonly bool isBillBoard;
 		private readonly QueryObject query;
 
+		internal BooklistCollection()
+		{
+		}
+
 		internal BooklistCollection(bool isBillBoard)
 		{
 			this.isBillBoard = isBillBoard;
@@ -588,7 +538,7 @@ namespace Frontend
 			this.query = query;
 		}
 
-		internal bool Finished { get; private set; } = false;
+		internal bool Finished { get; set; } = false;
 
 		internal async void Reload(bool addMore = false)
 		{
@@ -648,7 +598,21 @@ namespace Frontend
 		internal string CreateUser { set; get; }
 		internal DateTime EditTime { set; get; }
 		internal int FollowAmount { set; get; }
+		internal bool Followed { set; get; }
 		internal bool Finished { get; private set; } = false;
+
+		internal bool ShowFollowSwipe { set; get; } = true;
+		private string FollowString { get => Followed ? "Unfollow read list" : "Follow read list"; }
+		private string DeleteString { get => "Delete read list"; }
+		private IconSource FollowIcon {
+			get => Application.Current.Resources[Followed ? "AddIcon" : "RemoveIcon"] as IconSource;
+		}
+		private IconSource DeleteIcon {
+			get => Application.Current.Resources["DeleteIcon"] as IconSource;
+		}
+
+		internal string SwipeString { get => ShowFollowSwipe ? FollowString : DeleteString; }
+		internal IconSource SwipeIcon { get => ShowFollowSwipe ? FollowIcon : DeleteIcon; }
 
 		internal int? ID {
 			get => this.query.BookListId;
@@ -767,7 +731,7 @@ namespace Frontend
 	/// <summary>
 	/// Collection for showing book summary
 	/// </summary>
-	internal class BookSummaryCollection : INotifyPropertyChanged
+	public class BookSummaryCollection : INotifyPropertyChanged
 	{
 		internal enum OtherType
 		{
@@ -872,7 +836,7 @@ namespace Frontend
 		internal string BookName { set; get; }
 		internal string BookFullName { set; get; }
 		internal BitmapImage BookCover { set; get; }
-		internal string Author { set; get; }
+		internal string AuthorName { set; get; }
 
 		internal BookSummary(BookSummary book)
 		{
@@ -880,7 +844,7 @@ namespace Frontend
 			this.ID = book.ID;
 			this.BookName = book.BookName;
 			this.BookFullName = book.BookFullName;
-			this.Author = book.Author;
+			this.AuthorName = book.AuthorName;
 		}
 
 		internal BookSummary(int BookId)

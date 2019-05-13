@@ -144,11 +144,15 @@
     <Compile Include="CustomControls\BookListsControl.xaml.cs">
       <DependentUpon>BookListsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Enums.cs" />
     <Compile Include="HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MyDanmuPage.xaml.cs">
       <DependentUpon>MyDanmuPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyFollowedListPage.xaml.cs">
+      <DependentUpon>MyFollowedListPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MyReadlistPage.xaml.cs">
       <DependentUpon>MyReadlistPage.xaml</DependentUpon>
@@ -276,6 +280,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MyDanmuPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MyFollowedListPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

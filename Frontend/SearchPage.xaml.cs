@@ -1,18 +1,8 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 
@@ -27,6 +17,9 @@ namespace Frontend
 		{
 			this.InitializeComponent();
 			this.NavigationCacheMode = NavigationCacheMode.Enabled;
+
+			readlistsList.Booklist = new BooklistCollection(false);
+			readlistsList.WaitLoading();
 		}
 
 		private SearchInfo Info { set; get; }
@@ -37,8 +30,8 @@ namespace Frontend
 			billboardsList.Booklist = Info.Billboards;
 			readlistsList.Booklist = Info.ReadLists;
 			directBooks.RefreshRequest = this.RefreshRequested;
-			billboardsList.RefreshRequest = this.RefreshRequested;
-			readlistsList.RefreshRequest = this.RefreshRequested;
+			billboardsList.RefreshOverride = this.RefreshRequested;
+			readlistsList.RefreshOverride = this.RefreshRequested;
 		}
 
 		private void RebindBooks()
