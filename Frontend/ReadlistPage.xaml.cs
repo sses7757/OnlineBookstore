@@ -32,7 +32,7 @@ namespace Frontend
 
 		internal static string DateFollow(DateTime date, int followers, string user)
 		{
-			return string.Format("Created by: {0}\t at:\t{0}\t with {1} followers",
+			return string.Format("Created / edited by {0}\tat {1}\twith {2} followers",
 								 user, date.ToShortDateString(), followers);
 		}
 

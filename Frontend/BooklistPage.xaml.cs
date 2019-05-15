@@ -18,7 +18,10 @@ namespace Frontend
 		private QueryObject query = new QueryObject();
 		private string title = "";
 		private string description = "";
+
 		private bool IsBillboard { get => !query.IsBillboard.HasValue || query.IsBillboard.Value; }
+
+		private CustomControls.BookCollectionControl bookCollection;
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
@@ -29,17 +32,19 @@ namespace Frontend
 			this.title = para.title;
 			this.description = para.description;
 			this.query = para.query;
-			bookCollection = new CustomControls.BookCollectionControl()
+			this.bookCollection = new CustomControls.BookCollectionControl(
+				new BookDetailCollection(this.query, this.title, this.description),
+				this.IsBillboard)
 			{
-				PaddingX = 120,
-				IsBillboard = this.IsBillboard
+				PaddingX = 135
 			};
-			bookCollection.Books = new BookDetailCollection(this.query, this.title, this.description);
+			grid.Children.Clear();
+			grid.Children.Add(bookCollection);
 		}
 
 		public void RefreshButtonPressed()
 		{
-			bookCollection.RefreshPage();
+			this.bookCollection.RefreshPage();
 		}
 
 		public void AdminButtonPressed(bool isChecked)

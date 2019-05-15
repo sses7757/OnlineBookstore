@@ -61,7 +61,7 @@ namespace Frontend
 		private void Notification_Closed(object sender, InAppNotificationClosedEventArgs e)
 		{
 			if (notification.Content as string == "Sign up success")
-			Util.main.NavigateToHomeAndShowMine(false, e.DismissKind == InAppNotificationDismissKind.User);
+			Util.MainElem.NavigateToHomeAndShowMine(false, e.DismissKind == InAppNotificationDismissKind.User);
 		}
 	}
 }

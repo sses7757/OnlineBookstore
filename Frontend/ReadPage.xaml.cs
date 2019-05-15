@@ -356,7 +356,7 @@ namespace Frontend
 			// Draw avaliable bullet
 			if (!IsObsolete)
 			{
-				ds.DrawText(CommentItem.Comment, center, Util.DanmuColor, Util.DanmuTextFormat);
+				ds.DrawText(CommentItem.Comment, center, Storage.DanmuColor, Storage.DanmuTextFormat);
 			}
 		}
 
@@ -377,8 +377,8 @@ namespace Frontend
 
 		internal string Comment { get => this.danmu.Content; }
 		internal uint PageNum { get; private set; }
-		internal float Width { get => this.danmu.Content.Length * Util.DanmuSize; }
-		internal float Height { get => Util.DanmuSize + Util.DanmuSpacing; }
+		internal float Width { get => this.danmu.Content.Length * Storage.DanmuSize; }
+		internal float Height { get => Storage.DanmuSize + Storage.DanmuSpacing; }
 
 		internal LiveComment(Danmu danmu, uint pagenum)
 		{

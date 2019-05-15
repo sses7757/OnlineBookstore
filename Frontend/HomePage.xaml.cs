@@ -29,7 +29,7 @@ namespace Frontend
 			}
 			this.UpdateLabels();
 			WaitLoading();
-			Util.LABELS = this.Labels;
+			Storage.LABELS = this.Labels;
 		}
 
 		/// <summary>
@@ -93,7 +93,7 @@ namespace Frontend
 				}
 				this._navigateType = (BookSummaryCollectionType)item.Tag;
 				this._navigateItem = dataToPass;
-				Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+				Util.MainElem.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
 			}
 		}
 
@@ -150,19 +150,19 @@ namespace Frontend
 
 		private void HyperlinkButton_Click_Best(object sender, RoutedEventArgs e)
 		{
-			Util.main.NavigateToBooklist("Best Selling Books", "System generated recommendations",
+			Util.MainElem.NavigateToBooklist("Best Selling Books", "System generated recommendations",
 										 NetworkGet.TopBooks);
 		}
 
 		private void HyperlinkButton_Click_New(object sender, RoutedEventArgs e)
 		{
-			Util.main.NavigateToBooklist("Newly Published Books", "System generated recommendations",
+			Util.MainElem.NavigateToBooklist("Newly Published Books", "System generated recommendations",
 										 NetworkGet.NewBooks);
 		}
 
 		private void HyperlinkButton_Click_Person(object sender, RoutedEventArgs e)
 		{
-			Util.main.NavigateToBooklist("Personalized Recommendation", "System generated recommendations",
+			Util.MainElem.NavigateToBooklist("Personalized Recommendation", "System generated recommendations",
 										 NetworkGet.PersonalRecommend);
 		}
 
@@ -186,7 +186,7 @@ namespace Frontend
 
 		private void HyperlinkButton_Click_SubLabel(object sender, RoutedEventArgs e)
 		{
-			Util.main.QuerySubmitted((sender as HyperlinkButton).Content as string);
+			Util.MainElem.QuerySubmitted((sender as HyperlinkButton).Content as string);
 		}
 	}
 }

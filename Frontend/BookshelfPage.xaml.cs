@@ -70,7 +70,7 @@ namespace Frontend
 								  "please try again", 4000);
 				return;
 			}
-			Util.main.NavigateToReadBook(book.ID, pdfUrl, password);
+			Util.MainElem.NavigateToReadBook(book.ID, pdfUrl, password);
 		}
 	}
 }

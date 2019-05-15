@@ -79,17 +79,17 @@ namespace Frontend
 		{
 			if ((string)notification.Content == "Login success")
 			{
-				Util.main.NavigateToHomeAndShowMine(true, e.DismissKind == InAppNotificationDismissKind.User);
+				Util.MainElem.NavigateToHomeAndShowMine(true, e.DismissKind == InAppNotificationDismissKind.User);
 			}
 			else if ((string)notification.Content == "Logout success")
 			{
-				Util.main.NavigateToHomeAndShowMine(false, e.DismissKind == InAppNotificationDismissKind.User);
+				Util.MainElem.NavigateToHomeAndShowMine(false, e.DismissKind == InAppNotificationDismissKind.User);
 			}
 		}
 
 		private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
 		{
-			Util.main.NavigateToSignUp();
+			Util.MainElem.NavigateToSignUp();
 		}
 	}
 }

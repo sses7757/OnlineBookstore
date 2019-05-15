@@ -22,16 +22,13 @@
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition/>
 				</Grid.ColumnDefinitions>
-				<TextBlock x:Name="WelcomeLabel1"
+                <TextBlock x:Name="WelcomeLabel1"
 						   Grid.Column="0"
 						   VerticalAlignment="Center"
 						   FontSize="16"
 						   Style="{StaticResource TitleTextStyle}"
 						   Text="Welcome to"/>
-				<Button Grid.Column="0"
-						Click="Button_Click"
-						Content="test send"/>
-				<TextBlock x:Name="WelcomeLabel2"
+                <TextBlock x:Name="WelcomeLabel2"
 						   Grid.Column="1"
 						   VerticalAlignment="Center"
 						   FontSize="16"

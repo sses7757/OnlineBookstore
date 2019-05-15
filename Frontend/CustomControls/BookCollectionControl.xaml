@@ -8,28 +8,29 @@
 			 xmlns:sys="using:System"
 			 d:DesignHeight="700"
 			 d:DesignWidth="1000"
-			 mc:Ignorable="d">
+			 mc:Ignorable="d"
+             Loading="UserControl_Loading">
 
 	<RefreshContainer PullDirection="BottomToTop" RefreshRequested="RefreshRequested">
 		<controls:AdaptiveGridView x:Name="bookGrid"
 								   Padding="{x:Bind OutPadding}"
 								   ItemClick="BookGrid_ItemClick"
-								   ItemsSource="{x:Bind Books.Books, Mode=OneWay}"
+								   ItemsSource="{x:Bind BookCollection.Books, Mode=OneWay}"
 								   Loaded="BookGrid_Loaded"
-								   Style="{StaticResource AGVStyle}"
-								   Tag="{x:Bind UserInfoVisibility}">
+								   Style="{StaticResource AGVStyle}">
 			<controls:AdaptiveGridView.Header>
 				<controls:ScrollHeader Mode="QuickReturn">
 					<StackPanel Background="White">
 						<TextBlock Style="{StaticResource TitleTextStyle}" Text=" "/>
-						<TextBlock Style="{StaticResource TitleTextStyle}" Text="{x:Bind Books.Title, Mode=OneWay}"/>
+                        <TextBlock Style="{StaticResource TitleTextStyle}"
+                                   Text="{x:Bind BookCollection.Title, Mode=OneWay}"/>
 						<TextBlock Style="{StaticResource DescriptionTextStyle}"
-								   Text="{x:Bind Books.Description, Mode=OneWay}"
+								   Text="{x:Bind BookCollection.Description, Mode=OneWay}"
 								   Visibility="{x:Bind DescriptionVisibility, Mode=OneWay}"/>
 						<TextBlock FontWeight="SemiLight"
 								   Style="{StaticResource DescriptionTextStyle}"
-								   Text="{x:Bind local:ReadlistPage.DateFollow(Books.EditTime, Books.FollowAmount, Books.CreateUser), Mode=OneWay}"
-								   Visibility="{Binding ElementName=bookGrid, Path=Tag}"/>
+								   Text="{x:Bind local:ReadlistPage.DateFollow(BookCollection.EditTime, BookCollection.FollowAmount, BookCollection.CreateUser), Mode=OneWay}"
+								   Visibility="{x:Bind UserInfoVisibility, Mode=OneWay}"/>
 						<NavigationViewItemSeparator Style="{StaticResource SeparatorStyle}"/>
 						<TextBlock Text=" "/>
 					</StackPanel>
@@ -39,7 +40,7 @@
 				<DataTemplate x:DataType="local:BookDetail">
 					<Grid MaxHeight="150"
 						  Margin="10"
-						  HorizontalAlignment="Center"
+						  HorizontalAlignment="Left"
 						  VerticalAlignment="Center">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>

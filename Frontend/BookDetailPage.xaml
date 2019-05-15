@@ -40,13 +40,13 @@
 
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="0.5*"/>
-						<ColumnDefinition Width="1.35*" MinWidth="160"/>
+						<ColumnDefinition Width="1.15*" MinWidth="160"/>
 						<ColumnDefinition Width="6*" MinWidth="260"/>
 						<ColumnDefinition Width="0.5*"/>
 					</Grid.ColumnDefinitions>
 
 					<StackPanel Grid.Column="1"
-								Margin="20"
+								Margin="10,20"
 								HorizontalAlignment="Stretch"
 								VerticalAlignment="Stretch">
 						<Image x:Name="bookCover"
@@ -98,7 +98,7 @@
 					</StackPanel>
 
 					<StackPanel Grid.Column="2"
-								Margin="20,40"
+								Margin="10,40"
 								HorizontalAlignment="Stretch"
 								Orientation="Vertical">
 						<Grid x:Name="anchorGrid">
@@ -218,14 +218,13 @@
 												   DesiredWidth="110"
 												   ItemsSource="{x:Bind Detail.RelatedBooks.Books, Mode=OneWay}"
 												   Loaded="RelatedBookGrid_Loaded"
-												   OneRowModeEnabled="False"
 												   Style="{StaticResource AGVStyle}">
 							<controls:AdaptiveGridView.ItemTemplate>
 								<DataTemplate x:DataType="local:BookSummary">
 									<StackPanel MaxWidth="150"
 												Margin="8,6"
 												HorizontalAlignment="Center"
-												VerticalAlignment="Center"
+												VerticalAlignment="Top"
 												PointerReleased="StackPanel_PointerReleased">
 										<Image x:Name="relateBookImage"
 											   Width="Auto"
@@ -272,8 +271,8 @@
 												<ColumnDefinition Width="5*"/>
 											</Grid.ColumnDefinitions>
 											<StackPanel Grid.Column="0" HorizontalAlignment="Left">
-												<RatingControl Margin="5"
-															   IsReadOnly="True"
+												<RatingControl IsReadOnly="True"
+                                                               Margin="5,5,5,-5"
 															   Value="{x:Bind Rating}"/>
 												<TextBlock Margin="5"
 														   FontSize="16"

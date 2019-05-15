@@ -25,9 +25,8 @@
                 <controls:AdaptiveGridView.ItemTemplate>
                     <DataTemplate x:DataType="local:BookDetailCollection">
                         <SwipeControl Margin="8,20"
-                                      Padding="13,0"
-                                      HorizontalAlignment="Stretch"
-                                      IsHitTestVisible="{Binding ShowTopSwipe, ElementName=parent}">
+                                      HorizontalAlignment="Stretch">
+                            <!--IsHitTestVisible="{Binding ShowTopSwipe, ElementName=parent}">-->
                             <SwipeControl.TopItems>
                                 <SwipeItems Mode="Reveal">
                                     <SwipeItem Background="LightGray"
@@ -37,7 +36,10 @@
                                 </SwipeItems>
                             </SwipeControl.TopItems>
 
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource BoardPanelStyle}">
+                            <Grid HorizontalAlignment="Stretch"
+                                  Style="{StaticResource BoardPanelStyle}"
+                                  Margin="0"
+                                  Padding="10,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -68,7 +70,8 @@
                                                  Grid.Column="1"
                                                  Margin="0,15,0,0"
                                                  Click="Hyperlink_Click"
-                                                 Style="{StaticResource ShowAllBtnStyle}"/>
+                                                 Style="{StaticResource ShowAllBtnStyle}"
+                                                 Visibility="{Binding TextBlockVisibility, ElementName=parent}"/>
                                 <TextBlock Grid.Row="1"
                                            Grid.Column="0"
                                            Margin="0,10,0,0"
@@ -112,8 +115,7 @@
                                           Style="{StaticResource ListStyle}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="local:BookDetail">
-                                            <SwipeControl MaxHeight="180"
-                                                          Margin="0,8"
+                                            <SwipeControl Margin="0,10"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"
                                                           IsHitTestVisible="{Binding ShowLeftSwipe, ElementName=parent}">
@@ -132,6 +134,7 @@
                                                     <Image x:Name="bookCover"
                                                            Grid.Column="0"
                                                            Margin="0"
+                                                           VerticalAlignment="Top"
                                                            Source="{x:Bind BookCover}"
                                                            Style="{StaticResource BookImageStyle}"/>
                                                     <StackPanel Grid.Column="1">

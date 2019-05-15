@@ -148,6 +148,7 @@
     <Compile Include="HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models.cs" />
     <Compile Include="MyDanmuPage.xaml.cs">
       <DependentUpon>MyDanmuPage.xaml</DependentUpon>
     </Compile>

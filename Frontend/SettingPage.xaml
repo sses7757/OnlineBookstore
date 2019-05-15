@@ -14,7 +14,7 @@
 						  VerticalAlignment="Center"
 						  FontSize="18"
 						  Header="Show bullet screen while reading"
-						  IsOn="{x:Bind local:Util.IsDanmuOn, Mode=TwoWay}"/>
+						  IsOn="{x:Bind local:Storage.IsDanmuOn, Mode=TwoWay}"/>
 			<ComboBox HorizontalAlignment="Left"
 					  VerticalAlignment="Center"
 					  FontSize="18"
@@ -34,7 +34,7 @@
 					  Header="Font size of bullets"
 					  IsEditable="True"
 					  SelectedIndex="5"
-					  SelectedItem="{x:Bind local:Util.DanmuSize}"
+					  SelectedItem="{x:Bind local:Storage.DanmuSize}"
 					  TextSubmitted="ComboBox_TextSubmitted">
 				<ComboBox.TextBoxStyle>
 					<Style TargetType="TextBox">
@@ -58,7 +58,7 @@
 					Header="Spacing of bullets"
 					Maximum="50"
 					Minimum="0"
-					Value="{x:Bind local:Util.DanmuSpacing, Mode=TwoWay}"/>
+					Value="{x:Bind local:Storage.DanmuSpacing, Mode=TwoWay}"/>
 		</StackPanel>
 	</Grid>
 </Page>

@@ -25,19 +25,19 @@ namespace Frontend
 			switch (combo.SelectedItem as string)
 			{
 				case "Black":
-					Util.DanmuColor = Colors.Black;
+					Storage.DanmuColor = Colors.Black;
 					break;
 				case "Red":
-					Util.DanmuColor = Colors.MediumVioletRed;
+					Storage.DanmuColor = Colors.MediumVioletRed;
 					break;
 				case "Green":
-					Util.DanmuColor = Colors.DarkOliveGreen;
+					Storage.DanmuColor = Colors.DarkOliveGreen;
 					break;
 				case "Blue":
-					Util.DanmuColor = Colors.DarkSlateBlue;
+					Storage.DanmuColor = Colors.DarkSlateBlue;
 					break;
 				case "Theme color":
-					Util.DanmuColor = (Color)Application.Current.Resources["SystemAccentColor"];
+					Storage.DanmuColor = (Color)Application.Current.Resources["SystemAccentColor"];
 					break;
 				case "Pick color":
 					ColorPicker picker = new ColorPicker()
@@ -47,7 +47,7 @@ namespace Frontend
 						IsColorPreviewVisible = true,
 						IsColorChannelTextInputVisible = true,
 						IsHexInputVisible = true,
-						Color = Util.DanmuColor
+						Color = Storage.DanmuColor
 					};
 					ContentDialog dialog = new ContentDialog
 					{
@@ -59,12 +59,12 @@ namespace Frontend
 					};
 					if (await dialog.ShowAsync() == ContentDialogResult.Primary)
 					{
-						Util.DanmuColor = picker.Color;
+						Storage.DanmuColor = picker.Color;
 					}
 					else
 					{
 						combo.SelectedIndex = 0;
-						Util.DanmuColor = Colors.Black;
+						Storage.DanmuColor = Colors.Black;
 					}
 					break;
 				default:
@@ -79,7 +79,7 @@ namespace Frontend
 				var size = int.Parse(sender.Text);
 				if (!sender.Items.Contains(size))
 					sender.Items[0] = sender.Text;
-				Util.DanmuSize = size;
+				Storage.DanmuSize = size;
 			}
 			catch (Exception) { }
 		}

@@ -17,41 +17,38 @@ namespace Frontend
 		{
 			this.InitializeComponent();
 			this.NavigationCacheMode = NavigationCacheMode.Enabled;
-
-			readlistsList.Booklist = new BooklistCollection(false);
-			readlistsList.WaitLoading();
 		}
 
 		private SearchInfo Info { set; get; }
 
-		private void BindBooks()
-		{
-			directBooks.Books = Info.Books;
-			billboardsList.Booklist = Info.Billboards;
-			readlistsList.Booklist = Info.ReadLists;
-			directBooks.RefreshRequest = this.RefreshRequested;
-			billboardsList.RefreshOverride = this.RefreshRequested;
-			readlistsList.RefreshOverride = this.RefreshRequested;
-		}
+		private CustomControls.BookCollectionControl directBooks;
 
-		private void RebindBooks()
+		private async void BindBooks()
 		{
-			directBooks = new CustomControls.BookCollectionControl()
+			directBooks = new CustomControls.BookCollectionControl(Info.Books, false)
 			{
 				PaddingX = 125,
-				IsBillboard = false
+				RefreshOverride = this.RefreshRequested
 			};
+			await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
+			booksTab.Content = directBooks;
 			billboardsList = new CustomControls.BookListsControl()
 			{
+				Booklist = Info.Billboards,
 				PaddingX = 100,
-				IsBillboard = true
+				IsBillboard = true,
+				RefreshOverride = this.RefreshRequested
 			};
+			billboardsTab.Content = billboardsList;
 			readlistsList = new CustomControls.BookListsControl()
 			{
+				Booklist = Info.ReadLists,
 				PaddingX = 100,
-				IsBillboard = false
+				IsBillboard = false,
+				ShowTopSwipe = true,
+				RefreshOverride = this.RefreshRequested
 			};
-			BindBooks();
+			readListsTab.Content = readlistsList;
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -67,7 +64,7 @@ namespace Frontend
 			else if (para.QueryText != Info.QueryText)
 			{
 				Info = para;
-				RebindBooks();
+				BindBooks();
 				Tabs.SelectedIndex = 0;
 				this.Tabs_SelectionChanged(Tabs, null);
 			}

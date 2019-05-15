@@ -67,7 +67,7 @@ namespace Frontend
 			{
 				relatedBookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "relateBookImage");
 				this._navigateItem = dataToPass;
-				Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+				Util.MainElem.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
 			}
 		}
 
@@ -149,7 +149,7 @@ namespace Frontend
 		private async void Refresh()
 		{
 			await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
-			while (!detail.finished)
+			while (!detail.Finished)
 			{
 				await System.Threading.Tasks.Task.Delay(100);
 				Detail = detail;
@@ -222,7 +222,8 @@ namespace Frontend
 					List<string> titles = new List<string>(ids.Length);
 					foreach (int id in ids)
 					{
-						var readlist = await NetworkGet.GetTitleDescription(false, id);
+						var readlist = new BookDetailCollection();
+						await NetworkGet.GetTitleDescription(readlist, false, id);
 						titles.Add(readlist.Title);
 					}
 					var combo = new ComboBox()
@@ -263,7 +264,7 @@ namespace Frontend
 					break;
 				case "preview":
 					var pdfUrl = await NetworkGet.GetBookPreview(bookId);
-					Util.main.NavigateToReadBook(bookId, pdfUrl);
+					Util.MainElem.NavigateToReadBook(bookId, pdfUrl);
 					break;
 				default:
 					return;

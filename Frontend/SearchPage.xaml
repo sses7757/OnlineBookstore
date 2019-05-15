@@ -206,7 +206,7 @@
 							  HorizontalAlignment="Stretch"
 							  VerticalAlignment="Top"
 							  HorizontalContentAlignment="Stretch"
-							  ItemsSource="{x:Bind local:Util.LABELS, Mode=OneWay}"
+							  ItemsSource="{x:Bind local:Storage.LABELS, Mode=OneWay}"
 							  ScrollViewer.VerticalScrollBarVisibility="Auto"
 							  SelectionMode="None">
 						<ListView.ItemTemplate>
@@ -272,19 +272,15 @@
 							  SelectionChanged="Tabs_SelectionChanged"
 							  TabWidthBehavior="Equal">
 				<!--  The direct search of book  -->
+                <controls:TabViewItem HorizontalContentAlignment="Center"
+									  FontSize="17"
+									  Header="{x:Bind local:Util.EnumToString(local:ContentType.Books)}"
+                                      x:Name="booksTab"/>
+                <!--  The search of billboard  -->
 				<controls:TabViewItem HorizontalContentAlignment="Center"
 									  FontSize="17"
-									  Header="{x:Bind local:Util.EnumToString(local:ContentType.Books)}">
-					<localControl:BookCollectionControl x:Name="directBooks"
-														HorizontalAlignment="Stretch"
-														VerticalAlignment="Stretch"
-														IsBillboard="False"
-														PaddingX="125"/>
-				</controls:TabViewItem>
-				<!--  The search of billboard  -->
-				<controls:TabViewItem HorizontalContentAlignment="Center"
-									  FontSize="17"
-									  Header="{x:Bind local:Util.EnumToString(local:ContentType.Billboards)}">
+									  Header="{x:Bind local:Util.EnumToString(local:ContentType.Billboards)}"
+                                      x:Name="billboardsTab">
 					<localControl:BookListsControl x:Name="billboardsList"
 												   HorizontalAlignment="Stretch"
 												   VerticalAlignment="Stretch"
@@ -294,7 +290,8 @@
 				<!--  The search of read lists  -->
 				<controls:TabViewItem HorizontalContentAlignment="Center"
 									  FontSize="17"
-									  Header="{x:Bind local:Util.EnumToString(local:ContentType.ReadLists)}">
+									  Header="{x:Bind local:Util.EnumToString(local:ContentType.ReadLists)}"
+                                      x:Name="readListsTab">
 					<localControl:BookListsControl x:Name="readlistsList"
 												   HorizontalAlignment="Stretch"
 												   VerticalAlignment="Stretch"

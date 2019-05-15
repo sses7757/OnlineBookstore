@@ -64,7 +64,7 @@ namespace Frontend
 			{
 				bookGrid.PrepareConnectedAnimation(Util.TO_BOOK_DETAIL, dataToPass, "bookCover");
 				this._navigateItem = dataToPass;
-				Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+				Util.MainElem.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
 			}
 		}
 

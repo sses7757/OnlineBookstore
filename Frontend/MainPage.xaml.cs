@@ -22,7 +22,7 @@ namespace Frontend
 		{
 			this.InitializeComponent();
 
-			ApplicationView.PreferredLaunchViewSize = new Size(1440, 960);
+			ApplicationView.PreferredLaunchViewSize = new Size(1440, 900);
 			ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
 			ShowSearch(false);
@@ -87,7 +87,7 @@ namespace Frontend
 		private void NavView_Navigate(string navItemTag, NavigationTransitionInfo info, bool Override = true, object pass = null)
 		{
 			// show admin toggle or not
-			ShowAdmin(Util.IsAdmin);
+			ShowAdmin(Storage.IsAdmin);
 
 			Type _page = null;
 			if (navItemTag == "settings")
@@ -117,7 +117,7 @@ namespace Frontend
 		private void NavView_Navigate(Type toPage, NavigationTransitionInfo info, bool Override = true, object pass = null)
 		{
 			// show admin toggle or not
-			ShowAdmin(Util.IsAdmin);
+			ShowAdmin(Storage.IsAdmin);
 
 			// Get the page type before navigation so you can prevent duplicate entries in the backstack.
 			var preNavPageType = ContentFrame.CurrentSourcePageType;
@@ -150,7 +150,7 @@ namespace Frontend
 			altLeft.Invoked += BackInvoked;
 			this.KeyboardAccelerators.Add(altLeft);
 
-			Util.main = this;
+			Util.MainElem = this;
 
 			NavView_Navigate("home", new EntranceNavigationTransitionInfo(), false);
 			ShowAdmin(false);
@@ -305,11 +305,6 @@ namespace Frontend
 				if (c != null && c.HasValue)
 					(ContentFrame.Content as IRefreshAdminInterface).AdminButtonPressed(c.Value);
 			}
-		}
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			Connection.Test();
 		}
 
 		private void About_PointerReleased(object sender, PointerRoutedEventArgs e)

@@ -7,10 +7,8 @@
 	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	  mc:Ignorable="d">
 
-	<Grid>
-		<localControl:BookCollectionControl x:Name="bookCollection"
-											IsBillboard="{x:Bind IsBillboard, Mode=OneWay}"
-											PaddingX="120"/>
-	</Grid>
+    <Grid x:Name="grid">
+        
+    </Grid>
 
 </Page>

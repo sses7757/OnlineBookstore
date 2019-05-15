@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -9,7 +10,7 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Frontend.CustomControls
 {
-	public sealed partial class BookListsControl : UserControl
+	public sealed partial class BookListsControl : UserControl, INotifyPropertyChanged
 	{
 		public enum IconType
 		{
@@ -36,16 +37,25 @@ namespace Frontend.CustomControls
 			foreach (var collection in this.Booklist?.Booklists)
 			{
 				if (collection != null)
+				{
 					collection.ShowFollowSwipe = this.IsTopSwipeFollow;
+					collection.OnPropertyChanged("SwipeString");
+					collection.OnPropertyChanged("SwipeIcon");
+				}
 			}
+			this.OnPropertyChanged();
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void OnPropertyChanged()
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftSwipeText"));
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftIconSource"));
 		}
 
 		public string LeftSwipeText { set; get; } = "Remove book";
 		public IconType LeftSwipeIcon { set; get; } = IconType.DeleteIcon;
-
-		private IconSource LeftIconSource {
-			get => Application.Current.Resources[LeftSwipeIcon.ToString()] as IconSource;
-		}
 
 		public bool CanEdit { set; get; } = false;
 
@@ -53,12 +63,14 @@ namespace Frontend.CustomControls
 		public Action RefreshOverride { set; get; } = null;
 		public bool IsBillboard { set; get; }
 
-
-		private Visibility TextBoxVisibility { get => CanEdit.ToVisibility(); }
-		private Visibility TextBlockVisibility { get => (!CanEdit).ToVisibility(); }
-
 		private Thickness OutPadding { get => new Thickness(this.PaddingX, 0, this.PaddingX, 0); }
-		private Visibility UserInfoVisibility { get => (!this.IsBillboard).ToVisibility(); }
+
+		public IconSource LeftIconSource {
+			get => Application.Current.Resources[LeftSwipeIcon.ToString()] as IconSource;
+		}
+		public Visibility TextBoxVisibility { get => CanEdit.ToVisibility(); }
+		public Visibility TextBlockVisibility { get => (!CanEdit).ToVisibility(); }
+		public Visibility UserInfoVisibility { get => (!this.IsBillboard).ToVisibility(); }
 
 		/// <summary>
 		/// Show all button of read list, navigate to book list page
@@ -67,10 +79,10 @@ namespace Frontend.CustomControls
 		{
 			var elem = sender as UIElement;
 			var parent = elem.GetParentUpto(2);
-			if (parent == null || !(parent is ListViewItemPresenter))
+			if (parent == null || !(parent is ContentPresenter))
 				return;
-			var collection = (parent as ListViewItemPresenter).DataContext as BookDetailCollection;
-			Util.main.NavigateToBooklist(collection.Title, collection.Description, collection.query);
+			var collection = (parent as ContentPresenter).DataContext as BookDetailCollection;
+			Util.MainElem.NavigateToBooklist(collection.Title, collection.Description, collection.query);
 		}
 
 		private (BookDetail item, BookDetailCollection parent) _nav;
@@ -130,16 +142,15 @@ namespace Frontend.CustomControls
 
 				this._nav.item = dataToPass;
 				this._nav.parent = listView.DataContext as BookDetailCollection;
-				Util.main.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
+				Util.MainElem.NavigateToBookDetail(dataToPass, typeof(BookDetailPage));
 			}
 		}
 
 		internal async void WaitLoading()
 		{
-			UpdateSwipes();
 			loadingControl.IsLoading = true;
 			while (Booklist.Booklists.Count == 0)
-				await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
+				await Task.Delay(Util.REFRESH_RATE);
 
 			while (true)
 			{
@@ -149,12 +160,13 @@ namespace Frontend.CustomControls
 				}
 				else
 				{
-					await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE);
+					await Task.Delay(Util.REFRESH_RATE);
 					Booklist.OnPropertyChanged();
 				}
 			}
-			await System.Threading.Tasks.Task.Delay(Util.REFRESH_RATE * 2);
+			await Task.Delay(Util.REFRESH_RATE * 2);
 			Booklist.OnPropertyChanged();
+			UpdateSwipes();
 			loadingControl.IsLoading = false;
 		}
 
@@ -199,7 +211,7 @@ namespace Frontend.CustomControls
 				ContentDialog dialog = new ContentDialog()
 				{
 					Content = "Are you sure to delete the whole read lists?" +
-							"\r\nThis operation is irrevesable.",
+								"\r\nThis operation is irrevesable.",
 					Title = "Deleting Read List",
 					IsSecondaryButtonEnabled = true,
 					PrimaryButtonText = "Confirm",
@@ -257,8 +269,47 @@ namespace Frontend.CustomControls
 					success = await EditDesc_Invoked(newText, collection);
 				}
 				if (!success)
+				{
+					ContentDialog dialog = new ContentDialog
+					{
+						Content = $"Something wrong in editing the {(sender as TextBox).Tag as string}" +
+									"of your read list. Pleast try again later.",
+						Title = "Editing notify",
+						IsPrimaryButtonEnabled = true,
+						PrimaryButtonText = "OK"
+					};
+					await dialog.ShowAsync();
 					box.Text = oldText;
+				}
+				else
+				{
+					ContentDialog dialog = new ContentDialog
+					{
+						Content = $"Success in editing the {(sender as TextBox).Tag as string} of your read list.",
+						Title = "Editing notify",
+						IsPrimaryButtonEnabled = true,
+						PrimaryButtonText = "OK"
+					};
+					await dialog.ShowAsync();
+				}
+
+				e.Handled = true;
+				LoseFocus(box);
 			}
+		}
+
+		/// <summary>
+		/// Makes virtual keyboard disappear
+		/// </summary>
+		/// <param name="sender"></param>
+		private void LoseFocus(object sender)
+		{
+			var control = sender as Control;
+			var isTabStop = control.IsTabStop;
+			control.IsTabStop = false;
+			control.IsEnabled = false;
+			control.IsEnabled = true;
+			control.IsTabStop = isTabStop;
 		}
 
 		private async Task<bool> EditTitle_Invoked(string newTitle, BookDetailCollection collection)

@@ -126,7 +126,6 @@ namespace Frontend
 
 		public string BookCoverUrl { set; get; }
 		public string BookName { set; get; }
-		public string BookFullName { set; get; }
 		public string AuthorName { set; get; }
 		public string MainAndSubLabel { set; get; }
 		public double? Price { set; get; }
@@ -251,11 +250,13 @@ namespace Frontend
 		/// <param name="query"> A copied <code>QueryObject</code> </param>
 		private static async Task<ReceiveObject> SendWithUser(IJsonable query)
 		{
+			return new ReceiveObject();
+
 			if (!Instance.SocketConnected)
 			{
 				await Instance.Reconnect();
 			}
-			query.UserId = Util.UserId;
+			query.UserId = Storage.UserId;
 			var send = Encoding.UTF8.GetBytes(query.ToJson());
 			byte[] receive;
 			try
@@ -295,11 +296,11 @@ namespace Frontend
 		}
 	}
 
-	public class NetworkGet
+	public static class NetworkGet
 	{
 		internal static bool IsValidID(int id)
 		{
-			return id >= 0;
+			return id > 0;
 		}
 
 		public static async Task<LoginStatus> Login(string UserName, string EncodedPassword)
@@ -309,9 +310,13 @@ namespace Frontend
 				UserName = UserName,
 				EncodedPassword = EncodedPassword
 			};
+			Storage.UserId = 1;
+			Storage.IsAdmin = true;
+			return LoginStatus.Success;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			Util.UserId = recv.UserId.Value;
-			Util.IsAdmin = recv.IsAdmin.Value;
+			Storage.UserId = recv.UserId.Value;
+			Storage.IsAdmin = recv.IsAdmin.Value;
 			return (LoginStatus)recv.LoginStatus.Value;
 		}
 
@@ -319,6 +324,15 @@ namespace Frontend
 		{
 			var query = new QueryObject("GetMainLabels")
 			{
+			};
+			return new string[]
+			{
+				"文学",
+				"流行",
+				"文化",
+				"生活",
+				"经管",
+				"科技"
 			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.MainLabels;
@@ -330,6 +344,13 @@ namespace Frontend
 			{
 				MainLabel = label.Name
 			};
+			foreach (var sub in new string[] { "小说", "随笔", "散文", "诗歌", "童话", "名著", "科幻", "言情", "青春" })
+			{
+				label.AllSubs.Add(new SubLabel(sub, label));
+				label.OnPropertyChanged("HotSubs");
+			}
+			return;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			foreach (var sub in recv.SubLabels)
 			{
@@ -338,41 +359,57 @@ namespace Frontend
 			}
 		}
 
+		private static string RandomName()
+		{
+			return new string[]
+			{
+				"松浦彌太郎說：假如我現在25歲，最想做的50件事",
+				"The Road Less Traveled (少有人走的路)"
+			}[new Random().Next(2)];
+		}
+
 		public static async Task GetBookSummary(BookSummary book)
 		{
-			if (!IsValidID(book.ID))
-			{
-				Console.Error.WriteLine("Book id wrong");
-				return;
-			}
 			var query = new QueryObject("GetBookSummary")
 			{
 				BookId = book.ID
 			};
-			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
-									new Uri(recv.BookCoverUrl));
-			book.BookName = recv.BookName;
-			book.BookFullName = recv.BookFullName;
+				new Uri("https://gss0.baidu.com/7LsWdDW5_xN3otqbppnN2DJv/doc/pic/item/6159252dd42a283478df074e58b5c9ea15cebf7d.jpg"));
+			book.BookFullName = RandomName();
+			book.BookName = book.BookFullName.CutString();
+			book.AuthorName = "松浦彌太郎";
+			return;
+
+			var recv = await Connection.SendAndReceive.GlobalLock(query);
+			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(new Uri(recv.BookCoverUrl));
+			book.BookFullName = recv.BookName;
+			book.BookName = book.BookFullName.CutString();
 			book.AuthorName = recv.AuthorName;
 		}
 
 		public static async Task GetBookQuasiDetail(BookDetail book)
 		{
-			if (!IsValidID(book.ID))
-			{
-				Console.Error.WriteLine("Book id wrong");
-				return;
-			}
 			var query = new QueryObject("GetBookQuasiDetail")
 			{
 				BookId = book.ID
 			};
+			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
+				new Uri("https://gss0.baidu.com/7LsWdDW5_xN3otqbppnN2DJv/doc/pic/item/6159252dd42a283478df074e58b5c9ea15cebf7d.jpg"));
+			book.BookFullName = RandomName();
+			book.BookName = book.BookFullName.CutString();
+			book.AuthorName = "松浦彌太郎";
+			book.Labels = "生活 - 随笔";
+			book.Price = 28;
+			book.Discount = 95;
+			book.OverallRating = 4.5;
+			return;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
 									new Uri(recv.BookCoverUrl));
-			book.BookName = recv.BookName;
-			book.BookFullName = recv.BookFullName;
+			book.BookFullName = recv.BookName;
+			book.BookName = book.BookFullName.CutString();
 			book.AuthorName = recv.AuthorName;
 			book.Labels = recv.MainAndSubLabel;
 			book.Price = recv.Price.Value;
@@ -386,6 +423,30 @@ namespace Frontend
 			{
 				BookId = book.ID
 			};
+			book.Labels = "生活 - 随笔";
+			book.Price = 28;
+			book.Discount = 95;
+			book.OverallRating = 4.5;
+			book.BookDescription = "九月一日瓦官教寺住持克勤載拜致書于延曆堂上座主大和尚侍者夫道盛" +
+				"于得人而衰于失人事成于有為而敗于無為此古今之確論也自吾佛之教入中國中國之人莫不論者宗" +
+				"論經者宗教而各有其師及我天台生陳隋之朝以一大藏教序以五時列為八教開闡大塗為一宗正" +
+				"傳使海內外咸被佛之聲教於戲盛乎唐之大曆間至興道尊者為";
+			book.OtherAuthors = "Daniel Kahneman (translator)";
+			book.PublishInfo = "北京联合出版有限责任公司 / 2005-10-05 / 第一版";
+			book.ISBN = "9787725426293";
+			book.BuyAmount = 505;
+			book.DanmuAmount = 1835;
+			book.PreviewAmount = 2200;
+			book.ReviewAmount = 112;
+			book.PageCount = 280;
+			book.CanAddReadList = IsValidID(Storage.UserId);
+			book.CanAddWishList = IsValidID(Storage.UserId);
+			book.CanBuy = IsValidID(Storage.UserId);
+			await GetReviewContents(book);
+			await book.RelatedBooks.Reload();
+			book.Finished = true;
+			return;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			book.BookDescription = recv.Description;
 			book.Labels = recv.MainAndSubLabel;
@@ -404,7 +465,9 @@ namespace Frontend
 			book.CanAddReadList = recv.CanAddReadList.Value;
 			book.CanAddWishList = recv.CanAddWishList.Value;
 			book.CanBuy = recv.CanBuy.Value;
-			book.finished = true;
+			await GetReviewContents(book);
+			await book.RelatedBooks.Reload();
+			book.Finished = true;
 		}
 
 		internal static async Task GetReviewContents(BookDetail book, bool setFinish = false, int from = 0,
@@ -418,7 +481,17 @@ namespace Frontend
 				book.Reviews.Add(review);
 			}
 			if (setFinish)
-				book.finished = true;
+				book.Finished = true;
+		}
+
+		private static int[] GenerateIDs(int count)
+		{
+			List<int> list = new List<int>(count);
+			for (int i = 10; i < 10 + count; ++i)
+			{
+				list.Add(i);
+			}
+			return list.ToArray();
 		}
 
 		public static async Task<int[]> GetBookReviews(int bookId, int from, int count)
@@ -429,6 +502,8 @@ namespace Frontend
 				From = from,
 				Count = count
 			};
+			return GenerateIDs(count);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -439,6 +514,13 @@ namespace Frontend
 			{
 				ReviewId = review.ID
 			};
+			review.UserName = "Rk9LX2kC";
+			review.PublishDate = DateTime.Now;
+			review.Rating = 5;
+			review.Content = "fqdTgcZfPZasdohwlkgasjdbfakl;sfasifasuifb";
+			review.Title = "asgase5g1";
+			return;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			review.UserName = recv.CreateUser;
 			review.PublishDate = recv.TimeStap.Value.GetTime();
@@ -457,6 +539,8 @@ namespace Frontend
 				From = from,
 				Count = count
 			};
+			return GenerateIDs(count == int.MaxValue ? 8 : count);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -466,6 +550,8 @@ namespace Frontend
 			var query = new QueryObject("GetShelfBooks")
 			{
 			};
+			return GenerateIDs(10);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -476,6 +562,8 @@ namespace Frontend
 			newQuery.Type = "GetFromQuery";
 			newQuery.From = from;
 			newQuery.Count = count;
+			return GenerateIDs(count);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(newQuery);
 			return recv.IDs;
 		}
@@ -566,33 +654,29 @@ namespace Frontend
 				From = from,
 				Count = count
 			};
+			return GenerateIDs(count);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
 
-		public static async Task<BookDetailCollection> GetTitleDescription(bool isBillboard, int id)
+		public static async Task GetTitleDescription(BookDetailCollection collection, bool isBillboard, int id)
 		{
 			var query = new QueryObject("GetTitleDescription")
 			{
 				IsBillboard = isBillboard,
 				BookListId = id
 			};
-			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			var collection = new BookDetailCollection
-			{
-				Title = recv.Title,
-				Description = recv.Description
-			};
-			return collection;
-		}
+			collection.Title = "Bo4PSSm0";
+			collection.Description = "Bo4PSSm0Po83pIiC";
+			if (isBillboard)
+				return;
+			collection.CreateUser = "Aq4K9ycU";
+			collection.EditTime = DateTime.Now;
+			collection.FollowAmount = 123;
+			collection.Followed = false;
+			return;
 
-		public static async void GetTitleDescription(BookDetailCollection collection, bool isBillboard, int id)
-		{
-			var query = new QueryObject("GetTitleDescription")
-			{
-				IsBillboard = isBillboard,
-				BookListId = id
-			};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			collection.Title = recv.Title;
 			collection.Description = recv.Description;
@@ -609,6 +693,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyWishlist")
 			{
 			};
+			return GenerateIDs(5);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -618,6 +704,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyDanmus")
 			{
 			};
+			return GenerateIDs(15);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -629,6 +717,8 @@ namespace Frontend
 				BookId = bookId,
 				Page = (int)page
 			};
+			return GenerateIDs(25);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -639,6 +729,9 @@ namespace Frontend
 			{
 				DanmuId = danmu.ID
 			};
+			danmu.Content = "6666666666666666";
+			return;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			danmu.Content = recv.Content;
 		}
@@ -649,10 +742,17 @@ namespace Frontend
 			{
 				DanmuId = danmu.ID
 			};
+			danmu.Content = "6666666666666666";
+			danmu.BookName = "松浦彌太郎說：假如我現在25歲，最想做的50件事";
+			danmu.EditTime = DateTime.Now;
+			danmu.PageNum = 102;
+			return;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			danmu.Content = recv.Content;
 			danmu.BookName = recv.BookName;
 			danmu.EditTime = recv.TimeStap.Value.GetTime();
+			danmu.PageNum = recv.PageNum.Value;
 		}
 
 		public static async Task<int[]> GetMyCreatedReadLists()
@@ -660,6 +760,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyCreatedReadLists")
 			{
 			};
+			return GenerateIDs(5);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -669,6 +771,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyFollowedReadLists")
 			{
 			};
+			return GenerateIDs(5);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -679,6 +783,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
+			return GenerateIDs(4);
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
 		}
@@ -689,6 +795,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
+			return "http://www.africau.edu/images/default/sample.pdf";
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.URL;
 		}
@@ -699,6 +807,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
+			return "https://gahp.net/wp-content/uploads/2017/09/sample.pdf";
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.URL;
 		}
@@ -709,24 +819,30 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
+			return "as1dg56aseg";
+
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.PrivateKey;
 		}
 	}
 
 
-	public class NetworkSet
+	public static class NetworkSet
 	{
 		public static async Task<bool> Logout()
 		{
 			var change = new ChangeObject("Logout")
 			{
 			};
+			Storage.UserId = -1;
+			Storage.IsAdmin = false;
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			if (recv.Success)
 			{
-				Util.UserId = -1;
-				Util.IsAdmin = false;
+				Storage.UserId = -1;
+				Storage.IsAdmin = false;
 			}
 			return recv.Success;
 		}
@@ -739,6 +855,8 @@ namespace Frontend
 				Email = email,
 				EncodedPassword = password
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -752,6 +870,8 @@ namespace Frontend
 				IsDeleteAction = isDeleteAction,
 				NewContent = newContent
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -766,6 +886,8 @@ namespace Frontend
 				AlteredBookId = alteredId,
 				AlteredText = alteredText
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -777,6 +899,8 @@ namespace Frontend
 				BookId = bookId,
 				IsAddAction = isAddAction
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -789,6 +913,8 @@ namespace Frontend
 				BookId = bookId,
 				PageNum = pageNum
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -800,6 +926,8 @@ namespace Frontend
 				Description = desc,
 				Title = title
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -810,6 +938,7 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
+			return "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			if (recv.Success && recv.URL != null)
 			{
@@ -830,6 +959,8 @@ namespace Frontend
 				Title = title,
 				Content = content
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -840,6 +971,8 @@ namespace Frontend
 			{
 				BookId = bookId,
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -850,6 +983,8 @@ namespace Frontend
 			{
 				BookId = bookId,
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}
@@ -861,6 +996,8 @@ namespace Frontend
 				ReadListId = readListId,
 				IsFollowAction = isFollowAction,
 			};
+			return true;
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
 		}

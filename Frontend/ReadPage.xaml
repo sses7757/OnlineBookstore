@@ -32,7 +32,7 @@
 									  VerticalAlignment="Top"
 									  Draw="AnimatedControl_Draw"
 									  Update="AnimatedControl_Update"
-									  Visibility="{x:Bind local:Util.DanmuVisibility, Mode=OneTime}"/>
+									  Visibility="{x:Bind local:Storage.DanmuVisibility, Mode=OneTime}"/>
 
 		<controls:Loading x:Name="loadingControl"
 						  HorizontalContentAlignment="Center"

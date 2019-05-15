@@ -28,6 +28,7 @@ namespace Frontend
 			};
 			listControl.RefreshOverride = this.Refresh;
 			listControl.WaitLoading();
+			this.Refresh();
 		}
 
 		private ObservableCollection<BookDetailCollection> ReadLists { set; get; } =
