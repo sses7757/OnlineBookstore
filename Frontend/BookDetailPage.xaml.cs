@@ -205,6 +205,7 @@ namespace Frontend
 						{
 							this.detail.CanBuy = false;
 							this.Detail = detail;
+							notification.Show("Payment success, wish you enjoy reading", 4000);
 						}
 						else
 						{

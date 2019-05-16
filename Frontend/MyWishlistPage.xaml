@@ -51,10 +51,13 @@
                                                        VerticalAlignment="Center"
                                                        IsReadOnly="True"
                                                        Value="{x:Bind OverallRating}"/>
-                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
+                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
+                                                   Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
                                     </StackPanel>
-                                    <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"/>
-                                    <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind sys:String.Format('Author:\\t{0}\\t\\tCategory: {0}', Labels)}"/>
+                                    <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
+                                               Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"/>
+                                    <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
+                                               Text="{x:Bind local:MyWishlistPage.AuthorClass(AuthorName, Labels)}"/>
                                 </StackPanel>
                             </Grid>
                         </SwipeControl>

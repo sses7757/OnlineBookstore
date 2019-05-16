@@ -189,6 +189,9 @@ namespace Frontend.CustomControls
 
 		private async void Top_SwipeItem_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
 		{
+			if (!this.ShowTopSwipe)
+				return;
+
 			if (!(args.SwipeControl.DataContext is BookDetailCollection collection) ||
 				!collection.ID.HasValue)
 			{

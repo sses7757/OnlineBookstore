@@ -110,6 +110,7 @@ namespace Frontend
 				if (finish)
 				{
 					this.WishBooks.Remove(args.SwipeControl.DataContext as BookDetail);
+					notification.Show("Payment success, wish you enjoy reading", 4000);
 				}
 				else
 				{
@@ -130,6 +131,11 @@ namespace Frontend
 			if (!success)
 				return;
 			this.WishBooks.Remove(book);
+		}
+
+		internal static string AuthorClass(string author, string category)
+		{
+			return string.Format("Author:\t{0}\t\tCategory: {1}", author, category);
 		}
 	}
 }
