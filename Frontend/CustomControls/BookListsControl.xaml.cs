@@ -54,9 +54,6 @@ namespace Frontend.CustomControls
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftIconSource"));
 		}
 
-		public string LeftSwipeText { set; get; } = "Remove book";
-		public IconType LeftSwipeIcon { set; get; } = IconType.DeleteIcon;
-
 		public bool CanEdit { set; get; } = false;
 
 		public int PaddingX { set; get; }
@@ -65,9 +62,6 @@ namespace Frontend.CustomControls
 
 		private Thickness OutPadding { get => new Thickness(this.PaddingX, 0, this.PaddingX, 0); }
 
-		public IconSource LeftIconSource {
-			get => Application.Current.Resources[LeftSwipeIcon.ToString()] as IconSource;
-		}
 		public Visibility TextBoxVisibility { get => CanEdit.ToVisibility(); }
 		public Visibility TextBlockVisibility { get => (!CanEdit).ToVisibility(); }
 		public Visibility UserInfoVisibility { get => (!this.IsBillboard).ToVisibility(); }
@@ -224,7 +218,16 @@ namespace Frontend.CustomControls
 				{
 					bool success = await NetworkSet.ChangeReadList(id, BookListChangeType.RemoveList);
 					if (success)
+					{
 						this.Booklist.Booklists.Remove(collection);
+						notification.Show($"Success in deleting your read list \"{collection.Title}\"", 4000);
+					}
+					else
+					{
+						notification.Show("Something wrong in deleting your read list" +
+											$" \"{collection.Title}\". " +
+											"Please try again later.", 4000);
+					}
 				}
 			}
 		}
@@ -249,6 +252,14 @@ namespace Frontend.CustomControls
 				collection.Books.Remove(book);
 				collection.EditTime = DateTime.Now;
 				collection.OnPropertyChanged("EditTime");
+				notification.Show($"Success in removing the book \"{book.BookFullName}\"" +
+									" of your read list.", 4000);
+			}
+			else
+			{
+				notification.Show("Something wrong in removing the book" +
+									$" \"{book.BookFullName}\" of your read list. " +
+									"Please try again later.", 4000);
 			}
 		}
 
@@ -271,29 +282,16 @@ namespace Frontend.CustomControls
 				{
 					success = await EditDesc_Invoked(newText, collection);
 				}
-				if (!success)
+				if (success)
 				{
-					ContentDialog dialog = new ContentDialog
-					{
-						Content = $"Something wrong in editing the {(sender as TextBox).Tag as string}" +
-									"of your read list. Pleast try again later.",
-						Title = "Editing notify",
-						IsPrimaryButtonEnabled = true,
-						PrimaryButtonText = "OK"
-					};
-					await dialog.ShowAsync();
-					box.Text = oldText;
+					notification.Show($"Success in editing the {(sender as TextBox).Tag as string}" +
+										" of your read list.", 4000);
 				}
 				else
 				{
-					ContentDialog dialog = new ContentDialog
-					{
-						Content = $"Success in editing the {(sender as TextBox).Tag as string} of your read list.",
-						Title = "Editing notify",
-						IsPrimaryButtonEnabled = true,
-						PrimaryButtonText = "OK"
-					};
-					await dialog.ShowAsync();
+					notification.Show($"Something wrong in editing the {(sender as TextBox).Tag as string}" +
+										"of your read list. Pleast try again later.", 4000);
+					box.Text = oldText;
 				}
 
 				e.Handled = true;

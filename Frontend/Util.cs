@@ -136,7 +136,7 @@ namespace Frontend
 
 			//Create byte/raw bitmap qr code
 			BitmapByteQRCode qrCodeBmp = new BitmapByteQRCode(qrCodeData);
-			byte[] qrCodeImageBmp = qrCodeBmp.GetGraphic(20);
+			byte[] qrCodeImageBmp = qrCodeBmp.GetGraphic(12);
 			InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream();
 			DataWriter writer = new DataWriter(stream.GetOutputStreamAt(0));
 			writer.WriteBytes(qrCodeImageBmp);
