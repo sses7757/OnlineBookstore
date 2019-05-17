@@ -41,6 +41,7 @@ namespace Frontend
 			{ "readlist", typeof(ReadlistPage) },
 			{ "billboard", typeof(BillboardPage) },
 			{ "bookshelf", typeof(BookshelfPage) },
+			{ "myreview", typeof(MyReivewPage) },
 			{ "mydanmu", typeof(MyDanmuPage) },
 			{ "myreadlist", typeof(MyReadlistPage) },
 			{ "mywishlist", typeof(MyWishlistPage) },
@@ -69,6 +70,7 @@ namespace Frontend
 			MyReadlistBtn.Visibility = v;
 			MyFolloedlistBtn.Visibility = v;
 			MyWishlistBtn.Visibility = v;
+			MyReviewBtn.Visibility = v;
 		}
 
 		private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -196,7 +198,9 @@ namespace Frontend
 		{
 			NavView.IsBackEnabled = ContentFrame.CanGoBack;
 
-			var item = Pages.FirstOrDefault(p => p.Value == e.SourcePageType);
+			danmuBtn.Visibility = (ContentFrame.SourcePageType == typeof(ReadPage)).ToVisibility();
+
+				var item = Pages.FirstOrDefault(p => p.Value == e.SourcePageType);
 			if (item.Key == null || item.Value == null)
 				return;
 
@@ -304,6 +308,15 @@ namespace Frontend
 				var c = (sender as AppBarToggleButton)?.IsChecked;
 				if (c != null && c.HasValue)
 					(ContentFrame.Content as IRefreshAdminInterface).AdminButtonPressed(c.Value);
+			}
+		}
+
+		private void SendDanmu_Pressed(object sender, RoutedEventArgs e)
+		{
+			if(ContentFrame.SourcePageType != null)
+			{
+				if (ContentFrame.Content is ISendDanmuInterface page)
+					page.SendDanmuPressed();
 			}
 		}
 

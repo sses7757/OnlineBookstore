@@ -158,6 +158,9 @@
     <Compile Include="MyReadlistPage.xaml.cs">
       <DependentUpon>MyReadlistPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MyReivewPage.xaml.cs">
+      <DependentUpon>MyReivewPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MyWishlistPage.xaml.cs">
       <DependentUpon>MyWishlistPage.xaml</DependentUpon>
     </Compile>
@@ -289,6 +292,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MyReadlistPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MyReivewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -59,6 +59,14 @@
 					Maximum="50"
 					Minimum="0"
 					Value="{x:Bind local:Storage.DanmuSpacing, Mode=TwoWay}"/>
+            <Slider MinWidth="260"
+					HorizontalAlignment="Left"
+					VerticalAlignment="Center"
+					FontSize="18"
+					Header="Moving speed of bullets"
+					Maximum="100"
+					Minimum="10"
+					Value="{x:Bind local:Storage.DanmuSpeed, Mode=TwoWay}"/>
 		</StackPanel>
 	</Grid>
 </Page>

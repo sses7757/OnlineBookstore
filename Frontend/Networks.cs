@@ -77,6 +77,10 @@ namespace Frontend
 		public bool? IsDeleteAction { set; get; }
 		public string NewContent { set; get; }
 
+		public int? ReviewId { set; get; }
+		public string NewTitle { set; get; }
+		public int? NewRating { set; get; }
+
 		public int? ReadListId { set; get; }
 		public int? ChangeType { set; get; }
 		public int? AlteredBookId { set; get; }
@@ -517,8 +521,12 @@ namespace Frontend
 			review.UserName = "Rk9LX2kC";
 			review.PublishDate = DateTime.Now;
 			review.Rating = 5;
-			review.Content = "fqdTgcZfPZasdohwlkgasjdbfakl;sfasifasuifb";
+			review.Content = "Sometimes you need to show ratings of secondary content, " +
+				"such as that displayed in recommended content or when displaying a list " +
+				"of comments and their corresponding ratings. In this case, the user " +
+				"shouldn’t be able to edit the rating, so you can make the control read-only.";
 			review.Title = "asgase5g1";
+			review.BookName = "The Road Less Traveled (少有人走的路)";
 			return;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
@@ -527,6 +535,7 @@ namespace Frontend
 			review.Rating = recv.Rating.Value;
 			review.Content = recv.Content;
 			review.Title = recv.Title;
+			review.BookName = recv.BookName;
 		}
 
 		public static async Task<int[]> GetBookListBooks(bool isBillboard, int id, int from = 0,
@@ -705,6 +714,17 @@ namespace Frontend
 			{
 			};
 			return GenerateIDs(15);
+
+			var recv = await Connection.SendAndReceive.GlobalLock(query);
+			return recv.IDs;
+		}
+
+		public static async Task<int[]> GetMyReviews()
+		{
+			var query = new QueryObject("GetMyReviews")
+			{
+			};
+			return GenerateIDs(9);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -905,13 +925,13 @@ namespace Frontend
 			return recv.Success;
 		}
 
-		public static async Task<bool> CreateDanmu(string content, int bookId, int pageNum)
+		public static async Task<bool> CreateDanmu(string content, int bookId, uint pageNum)
 		{
 			var change = new ChangeObject("CreateDanmu")
 			{
 				Content = content,
 				BookId = bookId,
-				PageNum = pageNum
+				PageNum = (int)pageNum
 			};
 			return true;
 
@@ -948,6 +968,22 @@ namespace Frontend
 			{
 				return null;
 			}
+		}
+
+		public static async Task<bool> ChangeReview(int reviewId, bool isDelete, int rating, string title, string content)
+		{
+			var change = new ChangeObject("ChangeReview")
+			{
+				ReviewId = reviewId,
+				NewTitle = title,
+				NewContent = content,
+				NewRating = rating,
+				IsDeleteAction = isDelete
+			};
+			return true;
+
+			var recv = await Connection.SendAndReceive.GlobalLock(change);
+			return recv.Success;
 		}
 
 		public static async Task<bool> CreateReview(int bookId, int rating, string title, string content)

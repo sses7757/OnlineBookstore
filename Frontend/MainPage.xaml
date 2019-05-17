@@ -47,6 +47,11 @@
 					<AppBarButton Click="Refresh_Pressed"
 								  Icon="Refresh"
 								  Label="Refresh"/>
+                    <AppBarButton x:Name="danmuBtn"
+                                  Click="SendDanmu_Pressed"
+								  Icon="Send"
+								  Label="Send Bullet"
+                                  Visibility="Collapsed"/>
 					<AppBarSeparator x:Name="TopSeparator"/>
 					<AppBarToggleButton x:Name="ToggleAdmin"
 										Checked="Admin_Pressed"
@@ -107,20 +112,28 @@
 			</NavigationViewItem>
 			<NavigationViewItem x:Name="MyWishlistBtn"
 								Content="My wish list"
-								Icon="Contact2"
+								Icon="Pin"
 								Tag="mywishlist">
 				<NavigationViewItem.FocusVisualPrimaryBrush>
 					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
 				</NavigationViewItem.FocusVisualPrimaryBrush>
 			</NavigationViewItem>
-			<NavigationViewItem x:Name="MyDanmuBtn"
+            <NavigationViewItem x:Name="MyReviewBtn"
+								Content="Created reviews"
+								Icon="Contact2"
+								Tag="myreview">
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="MyDanmuBtn"
 								Content="Created bullet screen"
 								Icon="ContactInfo"
 								Tag="mydanmu">
-				<NavigationViewItem.FocusVisualPrimaryBrush>
-					<SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
-				</NavigationViewItem.FocusVisualPrimaryBrush>
-			</NavigationViewItem>
+                <NavigationViewItem.FocusVisualPrimaryBrush>
+                    <SolidColorBrush Color="{ThemeResource SystemAccentColorDark2}"/>
+                </NavigationViewItem.FocusVisualPrimaryBrush>
+            </NavigationViewItem>
             <NavigationViewItem x:Name="MyFolloedlistBtn"
 								Content="Followed read list"
 								Icon="AddFriend"

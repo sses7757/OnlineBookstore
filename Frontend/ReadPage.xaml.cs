@@ -24,7 +24,7 @@ namespace Frontend
 	/// <summary>
 	/// 可用于自身或导航至 Frame 内部的空白页。
 	/// </summary>
-	public sealed partial class ReadPage : Page, IRefreshAdminInterface
+	public sealed partial class ReadPage : Page, IRefreshAdminInterface, ISendDanmuInterface
 	{
 		public ReadPage()
 		{
@@ -256,31 +256,72 @@ namespace Frontend
 		{
 			if (e.IsIntermediate)
 			{
-				Debug.WriteLine("scroll ongoing");
 			}
 			else
 			{
-				Debug.WriteLine("scroll finish");
+				ReloadComments(GetCurrentPageNum());
+			}
+		}
 
-				var scroll = sender as ScrollViewer;
-				var yScroll = scroll.VerticalOffset;
-				if (double.IsNaN(yScroll))
-					yScroll = 0;
-				var zoom = scroll.ZoomFactor;
-				yScroll /= zoom;
-				uint currentPagePos = (uint)PdfPages.Count;
-				for (int i = 1; i <= PdfPages.Count; ++i)
+		private uint GetCurrentPageNum()
+		{
+			var yScroll = scroller.VerticalOffset;
+			if (double.IsNaN(yScroll))
+				yScroll = 0;
+			var zoom = scroller.ZoomFactor;
+			yScroll /= zoom;
+			uint currentPagePos = (uint)PdfPages.Count;
+			for (int i = 1; i <= PdfPages.Count; ++i)
+			{
+				var pageHeight = (double)PdfPages[i - 1].PixelHeight;
+				pageHeight *= scroller.ViewportWidth / PdfPages[i - 1].PixelWidth;
+				yScroll -= pageHeight + scroller.Margin.Top;
+				if (yScroll <= 0f)
 				{
-					var pageHeight = (double)PdfPages[i - 1].PixelHeight;
-					pageHeight *= scroll.ViewportWidth / PdfPages[i - 1].PixelWidth;
-					yScroll -= pageHeight + scroll.Margin.Top;
-					if (yScroll <= 0f)
-					{
-						currentPagePos = (uint)i;
-						break;
-					}
+					currentPagePos = (uint)i;
+					break;
 				}
-				ReloadComments(currentPagePos);
+			}
+			return currentPagePos;
+		}
+		
+		public async void SendDanmuPressed()
+		{
+			TextBox text = new TextBox
+			{
+				PlaceholderText = "The bullet conent",
+				Header = "Please input the bullet you want to send"
+			};
+			ContentDialog dialog = new ContentDialog
+			{
+				Content = text,
+				Title = "Send your bullet",
+				IsSecondaryButtonEnabled = true,
+				PrimaryButtonText = "Send",
+				SecondaryButtonText = "Cancle"
+			};
+			if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+			{
+				if (text.Text.Length <= 2)
+				{
+					notification.Show("You cannot send a danmu with such short content", 4000);
+				}
+				else if (text.Text.Length >= 100)
+				{
+					notification.Show("You cannot send a danmu with such long content", 4000);
+				}
+				var page = GetCurrentPageNum();
+				bool success = await NetworkSet.CreateDanmu(text.Text, bookId, page);
+				if (success)
+				{
+					this.bulletPool.Add(new LiveComment(new Danmu(0) { Content = text.Text }, page));
+					notification.Show($"Success in sending a bullet at page {page} with content {text.Text}", 4000);
+				}
+				else
+				{
+					notification.Show($"Something wrong in sending a bullet at page {page}." +
+										"Please try again later.", 4000);
+				}
 			}
 		}
 	}
@@ -325,12 +366,15 @@ namespace Frontend
 
 	internal class CommentBullet
 	{
-		// Default speed
-		private readonly float MoveSpeed = 0.002f;
+		//tex:
+		//Default speed $$v_\mathrm{default}=\frac{v_\mathrm{set}}{10000}$$
+		//Changed according the comment width by
+		//$$v_\mathrm{actual}=v_\mathrm{default}+\frac{l_\mathrm{comment}\cdot v_\mathrm{set}/20}{1000000}$$
+		private readonly float MoveSpeed = Storage.DanmuSpeed / 10000;
 
 		internal CommentBullet(Vector2 pos, LiveComment liveComment)
 		{
-			MoveSpeed += liveComment.Width / 1000000;
+			MoveSpeed += liveComment.Width * Storage.DanmuSpeed / 20 / 1000000;
 			Position = pos;
 			CommentItem = liveComment;
 			IsObsolete = false;

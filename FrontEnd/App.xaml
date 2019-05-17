@@ -100,8 +100,8 @@
 			<Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark2}"/>
 		</Style>
 
-        <SymbolIconSource x:Key="AddIcon" Symbol="Add"/>
-        <SymbolIconSource x:Key="RemoveIcon" Symbol="Clear"/>
+        <SymbolIconSource x:Key="AddIcon" Symbol="Favorite"/>
+        <SymbolIconSource x:Key="RemoveIcon" Symbol="UnFavorite"/>
 		<SymbolIconSource x:Key="BuyIcon" Symbol="Shop"/>
 		<SymbolIconSource x:Key="EditIcon" Symbol="Edit"/>
         <SymbolIconSource x:Key="DeleteIcon" Symbol="Delete"/>

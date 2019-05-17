@@ -438,6 +438,7 @@ namespace Frontend
 		internal DateTime PublishDate { set; get; }
 		internal string Content { set; get; }
 		internal string Title { set; get; }
+		internal string BookName { set; get; }
 
 		internal Review(int id)
 		{

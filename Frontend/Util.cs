@@ -21,6 +21,7 @@ namespace Frontend
 		internal static Color DanmuColor { set; get; } = Colors.Black;
 		internal static float DanmuSize { set; get; } = 20;
 		internal static float DanmuSpacing { set; get; } = 6;
+		internal static float DanmuSpeed { set; get; } = 20;
 		internal static bool IsDanmuOn { set; get; } = true;
 		internal static Visibility DanmuVisibility { get => IsDanmuOn.ToVisibility(); }
 		internal static CanvasTextFormat DanmuTextFormat { get; }
@@ -220,6 +221,11 @@ namespace Frontend
 		void RefreshButtonPressed();
 
 		void AdminButtonPressed(bool isChecked);
+	}
+
+	internal interface ISendDanmuInterface
+	{
+		void SendDanmuPressed();
 	}
 
 	/// <summary>The Range class. From drharris on Stackoverflow</summary>

@@ -15,14 +15,14 @@
 					  Background="Gray"
 					  ViewChanged="ScrollViewer_ViewChanged"
 					  ZoomMode="Enabled">
-			<ItemsControl x:Name="pages" ItemsSource="{x:Bind PdfPages, Mode=OneWay}">
-				<ItemsControl.ItemTemplate>
-					<DataTemplate x:DataType="BitmapImage">
-						<Image Margin="0,4" Source="{x:Bind}"/>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</ScrollViewer>
+            <ItemsControl x:Name="pages" ItemsSource="{x:Bind PdfPages, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="BitmapImage">
+                        <Image Margin="0,4" Source="{x:Bind}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
 		<canvas:CanvasAnimatedControl x:Name="animatedControl"
 									  Height="400"
@@ -52,5 +52,13 @@
 						   Text="Loading..."/>
 			</StackPanel>
 		</controls:Loading>
-	</Grid>
+
+        <controls:InAppNotification x:Name="notification"
+									AnimationDuration="00:00:0.2"
+									HorizontalOffset="0"
+									ShowDismissButton="True"
+									StackMode="Replace"
+									VerticalOffset="100"/>
+
+    </Grid>
 </Page>
