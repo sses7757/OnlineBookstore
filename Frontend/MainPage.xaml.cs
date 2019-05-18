@@ -86,7 +86,8 @@ namespace Frontend
 			}
 		}
 
-		private void NavView_Navigate(string navItemTag, NavigationTransitionInfo info, bool Override = true, object pass = null)
+		private void NavView_Navigate(string navItemTag, NavigationTransitionInfo info,
+									  bool Override = true, object pass = null)
 		{
 			// show admin toggle or not
 			ShowAdmin(Storage.IsAdmin);
@@ -116,7 +117,8 @@ namespace Frontend
 			}
 		}
 
-		private void NavView_Navigate(Type toPage, NavigationTransitionInfo info, bool Override = true, object pass = null)
+		private void NavView_Navigate(Type toPage, NavigationTransitionInfo info,
+									  bool Override = true, object pass = null)
 		{
 			// show admin toggle or not
 			ShowAdmin(Storage.IsAdmin);
@@ -200,9 +202,19 @@ namespace Frontend
 
 			danmuBtn.Visibility = (ContentFrame.SourcePageType == typeof(ReadPage)).ToVisibility();
 
-				var item = Pages.FirstOrDefault(p => p.Value == e.SourcePageType);
+			var item = Pages.FirstOrDefault(p => p.Value == e.SourcePageType);
 			if (item.Key == null || item.Value == null)
+			{
+				if (ContentFrame.SourcePageType is Type page)
+				{
+					WelcomeLabel1.Text = page.Name.Replace("Page", "").
+												   Replace("Danmu", "BulletComments").
+												   Replace("list", "List").
+												   WordSplit();
+					WelcomeLabel2.Text = "";
+				}
 				return;
+			}
 
 			if (ContentFrame.SourcePageType == typeof(SettingPage))
 			{
@@ -212,7 +224,8 @@ namespace Frontend
 				WelcomeLabel2.Text = "";
 				return;
 			}
-			else if (ContentFrame.SourcePageType == typeof(LoginPage) || ContentFrame.SourcePageType == typeof(HomePage))
+			else if (ContentFrame.SourcePageType == typeof(LoginPage) ||
+					 ContentFrame.SourcePageType == typeof(HomePage))
 			{
 				WelcomeLabel1.Text = "Welcome to";
 				WelcomeLabel2.Text = " BookHub";

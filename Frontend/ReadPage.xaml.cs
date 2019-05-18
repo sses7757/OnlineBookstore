@@ -289,8 +289,8 @@ namespace Frontend
 		{
 			TextBox text = new TextBox
 			{
-				PlaceholderText = "The bullet conent",
-				Header = "Please input the bullet you want to send"
+				PlaceholderText = "The bullet content",
+				Header = "Please input the bullet comment you want to send"
 			};
 			ContentDialog dialog = new ContentDialog
 			{

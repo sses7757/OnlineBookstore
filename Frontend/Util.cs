@@ -85,9 +85,14 @@ namespace Frontend
 			return parent;
 		}
 
+		internal static string WordSplit(this string s)
+		{
+			return System.Text.RegularExpressions.Regex.Replace(s, @"(\p{Lu})", " $1").TrimStart();
+		}
+
 		internal static string EnumToString(this Enum e)
 		{
-			return System.Text.RegularExpressions.Regex.Replace(e.ToString("F"), @"(\p{Lu})", " $1").TrimStart();
+			return e.ToString("F").WordSplit();
 		}
 
 		internal static T CloneThroughJson<T>(this T source)

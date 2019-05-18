@@ -229,7 +229,7 @@ namespace Frontend
 					}
 					var combo = new ComboBox()
 					{
-						FontSize = 18,
+						FontSize = 16,
 						ItemsSource = titles,
 						SelectedIndex = 0
 					};
@@ -250,7 +250,14 @@ namespace Frontend
 						{
 							this.detail.CanAddReadList = false;
 							this.Detail = detail;
-							notification.Show("Success in adding book to your read list", 4000);
+							notification.Show("Success in adding book to your read list" +
+												$"\"{combo.SelectedItem as string}\"", 4000);
+						}
+						else
+						{
+							notification.Show("Something wrong in adding book to your read list" +
+												$"\"{combo.SelectedItem as string}\". " + 
+												"Please try again later.", 4000);
 						}
 					}
 					break;
@@ -261,6 +268,11 @@ namespace Frontend
 						this.detail.CanAddWishList = false;
 						this.Detail = detail;
 						notification.Show("Success in adding book to your wish list", 4000);
+					}
+					else
+					{
+						notification.Show("Something wrong in adding book to your wish list. " +
+											"Please try again later.", 4000);
 					}
 					break;
 				case "preview":
