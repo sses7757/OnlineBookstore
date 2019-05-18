@@ -44,6 +44,7 @@ namespace Frontend
 					ShowProgress(false);
 					notification.Show("Please try again later", DELAY);
 				}
+				signUpBtn.Visibility = Storage.SignUpVisibility;
 				return;
 			}
 
@@ -73,6 +74,7 @@ namespace Frontend
 					notification.Show("Wrong password", DELAY);
 					break;
 			}
+			signUpBtn.Visibility = Storage.SignUpVisibility;
 		}
 
 		private void Notification_Closed(object sender, InAppNotificationClosedEventArgs e)

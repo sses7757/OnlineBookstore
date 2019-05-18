@@ -315,11 +315,11 @@ namespace Frontend
 				if (success)
 				{
 					this.bulletPool.Add(new LiveComment(new Danmu(0) { Content = text.Text }, page));
-					notification.Show($"Success in sending a bullet at page {page} with content {text.Text}", 4000);
+					notification.Show($"Success in sending a bullet at page {page} \"{text.Text}\"", 4000);
 				}
 				else
 				{
-					notification.Show($"Something wrong in sending a bullet at page {page}." +
+					notification.Show($"Something wrong in sending a bullet at page {page}. " +
 										"Please try again later.", 4000);
 				}
 			}

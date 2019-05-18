@@ -17,6 +17,7 @@ namespace Frontend
 	internal static class Storage
 	{
 		internal static int UserId { set; get; } = -1;
+		internal static Visibility SignUpVisibility { get => (!NetworkGet.IsValidID(UserId)).ToVisibility(); }
 		internal static bool IsAdmin { set; get; } = false;
 		internal static Color DanmuColor { set; get; } = Colors.Black;
 		internal static float DanmuSize { set; get; } = 20;
