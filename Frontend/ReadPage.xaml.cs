@@ -179,7 +179,8 @@ namespace Frontend
 		private void LoadComments(uint pagePosNow)
 		{
 			// Get all the avaliable bullets's id.
-			List<Guid> idList = bulletScreen.Bullets.Where(o => !o.IsObsolete).
+			List<Guid> idList = bulletScreen.Bullets.ToList().
+													 Where(o => !o.IsObsolete).
 													 Select(o => o.CommentItem.ID).
 													 ToList();
 			// Get comments need to load to screen from the comment pool.
@@ -195,8 +196,9 @@ namespace Frontend
 				Size ControlSize = this.animatedControl.Size;
 				// Get last bullet in the bullet queue
 				CommentBullet lastBullet;
-				if (bulletScreen.Bullets.Count > 0)
-					lastBullet = bulletScreen.Bullets.LastOrDefault();
+				IList<CommentBullet> bulletsNow = bulletScreen.Bullets.ToList();
+				if (bulletsNow.Count > 0)
+					lastBullet = bulletsNow.LastOrDefault();
 				else
 					lastBullet = null;
 
@@ -230,7 +232,10 @@ namespace Frontend
 		/// </summary>
 		private void ReloadComments(uint pagePos)
 		{
-			bulletScreen.Bullets.ForEach(o => o.IsObsolete = true);
+			foreach (var b in bulletScreen.Bullets.ToList())
+			{
+				b.IsObsolete = true;
+			}
 			LoadComments(pagePos);
 		}
 
@@ -332,10 +337,10 @@ namespace Frontend
 	/// </summary>
 	internal class BulletScreen
 	{
-		internal List<CommentBullet> Bullets { get; set; }
+		internal  SynchronizedCollection<CommentBullet> Bullets { set; get; }
 		internal BulletScreen()
 		{
-			Bullets = new List<CommentBullet>();
+			Bullets = new SynchronizedCollection<CommentBullet>();
 		}
 
 		/// <summary>
@@ -345,10 +350,14 @@ namespace Frontend
 		{
 			Matrix3x2 transform = Matrix3x2.CreateScale(size.ToVector2());
 			// Before drawing the bullets, remove the discard bullet first.
-			Bullets.RemoveAll(o => o.IsObsolete);
-			for (int i = 0; i < Bullets.Count; i++)
+			foreach (var b in Bullets.ToList())
 			{
-				Bullets[i].Draw(ds, transform);
+				if (b.IsObsolete)
+					Bullets.Remove(b);
+			}
+			foreach (var b in Bullets.ToList())
+			{
+				b.Draw(ds, transform);
 			}
 		}
 
@@ -357,7 +366,7 @@ namespace Frontend
 		/// </summary>
 		internal void Update()
 		{
-			foreach (CommentBullet bullet in Bullets)
+			foreach (var bullet in Bullets.ToList())
 			{
 				bullet.Update();
 			}
