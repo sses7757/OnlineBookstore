@@ -178,7 +178,7 @@ namespace Frontend
 		internal Range<int> PageRange { set; get; } = new Range<int>(0, MAX_PAGE_RANGE, MAX_PAGE_RANGE);
 		internal bool IncludeFreeBooks { set; get; }
 
-		private readonly List<string> LabelFilters = new List<string>();
+		private List<string> LabelFilters { get; } = new List<string>();
 
 		internal BookDetailCollection Books { set; get; }
 		internal BooklistCollection Billboards { set; get; }

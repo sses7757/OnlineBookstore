@@ -33,7 +33,6 @@ namespace Frontend
 		public int? Count { set; get; }
 
 		public int? SearchType { set; get; }
-		public string DirectQuery { set; get; }
 		public string QueryText { set; get; }
 		public bool? OrderDescend { set; get; }
 		public int? Order { set; get; }
@@ -125,6 +124,7 @@ namespace Frontend
 		public int? LoginStatus { set; get; }
 		public int? UserId { set; get; }
 		public bool? IsAdmin { set; get; }
+
 		public string[] MainLabels { set; get; }
 		public string[] SubLabels { set; get; }
 
@@ -567,6 +567,19 @@ namespace Frontend
 
 		public static async Task<int[]> GetFromQuery(QueryObject query, int from = 0, int count = int.MaxValue)
 		{
+			if (!query.SearchType.HasValue && query.IsBillboard.HasValue && query.BookListId.HasValue)
+			{
+				if (query.From.HasValue && query.Count.HasValue)
+					return await GetBookListBooks(query.IsBillboard.Value, query.BookListId.Value,
+												  query.From.Value, query.Count.Value);
+				else
+					return await GetBookListBooks(query.IsBillboard.Value, query.BookListId.Value);
+			}
+			else if (!query.SearchType.HasValue)
+			{
+				Debug.WriteLine("GetFromQuery has no SearchType");
+				return null;
+			}
 			var newQuery = query.CloneThroughJson();
 			newQuery.Type = "GetFromQuery";
 			newQuery.From = from;
