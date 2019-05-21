@@ -36,6 +36,6 @@ public abstract class AbstractController {
 	 * @return The <code>InfoToFront</code>'s instance's Json string
 	 * @throws Exception
 	 */
-	public abstract String methodController(String infoFromFront) throws Exception;
+	public abstract String methodController(String infoFromFront);
 
 }

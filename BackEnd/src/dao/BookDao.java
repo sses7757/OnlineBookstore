@@ -61,10 +61,20 @@ public interface BookDao {
 	 */
 	InfoToFront GetBookDetail(InfoFromFront infoFromFront) throws SQLException;
 
-	// get the related books, recommended books.
+	/** get the related books, recommended books.
+	 * @author Niu Lei
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
 	InfoToFront GetRelatedBooks(InfoFromFront infoFromFront) throws SQLException;
 
-	// preview the book, return URL
+	/** preview the book, return URL
+	 * @author Niu Lei
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
 	InfoToFront GetBookPreview(InfoFromFront infoFromFront) throws SQLException;
 
 	// download the book, return URL.
@@ -73,12 +83,30 @@ public interface BookDao {
 	// get the private key of a book for open the PDF.
 	InfoToFront GetBookKey(InfoFromFront infoFromFront) throws SQLException;
 
-	// issues: need to discuss with the front-end
+	/**
+	 * Buy book
+	 * @author Miao Yanchao
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
 	InfoToFront BuyBook(InfoFromFront infoFromFront) throws SQLException;
 
-	// Check whether the contraction was done.
+	/**
+	 * Check buy complete
+	 * @author Miao Yanchao
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
 	InfoToFront CheckBuyComplete(InfoFromFront infoFromFront) throws SQLException;
 
-	//
+	/**
+	 * Cancel a transaction, need consider the paid = true?
+	 * @author Miao Yanchao
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
 	InfoToFront CancelTransaction(InfoFromFront infoFromFront) throws SQLException;
 }

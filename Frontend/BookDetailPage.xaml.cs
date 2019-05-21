@@ -183,40 +183,8 @@ namespace Frontend
 			switch ((sender as Button).Tag as string)
 			{
 				case "buy":
-					string buyURL = await NetworkSet.BuyBook(bookId);
-					if (buyURL == null || buyURL.Length <= 4)
-						return;
-					ContentDialog dialog = new ContentDialog()
-					{
-						Content = new Image()
-						{
-							Stretch = Stretch.Uniform,
-							Source = await buyURL.ToQRCode()
-						},
-						Title = "Buying Book",
-						IsSecondaryButtonEnabled = true,
-						PrimaryButtonText = "I've paid",
-						SecondaryButtonText = "Cancel"
-					};
-					if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-					{ // click finish paying
-						var finish = await NetworkSet.CheckBuyComplete(bookId);
-						if (finish)
-						{
-							this.detail.CanBuy = false;
-							this.Detail = detail;
-							notification.Show("Payment success, wish you enjoy reading", 4000);
-						}
-						else
-						{
-							notification.Show("Payment failure, please try again later", 4000);
-						}
-					}
-					else
-					{
-						while (!await NetworkSet.CancleTransaction(bookId)) { }
-						notification.Show("Transaction cancled", 4000);
-					}
+					await Util.BuyBookAsync(bookId, this.detail, null, this.notification);
+					this.Detail = detail;
 					break;
 				case "readlist":
 					var ids = await NetworkGet.GetMyReadListsWithout(bookId);
@@ -233,7 +201,7 @@ namespace Frontend
 						ItemsSource = titles,
 						SelectedIndex = 0
 					};
-					dialog = new ContentDialog()
+					var dialog = new ContentDialog()
 					{
 						Content = combo,
 						Title = "Add Book to Read List",

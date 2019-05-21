@@ -16,19 +16,20 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 		bookId = infoFromFront.getBookId();
 		from = infoFromFront.getFrom();
 		count = infoFromFront.getCount();
+
 		List<Integer> reviewId = new LinkedList<Integer>();
+
 		getConnection();
 
-		String sql = " select review_id from review order by edit_time" + "where book_id = ?";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, bookId);
-		rs = pstmt.executeQuery();
+		String sql = "select review_id" + " from review" + " where book_id = ?" + " order by edit_time"
+				+ " limit ? offset ?";
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+		getPstmt().setInt(2, count);
+		getPstmt().setInt(3, from);
+		rs = getPstmt().executeQuery();
 
-		int i = 0, j = 0;
-		while (rs.next() && i < from) {
-			i++;
-		}
-		while (rs.next() && j < count) {
+		while (rs.next()) {
 			reviewId.add(rs.getInt("review_id"));
 		}
 
@@ -38,18 +39,18 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 	}
 
 	@Override
-	public InfoToFront GetReviews(InfoFromFront infoFromFront) throws SQLException {
+	public InfoToFront GetReview(InfoFromFront infoFromFront) throws SQLException {
 		int reviewId = infoFromFront.getReviewId();
 		InfoToFront info = new InfoToFront();
 
 		getConnection();
 
 		String sql = "select r.user_id, r.rating, r.edit_time, r.title, r.content, b.name as book_name"
-				+ "from review r join book b on r.book_id = b.id" + "where r.review_id = ?";
+				+ " from review r" + " join book b on r.book_id = b.id" + " where r.review_id = ?";
 
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, reviewId);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, reviewId);
+		rs = getPstmt().executeQuery();
 
 		while (rs.next()) {
 			info.setCreateUser(rs.getString("user_id"));
@@ -73,26 +74,25 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 		int newRating = infoFromFront.getRating();
 
 		InfoToFront info = new InfoToFront();
-		info.setType("ChangeReview");
 
-		String sql = null;
+		String sql = "";
 		if (isDeleteAction) {
-			sql = "DELETE FROM review WHERE user_id = ? AND review_id = ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, reviewId);
+			sql += "DELETE FROM review WHERE user_id = ? AND review_id = ?";
+			setPstmt(getConn().prepareStatement(sql));
+			getPstmt().setInt(1, userId);
+			getPstmt().setInt(2, reviewId);
 		}
 		else {
-			sql = "set sql_safe_updates = 1" + "UPDATE review " + "SET title = ? , content = ? , rating = ?"
+			sql += "UPDATE review " + "SET title = ? , content = ? , rating = ?"
 					+ "WHERE review_id = ? AND user_id = ?";
 
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, newTitle);
-			pstmt.setString(2, newContent);
-			pstmt.setInt(3, newRating);
+			setPstmt(getConn().prepareStatement(sql));
+			getPstmt().setString(1, newTitle);
+			getPstmt().setString(2, newContent);
+			getPstmt().setInt(3, newRating);
 
 		}
-		int rows = pstmt.executeUpdate();
+		int rows = getPstmt().executeUpdate();
 
 		if (rows == 1)
 			info.setSuccess(true);
@@ -104,21 +104,32 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 
 	@Override
 	public InfoToFront CreateReview(InfoFromFront infoFromFront) throws SQLException {
-		int bookId, rating;
+		int bookId, userId, rating;
 		String title, content;
 		bookId = infoFromFront.getBookId();
+		userId = infoFromFront.getUserId();
 		rating = infoFromFront.getRating();
 		title = infoFromFront.getTitle();
 		content = infoFromFront.getContent();
-		return null;
+
+		InfoToFront info = new InfoToFront();
+
+		getConnection();
+
+		String sql = "insert into review(user_id, book_id, title, content, rating) values(?,?,?,?,?)";
+
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+		pstmt.setString(3, title);
+		pstmt.setString(4, content);
+		pstmt.setInt(5, rating);
+
+		pstmt = conn.prepareStatement(sql);
+
+		int rows = pstmt.executeUpdate();
+		info.setSuccess(rows == 1);
+
+		closeAll();
+		return info;
 	}
-
-	@Override
-	public InfoToFront CheckBuyComplete(InfoFromFront infoFromFront) throws SQLException {
-		int userId = infoFromFront.getUserId();
-		int bookId = infoFromFront.getBookId();
-
-		return null;
-	}
-
 }

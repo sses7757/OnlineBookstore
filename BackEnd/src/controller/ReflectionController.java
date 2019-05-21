@@ -1,5 +1,6 @@
 package controller;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import service.DAOFactory;
@@ -20,7 +21,7 @@ public class ReflectionController extends AbstractController {
 	 * @see controller.AbstractController#methodController(java.lang.String)
 	 */
 	@Override
-	public String methodController(String infoFromFront) throws Exception {
+	public String methodController(String infoFromFront) {
 		InfoFromFront info = this.fromJson(infoFromFront);
 
 		DAOFactory factory = new DAOFactoryImpl();
@@ -37,7 +38,12 @@ public class ReflectionController extends AbstractController {
 				method = methods[i];
 		}
 
-		Object infoToFront = method.invoke(baseDao, info);
+		Object infoToFront = null;
+		try {
+			infoToFront = method.invoke(baseDao, info);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 		InfoToFront front;
 
 		if (infoToFront instanceof InfoToFront) {
@@ -45,7 +51,8 @@ public class ReflectionController extends AbstractController {
 			front.setType(method.getName());
 		}
 		else {
-			throw new Exception("Invoke method did not return correct result");
+			System.err.println("Invoke method did not return correct result");
+			return null;
 		}
 		return this.toJson(front);
 	}

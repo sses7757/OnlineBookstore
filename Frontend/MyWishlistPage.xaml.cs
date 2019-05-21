@@ -88,40 +88,9 @@ namespace Frontend
 
 		private async void Buy_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
 		{
-			var bookId = (args.SwipeControl.DataContext as BookDetail).ID;
-			string buyURL = await NetworkSet.BuyBook(bookId);
-			if (buyURL == null || buyURL.Length <= 4)
-				return;
-			ContentDialog dialog = new ContentDialog()
-			{
-				Content = new Image()
-				{
-					Stretch = Stretch.Uniform,
-					Source = await buyURL.ToQRCode()
-				},
-				Title = "Buying Book",
-				IsSecondaryButtonEnabled = true,
-				PrimaryButtonText = "I've paid",
-				SecondaryButtonText = "Cancel"
-			};
-			if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-			{ // click finish paying
-				var finish = await NetworkSet.CheckBuyComplete(bookId);
-				if (finish)
-				{
-					this.WishBooks.Remove(args.SwipeControl.DataContext as BookDetail);
-					notification.Show("Payment success, wish you enjoy reading", 4000);
-				}
-				else
-				{
-					notification.Show("Payment failure, please try again later", 4000);
-				}
-			}
-			else
-			{
-				while(!await NetworkSet.CancleTransaction(bookId)) { }
-				notification.Show("Transaction cancled", 4000);
-			}
+			var book = args.SwipeControl.DataContext as BookDetail;
+			var bookId = book.ID;
+			await Util.BuyBookAsync(bookId, book, this.WishBooks, this.notification);
 		}
 
 		private async void Delete_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)

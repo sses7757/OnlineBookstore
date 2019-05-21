@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import dao.BookDao;
+import socket.BookhubServer;
 import socket.InfoFromFront;
 import socket.InfoToFront;
 
@@ -14,55 +15,53 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 	public InfoToFront GetBookSummary(InfoFromFront infoFromFront) throws SQLException {
 		int bookId = infoFromFront.getBookId();
 
-		InfoToFront dataToFront = new InfoToFront();
-		dataToFront.setType("GetBookSummary");
+		InfoToFront info = new InfoToFront();
+		info.setType("GetBookSummary");
 		getConnection();
 
 		String sql = " select b.name as book_name, book_cover_url, a.name as author_name" + "from book b "
 				+ "join book_author ba on b.id = ba.id " + "join author a on a.id = ba.id"
 				+ "where b.id = ? and a.is_main_author is true ";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, bookId);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+		rs = getPstmt().executeQuery();
 		// if or while?
 		if (rs.next()) {
-			dataToFront.setBookCoverUrl(rs.getString("book_cover_url"));
-			dataToFront.setBookName(rs.getString("book_name"));
-			dataToFront.setAuthorName(rs.getString("author_name"));
+			info.setBookCoverUrl(rs.getString("book_cover_url"));
+			info.setBookName(rs.getString("book_name"));
+			info.setAuthorName(rs.getString("author_name"));
 		}
 
 		closeAll();
-		return dataToFront;
+		return info;
 	}
 
 	@Override
 	public InfoToFront GetBookQuasiDetail(InfoFromFront infoFromFront) throws SQLException {
-		InfoToFront dataToFront = GetBookSummary(infoFromFront);
 		int bookId = infoFromFront.getBookId();
-		dataToFront.setType("GetBookQuasiDetail");
-		try {
-			getConnection();
 
-			String sql = "select l.name as main, sl.name as sub, b.original_price, bs.discount, bs.overall_rating"
-					+ "from book b" + "join book_stat bs on b.id = bs.book_id"
-					+ "join sub_label sl on b.sublabel_id = sl.id" + "Ajoin label l on sl.main_id = l.id"
-					+ "where b.id = ? ";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, bookId);
-			rs = pstmt.executeQuery();
+		InfoToFront info = GetBookSummary(infoFromFront);
 
-			while (rs.next()) {
-				dataToFront.setMainAndSubLabel(rs.getString("main") + "-" + rs.getString("sub"));
-				dataToFront.setPrice(rs.getDouble("original_price"));
-				dataToFront.setDisCount(rs.getInt("discount"));
-				dataToFront.setOverallRating(rs.getDouble("overall_rating"));
-			}
+		getConnection();
 
-			closeAll();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		String sql = "select l.name as main, sl.name as sub, b.original_price, bs.discount, bs.overall_rating"
+				+ "from book b" + "join book_stat bs on b.id = bs.book_id"
+				+ "join sub_label sl on b.sublabel_id = sl.id" + "Ajoin label l on sl.main_id = l.id"
+				+ "where b.id = ? ";
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+		rs = getPstmt().executeQuery();
+
+		while (rs.next()) {
+			info.setMainAndSubLabel(rs.getString("main") + "-" + rs.getString("sub"));
+			info.setPrice(rs.getDouble("original_price"));
+			info.setDisCount(rs.getInt("discount"));
+			info.setOverallRating(rs.getDouble("overall_rating"));
 		}
-		return dataToFront;
+
+		closeAll();
+
+		return info;
 	}
 
 	@Override
@@ -73,9 +72,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		getConnection();
 
 		String sql = "select book_id from transaction where user_id = ? and paied is true";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, userId);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, userId);
+		rs = getPstmt().executeQuery();
 
 		while (rs.next()) {
 			shelf.add(rs.getInt("book_id"));
@@ -83,7 +82,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		InfoToFront info = new InfoToFront();
 		info.setIDs(shelf);
-		return null;
+		return info;
 	}
 
 	@Override
@@ -98,9 +97,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 				+ "join book_author ba on a.id = ba.author_id" + "join book b on ba.book_id = b.id"
 				+ "where is_main_author is false and b.id = ?";
 
-		pstmt = conn.prepareStatement(otherAuthorSql);
-		pstmt.setInt(1, bookId);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(otherAuthorSql));
+		getPstmt().setInt(1, bookId);
+		rs = getPstmt().executeQuery();
 
 		StringBuilder stringBuilder = new StringBuilder();
 		while (rs.next()) {
@@ -121,9 +120,9 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 				+ "from book b join book_stat bs on b.id = bs.book_id join press p on b.press_id = p.id"
 				+ "where b.id = ?";
 
-		pstmt = conn.prepareStatement(bookDetailSQL);
-		pstmt.setInt(1, bookId);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(bookDetailSQL));
+		getPstmt().setInt(1, bookId);
+		rs = getPstmt().executeQuery();
 
 		while (rs.next()) {
 			info.setDescription(rs.getString("description"));
@@ -143,14 +142,14 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		}
 
 		if (userId != -1) {
-			String canAddReadlistSQL = "select book_id\n" + "from readlist r\n"
-					+ "    join readlist_books rb on r.id = rb.readlist_id\n"
-					+ "where r.create_user = ? and rb.book_id = ?";
+			String canAddReadlistSQL = "select book_id" + " from readlist r"
+					+ " join readlist_books rb on r.id = rb.readlist_id"
+					+ " where r.create_user = ? and rb.book_id = ?";
 
-			pstmt = conn.prepareStatement(canAddReadlistSQL);
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, bookId);
-			rs = pstmt.executeQuery();
+			setPstmt(getConn().prepareStatement(canAddReadlistSQL));
+			getPstmt().setInt(1, userId);
+			getPstmt().setInt(2, bookId);
+			rs = getPstmt().executeQuery();
 
 			if (rs.next() == false)
 				info.setCanAddReadList(true);
@@ -160,10 +159,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 			//
 			String canAddWishlistSQL = "select w.user_id, w.book_id from wish_list w\n"
 					+ "where user_id = ? and book_id = ?;";
-			pstmt = conn.prepareStatement(canAddWishlistSQL);
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, bookId);
-			rs = pstmt.executeQuery();
+			setPstmt(getConn().prepareStatement(canAddWishlistSQL));
+			getPstmt().setInt(1, userId);
+			getPstmt().setInt(2, bookId);
+			rs = getPstmt().executeQuery();
 
 			if (rs.next() == false)
 				info.setCanAddWishList(true);
@@ -174,10 +173,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 			String canBuySQL = "select user_id, book_id, paied from transaction "
 					+ "where user_id = ? and book_id = ? and paied is true;";
 
-			pstmt = conn.prepareStatement(canBuySQL);
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, bookId);
-			rs = pstmt.executeQuery();
+			setPstmt(getConn().prepareStatement(canBuySQL));
+			getPstmt().setInt(1, userId);
+			getPstmt().setInt(2, bookId);
+			rs = getPstmt().executeQuery();
 
 			if (rs.next() == false)
 				info.setCanBuy(true);
@@ -189,49 +188,194 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 	@Override
 	public InfoToFront GetRelatedBooks(InfoFromFront infoFromFront) throws SQLException {
-		int bookId = infoFromFront.getBookId();
+		int bookid = infoFromFront.getBookId();
 		int from = infoFromFront.getFrom();
 		int count = infoFromFront.getCount();
-		return null;
+
+		List<Integer> relatedbooks = new LinkedList<Integer>();
+		getConnection();
+
+		String sql = "select id from book" + " where label_id in (select label_id from book where id = ?)"
+				+ " limit ? offset ?";
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookid);
+		getPstmt().setInt(2, count);
+		getPstmt().setInt(3, from);
+
+		rs = getPstmt().executeQuery();
+
+		while (rs.next()) {
+			relatedbooks.add(rs.getInt("id"));
+		}
+
+		closeAll();
+
+		InfoToFront info = new InfoToFront();
+		info.setIDs(relatedbooks);
+		return info;
 	}
 
 	@Override
 	public InfoToFront GetBookPreview(InfoFromFront infoFromFront) throws SQLException {
 		int bookId = infoFromFront.getBookId();
-		return null;
+
+		InfoToFront info = new InfoToFront();
+
+		getConnection();
+
+		String sql = "select preview_url from book where id = ?";
+
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+
+		rs = getPstmt().executeQuery();
+
+		while (rs.next()) {
+			info.setURL(rs.getString("preview_url"));
+		}
+
+		closeAll();
+
+		return info;
 	}
 
 	@Override
 	public InfoToFront DownloadBook(InfoFromFront infoFromFront) throws SQLException {
 		int bookId = infoFromFront.getBookId();
-		return null;
+
+		InfoToFront info = new InfoToFront();
+
+		getConnection();
+
+		String sql = "select download_url from book where id = ?";
+
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+
+		rs = getPstmt().executeQuery();
+
+		while (rs.next()) {
+			info.setURL(rs.getString("download_url"));
+		}
+
+		closeAll();
+
+		return info;
 	}
 
 	@Override
 	public InfoToFront GetBookKey(InfoFromFront infoFromFront) throws SQLException {
 		int bookId = infoFromFront.getBookId();
-		return null;
+
+		InfoToFront info = new InfoToFront();
+
+		getConnection();
+
+		String sql = "select pdf_password from book where id = ?";
+
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+
+		rs = getPstmt().executeQuery();
+
+		while (rs.next()) {
+			info.setURL(rs.getString("pdf_password"));
+		}
+
+		closeAll();
+
+		return info;
 	}
 
 	@Override
 	public InfoToFront BuyBook(InfoFromFront infoFromFront) throws SQLException {
 		int userId = infoFromFront.getUserId();
 		int bookId = infoFromFront.getBookId();
-		return null;
+
+		String bookName = null;
+		double price = 0;
+
+		String sql = "select name, price_now(id) as price from book where book.id = ?";
+
+		getConnection();
+
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, bookId);
+
+		rs = getPstmt().executeQuery();
+		while (rs.next()) {
+			bookName = rs.getString("name");
+			price = rs.getDouble("price");
+		}
+		closeAll();
+
+		InfoToFront infoToFront = new InfoToFront();
+		infoToFront.setURL(String.format("https://qr.alipay.com/?user=team309&name=%s&price=%f", bookName, price));
+		BookhubServer.waitForPaying(userId, bookId);
+
+		return infoToFront;
 	}
 
 	@Override
 	public InfoToFront CheckBuyComplete(InfoFromFront infoFromFront) throws SQLException {
 		int userId = infoFromFront.getUserId();
 		int bookId = infoFromFront.getBookId();
-		return null;
+		InfoToFront infoToFront = new InfoToFront();
+
+		getConnection();
+		String sql = "select paid from transaction where transaction.user_id = ? and transaction.book_id = ?";
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setInt(1, userId);
+		getPstmt().setInt(2, bookId);
+
+		rs = getPstmt().executeQuery();
+
+		while (rs.next()) {
+			infoToFront.setSuccess(rs.getBoolean("paied"));
+		}
+		closeAll();
+		return infoToFront;
 	}
 
 	@Override
 	public InfoToFront CancelTransaction(InfoFromFront infoFromFront) throws SQLException {
 		int userId = infoFromFront.getUserId();
 		int bookId = infoFromFront.getBookId();
-		return null;
+
+		InfoToFront infoToFront = new InfoToFront();
+
+		getConnection();
+
+		boolean paid = false;
+		String sqlQuery = "select paid from transaction where transaction.user_id = ? and transaction.book_id = ?";
+		pstmt = conn.prepareStatement(sqlQuery);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+
+		rs = pstmt.executeQuery();
+		while (rs.next()) {
+			paid = rs.getBoolean("paid");
+		}
+		if (paid) {
+			infoToFront.setSuccess(false);
+			return infoToFront;
+		}
+
+		String sql = "delete from transaction where transaction.user_id = ? ,transaction.book_id = ?";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+
+		int rows = pstmt.executeUpdate();
+		if (rows == 1) {
+			infoToFront.setSuccess(true);
+		}
+		else {
+			infoToFront.setSuccess(false);
+		}
+		closeAll();
+
+		return infoToFront;
 	}
 
 }

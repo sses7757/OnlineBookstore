@@ -1,5 +1,5 @@
 package socket.frontEnum;
 
-public enum BookListChangeType {
+public enum ReadListChangeType {
 	AddBook, RemoveList, DeleteBook, ChangeTitle, ChangeDescription
 }

@@ -4,13 +4,46 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import controller.AbstractController;
 import controller.ReflectionController;
+import dao.impl.BaseDao;
 
 public class BookhubServer {
+
+	/**
+	 * @author Kevin Sun
+	 * @param userId
+	 * @param bookId
+	 * @throws SQLException 
+	 */
+	public static void waitForPaying(final int userId, final int bookId) throws SQLException {
+		// directly set paid
+		String sql = "update transaction " + "set paid = true "
+				+ "where transaction.user_id = ? and transaction.book_id = ?";
+
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(5000);
+
+					BaseDao base = new BaseDao();
+					base.getConnection();
+
+					base.setPstmt(base.getConn().prepareStatement(sql));
+					base.getPstmt().setInt(1, userId);
+					base.getPstmt().setInt(2, bookId);
+
+					base.closeAll();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).run();
+	}
 
 	private static final int PORT = 2307;
 
@@ -29,13 +62,13 @@ public class BookhubServer {
 	 *
 	 * @throws Exception
 	 */
-	public void turnOnServer() throws Exception {
+	public void turnOnServer(final int N) throws Exception {
 		// 监听指定的端口
 		server = new ServerSocket(PORT);
 
 		System.out.println("Big brother is watching.");
 
-		ExecutorService threadPool = Executors.newFixedThreadPool(100);
+		ExecutorService threadPool = Executors.newFixedThreadPool(N);
 
 		while (true) {
 			Socket socket = server.accept();

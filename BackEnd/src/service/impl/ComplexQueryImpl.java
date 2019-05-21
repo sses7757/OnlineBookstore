@@ -215,10 +215,10 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			queryBookIdSQL += String.format(" %s limit ? offset ?;", orderDesend ? "desc" : "asc");
 
 			getConnection();
-			pstmt = conn.prepareStatement(queryBookIdSQL);
-			pstmt.setInt(1, count > MAX_COUNT ? MAX_COUNT : count);
-			pstmt.setInt(2, from);
-			rs = pstmt.executeQuery();
+			setPstmt(getConn().prepareStatement(queryBookIdSQL));
+			getPstmt().setInt(1, count > MAX_COUNT ? MAX_COUNT : count);
+			getPstmt().setInt(2, from);
+			rs = getPstmt().executeQuery();
 
 			ArrayList<Integer> ids = new ArrayList<Integer>(count);
 			while (rs.next()) {
@@ -315,27 +315,27 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			queryBookIdSQL += String.format(" %s limit ? offset ?;", orderDesend ? "desc" : "asc");
 
 			getConnection();
-			pstmt = conn.prepareStatement(queryBookIdSQL);
+			setPstmt(getConn().prepareStatement(queryBookIdSQL));
 			int i = 1;
 			if (mainLabels.size() > 0) {
 				for (String s : mainLabels) {
-					pstmt.setString(i++, s);
+					getPstmt().setString(i++, s);
 				}
 			}
 			if (subLabels.size() > 0) {
 				for (String s : subLabels) {
-					pstmt.setString(i++, s);
+					getPstmt().setString(i++, s);
 				}
 			}
 			for (String s : queryText) { // for names filter
 				String q = "%" + s + "%";
 				for (int ii = 0; ii < 4; ++ii)
-					pstmt.setString(i++, q);
+					getPstmt().setString(i++, q);
 
 			}
-			pstmt.setInt(i++, count > MAX_COUNT ? MAX_COUNT : count);
-			pstmt.setInt(i++, from);
-			rs = pstmt.executeQuery();
+			getPstmt().setInt(i++, count > MAX_COUNT ? MAX_COUNT : count);
+			getPstmt().setInt(i++, from);
+			rs = getPstmt().executeQuery();
 
 			ArrayList<Integer> ids = new ArrayList<Integer>(count);
 			while (rs.next()) {
@@ -370,10 +370,10 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			queryBookIdSQL += String.format(" %s limit ? offset ?;", orderDesend ? "desc" : "asc");
 
 			getConnection();
-			pstmt = conn.prepareStatement(queryBookIdSQL);
-			pstmt.setInt(1, count > MAX_COUNT ? MAX_COUNT : count);
-			pstmt.setInt(2, from);
-			rs = pstmt.executeQuery();
+			setPstmt(getConn().prepareStatement(queryBookIdSQL));
+			getPstmt().setInt(1, count > MAX_COUNT ? MAX_COUNT : count);
+			getPstmt().setInt(2, from);
+			rs = getPstmt().executeQuery();
 
 			ArrayList<Integer> ids = new ArrayList<Integer>(count);
 			while (rs.next()) {
@@ -430,17 +430,17 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			queryBookIdSQL += String.format(" %s limit ? offset ?;", orderDesend ? "desc" : "asc");
 
 			getConnection();
-			pstmt = conn.prepareStatement(queryBookIdSQL);
+			setPstmt(getConn().prepareStatement(queryBookIdSQL));
 			int i = 1;
 			for (String s : queryText) { // for names filter
 				String q = "%" + s + "%";
 				for (int ii = 0; ii < 2; ++ii)
-					pstmt.setString(i++, q);
+					getPstmt().setString(i++, q);
 
 			}
-			pstmt.setInt(i++, count > MAX_COUNT ? MAX_COUNT : count);
-			pstmt.setInt(i++, from);
-			rs = pstmt.executeQuery();
+			getPstmt().setInt(i++, count > MAX_COUNT ? MAX_COUNT : count);
+			getPstmt().setInt(i++, from);
+			rs = getPstmt().executeQuery();
 
 			ArrayList<Integer> ids = new ArrayList<Integer>(count);
 			while (rs.next()) {
@@ -479,10 +479,10 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			queryBookIdSQL += String.format(" %s limit ? offset ?;", orderDesend ? "desc" : "asc");
 
 			getConnection();
-			pstmt = conn.prepareStatement(queryBookIdSQL);
-			pstmt.setInt(1, count > MAX_COUNT ? MAX_COUNT : count);
-			pstmt.setInt(2, from);
-			rs = pstmt.executeQuery();
+			setPstmt(getConn().prepareStatement(queryBookIdSQL));
+			getPstmt().setInt(1, count > MAX_COUNT ? MAX_COUNT : count);
+			getPstmt().setInt(2, from);
+			rs = getPstmt().executeQuery();
 
 			ArrayList<Integer> ids = new ArrayList<Integer>(count);
 			while (rs.next()) {
@@ -543,17 +543,17 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			queryBookIdSQL += String.format(" %s limit ? offset ?;", orderDesend ? "desc" : "asc");
 
 			getConnection();
-			pstmt = conn.prepareStatement(queryBookIdSQL);
+			setPstmt(getConn().prepareStatement(queryBookIdSQL));
 			int i = 1;
 			for (String s : queryText) { // for names filter
 				String q = "%" + s + "%";
 				for (int ii = 0; ii < 3; ++ii)
-					pstmt.setString(i++, q);
+					getPstmt().setString(i++, q);
 
 			}
-			pstmt.setInt(i++, count > MAX_COUNT ? MAX_COUNT : count);
-			pstmt.setInt(i++, from);
-			rs = pstmt.executeQuery();
+			getPstmt().setInt(i++, count > MAX_COUNT ? MAX_COUNT : count);
+			getPstmt().setInt(i++, from);
+			rs = getPstmt().executeQuery();
 
 			ArrayList<Integer> ids = new ArrayList<Integer>(count);
 			while (rs.next()) {

@@ -16,6 +16,8 @@ namespace Frontend
 {
 	internal static class Storage
 	{
+		internal static bool Test { get; } = true;
+
 		internal static int UserId { set; get; } = -1;
 		internal static Visibility SignUpVisibility { get => (!NetworkGet.IsValidID(UserId)).ToVisibility(); }
 		internal static bool IsAdmin { set; get; } = false;
@@ -134,6 +136,49 @@ namespace Frontend
 				return inputTextBox.Text;
 			else
 				return previousContent;
+		}
+
+		internal static async Task BuyBookAsync(int bookId, BookDetail book, ObservableCollection<BookDetail> books,
+												Microsoft.Toolkit.Uwp.UI.Controls.InAppNotification notification)
+		{
+			string buyURL = await NetworkSet.BuyBook(bookId);
+			if (buyURL == null || buyURL.Length <= 4)
+				return;
+			ContentDialog dialog = new ContentDialog()
+			{
+				Content = new Image()
+				{
+					Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
+					Source = await buyURL.ToQRCode()
+				},
+				Title = "Buying Book",
+				IsSecondaryButtonEnabled = true,
+				PrimaryButtonText = "I've paid",
+				SecondaryButtonText = "Cancel"
+			};
+			if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+			{ // click finish paying
+				var finish = await NetworkSet.CheckBuyComplete(bookId);
+				if (finish)
+				{
+					if (books != null)
+						books.Remove(book);
+					else
+						book.CanBuy = false;
+					notification.Show("Payment success, wish you enjoy reading", 4000);
+				}
+				else
+				{
+					notification.Show("Payment failure, please try again later", 4000);
+				}
+			}
+			else
+			{
+				if (await NetworkSet.CancleTransaction(bookId))
+					notification.Show("Transaction cancled", 4000);
+				else
+					notification.Show("Transaction cannot be cancled since you have paid", 4000);
+			}
 		}
 
 		public static async Task<BitmapImage> ToQRCode(this string str)

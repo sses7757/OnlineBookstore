@@ -254,7 +254,8 @@ namespace Frontend
 		/// <param name="query"> A copied <code>QueryObject</code> </param>
 		private static async Task<ReceiveObject> SendWithUser(IJsonable query)
 		{
-			return new ReceiveObject();
+			if (Storage.Test)
+				return new ReceiveObject();
 
 			if (!Instance.SocketConnected)
 			{
@@ -294,10 +295,6 @@ namespace Frontend
 		/// </summary>
 		internal static readonly Func<IJsonable, Task<ReceiveObject>> SendAndReceive = SendWithUser;
 
-		internal static void Test()
-		{
-			var r = ReceiveObject.FromJson("{\"BookName\":\"AABB\",\"PageCount\":5}");
-		}
 	}
 
 	public static class NetworkGet
@@ -314,9 +311,12 @@ namespace Frontend
 				UserName = UserName,
 				EncodedPassword = EncodedPassword
 			};
-			Storage.UserId = 1;
-			Storage.IsAdmin = true;
-			return LoginStatus.Success;
+			if (Storage.Test)
+			{
+				Storage.UserId = 1;
+				Storage.IsAdmin = true;
+				return LoginStatus.Success;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			Storage.UserId = recv.UserId.Value;
@@ -329,15 +329,16 @@ namespace Frontend
 			var query = new QueryObject("GetMainLabels")
 			{
 			};
-			return new string[]
-			{
-				"文学",
-				"流行",
-				"文化",
-				"生活",
-				"经管",
-				"科技"
-			};
+			if (Storage.Test)
+				return new string[]
+				{
+					"文学",
+					"流行",
+					"文化",
+					"生活",
+					"经管",
+					"科技"
+				};
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.MainLabels;
 		}
@@ -348,12 +349,15 @@ namespace Frontend
 			{
 				MainLabel = label.Name
 			};
-			foreach (var sub in new string[] { "小说", "随笔", "散文", "诗歌", "童话", "名著", "科幻", "言情", "青春" })
+			if (Storage.Test)
 			{
-				label.AllSubs.Add(new SubLabel(sub, label));
-				label.OnPropertyChanged("HotSubs");
+				foreach (var sub in new string[] { "小说", "随笔", "散文", "诗歌", "童话", "名著", "科幻", "言情", "青春" })
+				{
+					label.AllSubs.Add(new SubLabel(sub, label));
+					label.OnPropertyChanged("HotSubs");
+				}
+				return;
 			}
-			return;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			foreach (var sub in recv.SubLabels)
@@ -378,12 +382,15 @@ namespace Frontend
 			{
 				BookId = book.ID
 			};
-			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
+			if (Storage.Test)
+			{
+				book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
 				new Uri("https://gss0.baidu.com/7LsWdDW5_xN3otqbppnN2DJv/doc/pic/item/6159252dd42a283478df074e58b5c9ea15cebf7d.jpg"));
-			book.BookFullName = RandomName();
-			book.BookName = book.BookFullName.CutString();
-			book.AuthorName = "松浦彌太郎";
-			return;
+				book.BookFullName = RandomName();
+				book.BookName = book.BookFullName.CutString();
+				book.AuthorName = "松浦彌太郎";
+				return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(new Uri(recv.BookCoverUrl));
@@ -398,16 +405,19 @@ namespace Frontend
 			{
 				BookId = book.ID
 			};
-			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
+			if (Storage.Test)
+			{
+				book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
 				new Uri("https://gss0.baidu.com/7LsWdDW5_xN3otqbppnN2DJv/doc/pic/item/6159252dd42a283478df074e58b5c9ea15cebf7d.jpg"));
-			book.BookFullName = RandomName();
-			book.BookName = book.BookFullName.CutString();
-			book.AuthorName = "松浦彌太郎";
-			book.Labels = "生活 - 随笔";
-			book.Price = 28;
-			book.Discount = 95;
-			book.OverallRating = 4.5;
-			return;
+				book.BookFullName = RandomName();
+				book.BookName = book.BookFullName.CutString();
+				book.AuthorName = "松浦彌太郎";
+				book.Labels = "生活 - 随笔";
+				book.Price = 28;
+				book.Discount = 95;
+				book.OverallRating = 4.5;
+				return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			book.BookCover = new Windows.UI.Xaml.Media.Imaging.BitmapImage(
@@ -427,29 +437,32 @@ namespace Frontend
 			{
 				BookId = book.ID
 			};
-			book.Labels = "生活 - 随笔";
-			book.Price = 28;
-			book.Discount = 95;
-			book.OverallRating = 4.5;
-			book.BookDescription = "九月一日瓦官教寺住持克勤載拜致書于延曆堂上座主大和尚侍者夫道盛" +
-				"于得人而衰于失人事成于有為而敗于無為此古今之確論也自吾佛之教入中國中國之人莫不論者宗" +
-				"論經者宗教而各有其師及我天台生陳隋之朝以一大藏教序以五時列為八教開闡大塗為一宗正" +
-				"傳使海內外咸被佛之聲教於戲盛乎唐之大曆間至興道尊者為";
-			book.OtherAuthors = "Daniel Kahneman (translator)";
-			book.PublishInfo = "北京联合出版有限责任公司 / 2005-10-05 / 第一版";
-			book.ISBN = "9787725426293";
-			book.BuyAmount = 505;
-			book.DanmuAmount = 1835;
-			book.PreviewAmount = 2200;
-			book.ReviewAmount = 112;
-			book.PageCount = 280;
-			book.CanAddReadList = IsValidID(Storage.UserId);
-			book.CanAddWishList = IsValidID(Storage.UserId);
-			book.CanBuy = IsValidID(Storage.UserId);
-			await GetReviewContents(book);
-			await book.RelatedBooks.Reload();
-			book.Finished = true;
-			return;
+			if (Storage.Test)
+			{
+				book.Labels = "生活 - 随笔";
+				book.Price = 28;
+				book.Discount = 95;
+				book.OverallRating = 4.5;
+				book.BookDescription = "九月一日瓦官教寺住持克勤載拜致書于延曆堂上座主大和尚侍者夫道盛" +
+					"于得人而衰于失人事成于有為而敗于無為此古今之確論也自吾佛之教入中國中國之人莫不論者宗" +
+					"論經者宗教而各有其師及我天台生陳隋之朝以一大藏教序以五時列為八教開闡大塗為一宗正" +
+					"傳使海內外咸被佛之聲教於戲盛乎唐之大曆間至興道尊者為";
+				book.OtherAuthors = "Daniel Kahneman (translator)";
+				book.PublishInfo = "北京联合出版有限责任公司 / 2005-10-05 / 第一版";
+				book.ISBN = "9787725426293";
+				book.BuyAmount = 505;
+				book.DanmuAmount = 1835;
+				book.PreviewAmount = 2200;
+				book.ReviewAmount = 112;
+				book.PageCount = 280;
+				book.CanAddReadList = IsValidID(Storage.UserId);
+				book.CanAddWishList = IsValidID(Storage.UserId);
+				book.CanBuy = IsValidID(Storage.UserId);
+				await GetReviewContents(book);
+				await book.RelatedBooks.Reload();
+				book.Finished = true;
+				return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			book.BookDescription = recv.Description;
@@ -506,7 +519,8 @@ namespace Frontend
 				From = from,
 				Count = count
 			};
-			return GenerateIDs(count);
+			if (Storage.Test)
+				return GenerateIDs(count);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -518,16 +532,19 @@ namespace Frontend
 			{
 				ReviewId = review.ID
 			};
-			review.UserName = "Rk9LX2kC";
-			review.PublishDate = DateTime.Now;
-			review.Rating = 5;
-			review.Content = "Sometimes you need to show ratings of secondary content, " +
-				"such as that displayed in recommended content or when displaying a list " +
-				"of comments and their corresponding ratings. In this case, the user " +
-				"shouldn’t be able to edit the rating, so you can make the control read-only.";
-			review.Title = "asgase5g1";
-			review.BookName = "The Road Less Traveled (少有人走的路)";
-			return;
+			if (Storage.Test)
+			{
+				review.UserName = "Rk9LX2kC";
+				review.PublishDate = DateTime.Now;
+				review.Rating = 5;
+				review.Content = "Sometimes you need to show ratings of secondary content, " +
+					"such as that displayed in recommended content or when displaying a list " +
+					"of comments and their corresponding ratings. In this case, the user " +
+					"shouldn’t be able to edit the rating, so you can make the control read-only.";
+				review.Title = "asgase5g1";
+				review.BookName = "The Road Less Traveled (少有人走的路)";
+				return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			review.UserName = recv.CreateUser;
@@ -548,7 +565,8 @@ namespace Frontend
 				From = from,
 				Count = count
 			};
-			return GenerateIDs(count == int.MaxValue ? 8 : count);
+			if (Storage.Test)
+				return GenerateIDs(count == int.MaxValue ? 8 : count);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -559,7 +577,8 @@ namespace Frontend
 			var query = new QueryObject("GetShelfBooks")
 			{
 			};
-			return GenerateIDs(10);
+			if (Storage.Test)
+				return GenerateIDs(10);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -584,7 +603,9 @@ namespace Frontend
 			newQuery.Type = "GetFromQuery";
 			newQuery.From = from;
 			newQuery.Count = count;
-			return GenerateIDs(count);
+
+			if (Storage.Test)
+				return GenerateIDs(count);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(newQuery);
 			return recv.IDs;
@@ -676,7 +697,8 @@ namespace Frontend
 				From = from,
 				Count = count
 			};
-			return GenerateIDs(count);
+			if (Storage.Test)
+				return GenerateIDs(count);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -689,15 +711,18 @@ namespace Frontend
 				IsBillboard = isBillboard,
 				BookListId = id
 			};
-			collection.Title = "Bo4PSSm0";
-			collection.Description = "Bo4PSSm0Po83pIiC";
-			if (isBillboard)
+			if (Storage.Test)
+			{
+				collection.Title = "Bo4PSSm0";
+				collection.Description = "Bo4PSSm0Po83pIiC";
+				if (isBillboard)
+					return;
+				collection.CreateUser = "Aq4K9ycU";
+				collection.EditTime = DateTime.Now;
+				collection.FollowAmount = 123;
+				collection.Followed = false;
 				return;
-			collection.CreateUser = "Aq4K9ycU";
-			collection.EditTime = DateTime.Now;
-			collection.FollowAmount = 123;
-			collection.Followed = false;
-			return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			collection.Title = recv.Title;
@@ -715,7 +740,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyWishlist")
 			{
 			};
-			return GenerateIDs(5);
+			if (Storage.Test)
+				return GenerateIDs(5);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -726,7 +752,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyDanmus")
 			{
 			};
-			return GenerateIDs(15);
+			if (Storage.Test)
+				return GenerateIDs(15);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -737,7 +764,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyReviews")
 			{
 			};
-			return GenerateIDs(9);
+			if (Storage.Test)
+				return GenerateIDs(9);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -750,7 +778,8 @@ namespace Frontend
 				BookId = bookId,
 				Page = (int)page
 			};
-			return GenerateIDs(25);
+			if (Storage.Test)
+				return GenerateIDs(25);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -762,8 +791,11 @@ namespace Frontend
 			{
 				DanmuId = danmu.ID
 			};
-			danmu.Content = "6666666666666666";
-			return;
+			if (Storage.Test)
+			{
+				danmu.Content = "6666666666666666";
+				return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			danmu.Content = recv.Content;
@@ -775,11 +807,14 @@ namespace Frontend
 			{
 				DanmuId = danmu.ID
 			};
-			danmu.Content = "6666666666666666";
-			danmu.BookName = "松浦彌太郎說：假如我現在25歲，最想做的50件事";
-			danmu.EditTime = DateTime.Now;
-			danmu.PageNum = 102;
-			return;
+			if (Storage.Test)
+			{
+				danmu.Content = "6666666666666666";
+				danmu.BookName = "松浦彌太郎說：假如我現在25歲，最想做的50件事";
+				danmu.EditTime = DateTime.Now;
+				danmu.PageNum = 102;
+				return;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			danmu.Content = recv.Content;
@@ -793,7 +828,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyCreatedReadLists")
 			{
 			};
-			return GenerateIDs(5);
+			if (Storage.Test)
+				return GenerateIDs(5);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -804,7 +840,8 @@ namespace Frontend
 			var query = new QueryObject("GetMyFollowedReadLists")
 			{
 			};
-			return GenerateIDs(5);
+			if (Storage.Test)
+				return GenerateIDs(5);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -816,7 +853,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
-			return GenerateIDs(4);
+			if (Storage.Test)
+				return GenerateIDs(4);
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.IDs;
@@ -828,7 +866,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
-			return "http://www.africau.edu/images/default/sample.pdf";
+			if (Storage.Test)
+				return "http://www.africau.edu/images/default/sample.pdf";
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.URL;
@@ -840,7 +879,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
-			return "https://gahp.net/wp-content/uploads/2017/09/sample.pdf";
+			if (Storage.Test)
+				return "https://gahp.net/wp-content/uploads/2017/09/sample.pdf";
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.URL;
@@ -852,7 +892,8 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
-			return "as1dg56aseg";
+			if (Storage.Test)
+				return "as1dg56aseg";
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.PrivateKey;
@@ -867,9 +908,12 @@ namespace Frontend
 			var change = new ChangeObject("Logout")
 			{
 			};
-			Storage.UserId = -1;
-			Storage.IsAdmin = false;
-			return true;
+			if (Storage.Test)
+			{
+				Storage.UserId = -1;
+				Storage.IsAdmin = false;
+				return true;
+			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			if (recv.Success)
@@ -888,7 +932,8 @@ namespace Frontend
 				Email = email,
 				EncodedPassword = password
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -903,7 +948,8 @@ namespace Frontend
 				IsDeleteAction = isDeleteAction,
 				NewContent = newContent
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -919,7 +965,8 @@ namespace Frontend
 				AlteredBookId = alteredId,
 				AlteredText = alteredText
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -932,7 +979,8 @@ namespace Frontend
 				BookId = bookId,
 				IsAddAction = isAddAction
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -946,7 +994,8 @@ namespace Frontend
 				BookId = bookId,
 				PageNum = (int)pageNum
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -959,7 +1008,8 @@ namespace Frontend
 				Description = desc,
 				Title = title
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -971,7 +1021,9 @@ namespace Frontend
 			{
 				BookId = bookId
 			};
-			return "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+			if (Storage.Test)
+				return "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			if (recv.Success && recv.URL != null)
 			{
@@ -993,7 +1045,8 @@ namespace Frontend
 				NewRating = rating,
 				IsDeleteAction = isDelete
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -1008,7 +1061,8 @@ namespace Frontend
 				Title = title,
 				Content = content
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -1020,7 +1074,8 @@ namespace Frontend
 			{
 				BookId = bookId,
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -1032,7 +1087,8 @@ namespace Frontend
 			{
 				BookId = bookId,
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
@@ -1045,7 +1101,8 @@ namespace Frontend
 				ReadListId = readListId,
 				IsFollowAction = isFollowAction,
 			};
-			return true;
+			if (Storage.Test)
+				return true;
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;

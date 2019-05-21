@@ -16,8 +16,8 @@ public class LabelDaoImpl extends BaseDao implements LabelDao {
 		getConnection();
 
 		String sql = "select name from label l";
-		pstmt = conn.prepareStatement(sql);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(sql));
+		rs = getPstmt().executeQuery();
 
 		while (rs.next()) {
 			labelList.add(rs.getString("name"));
@@ -41,9 +41,9 @@ public class LabelDaoImpl extends BaseDao implements LabelDao {
 				+ "join label l on sl.id = l.main_id" + "group by l.id" + "order by hot_spot desc"
 				+ "where l.name = ?";
 
-		pstmt.setString(1, mainLabels);
-		pstmt = conn.prepareStatement(sql);
-		rs = pstmt.executeQuery();
+		getPstmt().setString(1, mainLabels);
+		setPstmt(getConn().prepareStatement(sql));
+		rs = getPstmt().executeQuery();
 
 		while (rs.next()) {
 			labelList.add(rs.getString("sl.name"));

@@ -24,15 +24,18 @@ public interface ReviewDao {
 	 * @return InfoToFront
 	 * @throws SQLException
 	 */
-	InfoToFront GetReviews(InfoFromFront infoFromFront) throws SQLException;
+	InfoToFront GetReview(InfoFromFront infoFromFront) throws SQLException;
 
 	// Change the review writed by a user with a specific reviewID.
 	InfoToFront ChangeReview(InfoFromFront infoFromFront) throws SQLException;
 
-	// Create a review by a user.
+	/**
+	 * Create review
+	 * @author Miao Yanchao
+	 * @param infoFromFront
+	 * @return infoToFront
+	 * @throws SQLException
+	 */
 	InfoToFront CreateReview(InfoFromFront infoFromFront) throws SQLException;
-
-	// Check whether the contraction was done.
-	InfoToFront CheckBuyComplete(InfoFromFront infoFromFront) throws SQLException;
 
 }

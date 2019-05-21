@@ -18,9 +18,9 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 		getConnection();
 
 		String sql = "select id, name, password_encode, authority from user u where u.name = ? ";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, userName);
-		rs = pstmt.executeQuery();
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setString(1, userName);
+		rs = getPstmt().executeQuery();
 		if (rs.next()) {
 			String password = rs.getString("password_encode").trim();
 			int userId = rs.getInt("id");
@@ -45,14 +45,6 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 	}
 
 	@Override
-	public InfoToFront GetMyReadList(InfoFromFront infoFromFront) throws SQLException {
-		int userid = infoFromFront.getUserId();
-		int from = infoFromFront.getFrom();
-		int count = infoFromFront.getCount();
-		return null;
-	}
-
-	@Override
 	public InfoToFront SignUp(InfoFromFront infoFromFront) throws SQLException {
 		String userName = infoFromFront.getUserName();
 		String mailAddr = infoFromFront.getEmail();
@@ -64,12 +56,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 
 		getConnection();
 
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, userName);
-		pstmt.setString(2, mailAddr);
-		pstmt.setString(3, encodedPassword);
+		setPstmt(getConn().prepareStatement(sql));
+		getPstmt().setString(1, userName);
+		getPstmt().setString(2, mailAddr);
+		getPstmt().setString(3, encodedPassword);
 
-		int rows = pstmt.executeUpdate();
+		int rows = getPstmt().executeUpdate();
 
 		if (rows == 1)
 			info.setSuccess(true);
