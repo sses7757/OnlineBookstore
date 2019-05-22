@@ -11,7 +11,7 @@ import socket.InfoToFront;
 public class BillboardDaoImpl extends BaseDao implements BillboardDao {
 	@Override
 	public InfoToFront GetBookListBooks(InfoFromFront infoFromFront) throws SQLException {
-		boolean isbillboard = infoFromFront.getBillboard();
+		boolean isbillboard = infoFromFront.getIsBillboard();
 
 		int booklistid = infoFromFront.getBookListID();
 		int from = infoFromFront.getFrom();
@@ -24,11 +24,11 @@ public class BillboardDaoImpl extends BaseDao implements BillboardDao {
 				isbillboard ? "billboard" : "readlist");
 
 		getConnection();
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, booklistid);
-		getPstmt().setInt(2, count);
-		getPstmt().setInt(3, from);
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, booklistid);
+		pstmt.setInt(2, count);
+		pstmt.setInt(3, from);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			books.add(rs.getInt("booklist"));
@@ -43,7 +43,7 @@ public class BillboardDaoImpl extends BaseDao implements BillboardDao {
 
 	@Override
 	public InfoToFront GetTitleDescription(InfoFromFront infoFromFront) throws SQLException {
-		boolean isbillboard = infoFromFront.getBillboard();
+		boolean isbillboard = infoFromFront.getIsBillboard();
 		int booklistid = infoFromFront.getBookListID();
 		int userid = infoFromFront.getUserId();
 
@@ -53,32 +53,43 @@ public class BillboardDaoImpl extends BaseDao implements BillboardDao {
 
 		if (isbillboard == true) {
 			String sql = "select title, description from billboard where id = ? ";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setInt(1, booklistid);
-			rs = getPstmt().executeQuery();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, booklistid);
+			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				info.setTitle(rs.getString("title"));
 				info.setDescription(rs.getString("description"));
 			}
 		}
 		else {
-			String sql = "select r.title, r.create_user, r.description, r.edit_time,"
-					+ " follow_amount(r.id) as followamount, (rf.user_id = ? as isfollowed)" + " from readlist r"
-					+ " join readlist_follow rf on r.id = rf.readlist_id" + " where id = ?" + "group by isfollowed"
-					+ " order by isfollowed desc limit 1";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setInt(1, userid);
-			getPstmt().setInt(2, booklistid);
-
-			rs = getPstmt().executeQuery();
+			String sql = "select r.title, u.name, r.description, r.edit_time,"
+					+ " follow_amount(r.id) as followamount";
+			if (userid > 0) {
+				sql += ", (rf.user_id = ? and rf.user_id is not null) as isfollowed" + " from readlist r"
+						+ " left outer join readlist_follow rf on r.id = rf.readlist_id"
+						+ " join user u on u.id = r.create_user" + " where r.id = ?" + " group by isfollowed"
+						+ " order by isfollowed desc limit 1;";
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, userid);
+				pstmt.setInt(2, booklistid);
+			}
+			else {
+				sql += " from readlist r" + " join user u on u.id = r.create_user" + " where r.id = ?;";
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, booklistid);
+			}
+			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
 				info.setTitle(rs.getString("title"));
 				info.setDescription(rs.getString("description"));
-				info.setUserId(rs.getInt("create_user"));
-				info.setTimeStap(rs.getLong("edit_time"));
+				info.setCreateUser(rs.getString("name"));
+				info.setTimeStap(rs.getTimestamp("edit_time").getTime() / 1000);
 				info.setFollowAmount(rs.getInt("followamount"));
-				info.setFollowed(rs.getBoolean("isfollowed"));
+				if (userid > 0)
+					info.setFollowed(rs.getBoolean("isfollowed"));
+				else
+					info.setFollowed(false);
 			}
 		}
 

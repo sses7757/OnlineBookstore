@@ -63,5 +63,10 @@ namespace Frontend
 				return string.Format("Price:\t{0:C2} ({1}% OFF)", price, 100 - discount);
 			}
 		}
+
+		internal static string AuthorTrim(string author)
+		{
+			return string.Format("Author:\t{0}", author.CutString(19));
+		}
 	}
 }

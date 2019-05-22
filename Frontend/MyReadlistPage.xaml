@@ -20,7 +20,8 @@
                                        ShowTopSwipe="True"
                                        ShowLeftSwipe="True"
                                        IsTopSwipeFollow="False"
-                                       CanEdit="True"/>
+                                       CanEdit="True"
+                                       ShowAllVisible="False"/>
 
     </Grid>
 </Page>

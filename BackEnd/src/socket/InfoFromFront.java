@@ -13,8 +13,8 @@ public class InfoFromFront {
 	private String MainLabel;
 
 	private Integer BookId;
-	private Boolean isBillboard;
-	private Integer BookListID;
+	private Boolean IsBillboard;
+	private Integer BookListId;
 	private Integer ReviewId;
 	private Integer DanmuId;
 	private Integer From;
@@ -28,7 +28,7 @@ public class InfoFromFront {
 	private int[] TimeRange;
 	private int[] PageRange;
 	private String[] LabelFilters;
-	private Boolean includeFreeBooks;
+	private Boolean IncludeFreeBooks;
 
 	private Integer Page;
 
@@ -118,20 +118,20 @@ public class InfoFromFront {
 		BookId = bookId;
 	}
 
-	public Boolean getBillboard() {
-		return isBillboard;
+	public Boolean getIsBillboard() {
+		return IsBillboard;
 	}
 
-	public void setBillboard(Boolean billboard) {
-		isBillboard = billboard;
+	public void setIsBillboard(Boolean billboard) {
+		IsBillboard = billboard;
 	}
 
 	public Integer getBookListID() {
-		return BookListID;
+		return BookListId;
 	}
 
 	public void setBookListID(Integer bookListID) {
-		BookListID = bookListID;
+		BookListId = bookListID;
 	}
 
 	public Integer getReviewId() {
@@ -231,11 +231,11 @@ public class InfoFromFront {
 	}
 
 	public Boolean getIncludeFreeBooks() {
-		return includeFreeBooks;
+		return IncludeFreeBooks;
 	}
 
 	public void setIncludeFreeBooks(Boolean includeFreeBooks) {
-		this.includeFreeBooks = includeFreeBooks;
+		this.IncludeFreeBooks = includeFreeBooks;
 	}
 
 	public Integer getPage() {

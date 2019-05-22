@@ -12,26 +12,49 @@ import socket.frontEnum.ReadListChangeType;
 public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 
 	@Override
+	public InfoToFront GetMyReadListsWithout(InfoFromFront infoFromFront) throws SQLException {
+		int userid = infoFromFront.getUserId();
+		int bookid = infoFromFront.getBookId();
+		List<Integer> readlist = new LinkedList<>();
+
+		getConnection();
+		String sql = "select distinct r.id as readlist" + " from readlist r"
+				+ " left outer join readlist_book rb on r.id = rb.readlist_id" + " where r.create_user = ?"
+				+ " and (rb.book_id != ? or rb.readlist_id is null);";
+
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userid);
+		pstmt.setInt(2, bookid);
+
+		rs = pstmt.executeQuery();
+
+		while (rs.next()) {
+			readlist.add(rs.getInt("readlist"));
+		}
+
+		closeAll();
+
+		InfoToFront info = new InfoToFront();
+		info.setIDs(readlist);
+		return info;
+	}
+
+	@Override
 	public InfoToFront GetMyCreatedReadLists(InfoFromFront infoFromFront) throws SQLException {
-		int userId, from, count;
-		userId = infoFromFront.getUserId();
-		from = infoFromFront.getFrom();
-		count = infoFromFront.getCount();
+		int userId = infoFromFront.getUserId();
 		List<Integer> myreadlist = new LinkedList<>();
 
 		getConnection();
 
-		String sql = "select .book_id" + " from readlist r" + " where create_user = ?" + " limit ? offset ?";
-		setPstmt(getConn().prepareStatement(sql));
+		String sql = "select id" + " from readlist" + " where create_user = ?;";
+		pstmt = conn.prepareStatement(sql);
 
-		getPstmt().setInt(1, userId);
-		getPstmt().setInt(2, count);
-		getPstmt().setInt(3, from);
+		pstmt.setInt(1, userId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
-			myreadlist.add(rs.getInt("book_id"));
+			myreadlist.add(rs.getInt("id"));
 
 		}
 
@@ -44,22 +67,17 @@ public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 
 	@Override
 	public InfoToFront GetMyFollowedReadLists(InfoFromFront infoFromFront) throws SQLException {
-		int userId, from, count;
-		userId = infoFromFront.getUserId();
-		from = infoFromFront.getFrom();
-		count = infoFromFront.getCount();
+		int userId = infoFromFront.getUserId();
 		List<Integer> myreadlist = new LinkedList<>();
 
 		getConnection();
 
 		String sql = "select r.id" + " from readlist r" + " join readlist_follow rf on r.id = rf.readlist_id"
-				+ " where rf.user_id = ?" + " limit ? offset ?;";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		getPstmt().setInt(2, count);
-		getPstmt().setInt(3, from);
+				+ " where rf.user_id = ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			myreadlist.add(rs.getInt("id"));
@@ -74,51 +92,53 @@ public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 
 	@Override
 	public InfoToFront ChangeReadList(InfoFromFront infoFromFront) throws SQLException {
-		int readListId, alteredBookId;
+		int readListId, alteredBookId = -1;
 		ReadListChangeType changeType = ReadListChangeType.values()[infoFromFront.getChangeType()];
-		String alteredText;
+		String alteredText = null;
 		readListId = infoFromFront.getReadListId();
-		alteredBookId = infoFromFront.getAlteredBookId();
-		alteredText = infoFromFront.getAlteredText();
+		if (infoFromFront.getAlteredBookId() != null)
+			alteredBookId = infoFromFront.getAlteredBookId();
+		if (infoFromFront.getAlteredText() != null)
+			alteredText = infoFromFront.getAlteredText();
 
 		getConnection();
 
 		String sql = "";
 		switch (changeType) {
 		case AddBook:
-			sql += "UPDATE readlist " + "SET book_id = ? where readlist = ?;";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setInt(1, alteredBookId);
-			getPstmt().setInt(2, readListId);
+			sql += "insert into readlist_book(book_id, readlist_id)" + " values (?,?);";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, alteredBookId);
+			pstmt.setInt(2, readListId);
 			break;
 		case RemoveList:
 			sql += "delete from readlist where id = ?;";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setInt(1, readListId);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, readListId);
 			break;
 		case DeleteBook:
-			sql += "delete from readlist_books where readlist_id = ? and book_id = ?;";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setInt(1, readListId);
-			getPstmt().setInt(2, alteredBookId);
+			sql += "delete from readlist_book where readlist_id = ? and book_id = ?;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, readListId);
+			pstmt.setInt(2, alteredBookId);
 			break;
 		case ChangeDescription:
-			sql += "UPDATE readlist " + "SET description = ? where readlist = ?;";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setString(1, alteredText);
-			getPstmt().setInt(2, readListId);
+			sql += "UPDATE readlist " + "SET description = ? where id = ?;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, alteredText);
+			pstmt.setInt(2, readListId);
 			break;
 		case ChangeTitle:
-			sql += "UPDATE readlist " + "SET title = ? where readlist = ?;";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setString(1, alteredText);
-			getPstmt().setInt(2, readListId);
+			sql += "UPDATE readlist " + "SET title = ? where id = ?;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, alteredText);
+			pstmt.setInt(2, readListId);
 			break;
 		default:
 			break;
 		}
 
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 		InfoToFront info = new InfoToFront();
 		info.setSuccess(rows == 1);
 
@@ -135,12 +155,12 @@ public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 		String sql = "insert into readlsit (create_user, title, description) values (?,?,?);";
 		getConnection();
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		getPstmt().setString(2, title);
-		getPstmt().setString(3, description);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		pstmt.setString(2, title);
+		pstmt.setString(3, description);
 
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 		InfoToFront info = new InfoToFront();
 		info.setSuccess(rows == 1);
 
@@ -164,11 +184,11 @@ public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 		}
 
 		getConnection();
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		getPstmt().setInt(2, readlistId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, readlistId);
 
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 		InfoToFront info = new InfoToFront();
 		info.setSuccess(rows == 1);
 

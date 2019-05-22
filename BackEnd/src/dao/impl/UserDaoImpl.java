@@ -11,18 +11,19 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 
 	public InfoToFront Login(InfoFromFront infoFromFront) throws SQLException {
 		String userName = infoFromFront.getUserName();
-		String encodedPassword = infoFromFront.getEncodedPassword();
+		String encodedPassword = infoFromFront.getEncodedPassword().toUpperCase();
 
 		InfoToFront info = new InfoToFront();
 
 		getConnection();
 
-		String sql = "select id, name, password_encode, authority from user u where u.name = ? ";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setString(1, userName);
-		rs = getPstmt().executeQuery();
+		String sql = "select id, name, password_encode, authority from user u where u.name = ? or u.email = ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, userName);
+		pstmt.setString(2, userName);
+		rs = pstmt.executeQuery();
 		if (rs.next()) {
-			String password = rs.getString("password_encode").trim();
+			String password = rs.getString("password_encode").trim().toUpperCase();
 			int userId = rs.getInt("id");
 			Boolean isAdmin = rs.getBoolean("authority");
 
@@ -56,12 +57,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 
 		getConnection();
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setString(1, userName);
-		getPstmt().setString(2, mailAddr);
-		getPstmt().setString(3, encodedPassword);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, userName);
+		pstmt.setString(2, mailAddr);
+		pstmt.setString(3, encodedPassword);
 
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 
 		if (rows == 1)
 			info.setSuccess(true);

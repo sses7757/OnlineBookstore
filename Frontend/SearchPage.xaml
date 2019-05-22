@@ -44,7 +44,7 @@
 								  Checked="CheckBox_Checked"
 								  Content="Inlcude free books"
 								  FontSize="16"
-								  IsChecked="{x:Bind Info.IncludeFreeBooks, Mode=TwoWay}"
+								  IsChecked="{x:Bind Info.IncludeFreeBooks, Mode=OneWay}"
 								  Unchecked="CheckBox_Checked"/>
 						<ToggleButton x:Name="splitViewToggle"
 									  Grid.Column="1"
@@ -91,7 +91,7 @@
 								  Checked="CheckBox_Checked"
 								  Content="Descend"
 								  FontSize="16"
-								  IsChecked="{x:Bind Info.OrderDescend, Mode=TwoWay}"
+								  IsChecked="{x:Bind Info.OrderDescend, Mode=OneWay}"
 								  Unchecked="CheckBox_Checked"/>
 						<SymbolIcon Grid.Column="3"
 									Margin="10,0"
@@ -111,7 +111,7 @@
 										Margin="10,0"
 										PlaceholderText="Search books, read lists, billboards, …"
 										QuerySubmitted="QuerySubmitted"
-										Text="{x:Bind Info.QueryText, Mode=TwoWay}">
+										Text="{x:Bind Info.QueryText, Mode=OneWay}">
 							<AutoSuggestBox.TextBoxStyle>
 								<Style TargetType="TextBox">
 									<Setter Property="FontSize" Value="16"/>

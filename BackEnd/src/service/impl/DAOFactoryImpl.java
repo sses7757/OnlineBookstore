@@ -142,7 +142,6 @@ public class DAOFactoryImpl implements DAOFactory {
 
 	@Override
 	public BaseDao getBaseDao(String methodName) {
-		BaseDao baseDao = null;
 		if (isBillboard(methodName)) {
 			return new BillboardDaoImpl();
 		}
@@ -167,7 +166,9 @@ public class DAOFactoryImpl implements DAOFactory {
 		else if (isWishlist(methodName)) {
 			return new WishlistDaoImpl();
 		}
-		return baseDao;
+		else {
+			return new ComplexQueryImpl();
+		}
 	}
 
 }

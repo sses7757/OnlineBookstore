@@ -19,10 +19,10 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 		getConnection();
 
 		String sql = "select content from danmu where danmu.id = ? ";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, danmuId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, danmuId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setContent(rs.getString("content"));
@@ -35,21 +35,16 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 
 	@Override
 	public InfoToFront GetMyDanmus(InfoFromFront infoFromFront) throws SQLException {
-		int userId, from, count;
-		userId = infoFromFront.getUserId();
-		from = infoFromFront.getFrom();
-		count = infoFromFront.getCount();
+		int userId = infoFromFront.getUserId();
 
 		List<Integer> mydanmu = new LinkedList<>();
 		getConnection();
 
-		String sql = "select id from danmu where user_id = ? limit ? offset ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		getPstmt().setInt(2, count);
-		getPstmt().setInt(3, from);
+		String sql = "select id from danmu where user_id = ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			mydanmu.add(rs.getInt("id"));
@@ -71,11 +66,11 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 		getConnection();
 
 		String sql = "select id from danmu where book_id = ? and page_num = ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
-		getPstmt().setInt(2, page);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
+		pstmt.setInt(2, page);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			danmuofbook.add(rs.getInt("id"));
@@ -95,17 +90,18 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 
 		getConnection();
 
-		String sql = "select d.content, d.page_num, b.name" + " from danmu d" + " join book b on d.book_id = b.id"
-				+ " where d.id = ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, danmuId);
+		String sql = "select d.content, d.page_num, b.name, d.edit_time" + " from danmu d"
+				+ " join book b on d.book_id = b.id" + " where d.id = ?";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, danmuId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setContent(rs.getString("content"));
 			info.setBookName(rs.getString("name"));
 			info.setPageNum(rs.getInt("page_num"));
+			info.setTimeStap(rs.getTimestamp("edit_time").getTime() / 1000);
 		}
 
 		closeAll();
@@ -130,11 +126,11 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 			sql += "UPDATE danmu d" + " SET content = ?" + " WHERE d.id = ?";
 		}
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setString(1, newContent);
-		getPstmt().setInt(2, danmuId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, newContent);
+		pstmt.setInt(2, danmuId);
 
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 		info.setSuccess(rows == 1);
 
 		closeAll();
@@ -158,14 +154,14 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 
 		sql = "insert into  danmu(user_id, book_id, page_num, content) values(?,?,?,?)";
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		getPstmt().setInt(2, bookId);
-		getPstmt().setInt(3, pageNum);
-		getPstmt().setString(4, content);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+		pstmt.setInt(3, pageNum);
+		pstmt.setString(4, content);
 
-		setPstmt(getConn().prepareStatement(sql));
-		int rows = getPstmt().executeUpdate();
+		pstmt = conn.prepareStatement(sql);
+		int rows = pstmt.executeUpdate();
 		info.setSuccess(rows == 1);
 
 		closeAll();

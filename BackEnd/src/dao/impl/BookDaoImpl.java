@@ -19,12 +19,12 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		info.setType("GetBookSummary");
 		getConnection();
 
-		String sql = " select b.name as book_name, book_cover_url, a.name as author_name" + "from book b "
-				+ "join book_author ba on b.id = ba.id " + "join author a on a.id = ba.id"
-				+ "where b.id = ? and a.is_main_author is true ";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
-		rs = getPstmt().executeQuery();
+		String sql = "select b.name as book_name," + " book_cover_url," + " a.name as author_name" + " from book b"
+				+ " join book_author ba" + " on b.id = ba.book_id" + " join author a on a.id = ba.author_id"
+				+ " where b.id = ?" + " and ba.is_main_author is true;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
+		rs = pstmt.executeQuery();
 		// if or while?
 		if (rs.next()) {
 			info.setBookCoverUrl(rs.getString("book_cover_url"));
@@ -45,12 +45,12 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		getConnection();
 
 		String sql = "select l.name as main, sl.name as sub, b.original_price, bs.discount, bs.overall_rating"
-				+ "from book b" + "join book_stat bs on b.id = bs.book_id"
-				+ "join sub_label sl on b.sublabel_id = sl.id" + "Ajoin label l on sl.main_id = l.id"
-				+ "where b.id = ? ";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
-		rs = getPstmt().executeQuery();
+				+ " from book b" + " join book_stat bs on b.id = bs.book_id"
+				+ " join sub_label sl on b.sublabel_id = sl.id" + " join label l on sl.main_id = l.id"
+				+ " where b.id = ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setMainAndSubLabel(rs.getString("main") + "-" + rs.getString("sub"));
@@ -71,10 +71,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		getConnection();
 
-		String sql = "select book_id from transaction where user_id = ? and paied is true";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		rs = getPstmt().executeQuery();
+		String sql = "select book_id from transaction where user_id = ? and paid is true;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			shelf.add(rs.getInt("book_id"));
@@ -93,17 +93,18 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		int userId = infoFromFront.getUserId();
 
 		String otherAuthorSql = null;
-		otherAuthorSql = "select a.name, is_translator" + "from author a"
-				+ "join book_author ba on a.id = ba.author_id" + "join book b on ba.book_id = b.id"
-				+ "where is_main_author is false and b.id = ?";
+		otherAuthorSql = "select a.name, ba.is_translator" + " from author a"
+				+ " join book_author ba on a.id = ba.author_id" + " join book b on ba.book_id = b.id"
+				+ " where is_main_author is false" + " and b.id = ?;";
 
-		setPstmt(getConn().prepareStatement(otherAuthorSql));
-		getPstmt().setInt(1, bookId);
-		rs = getPstmt().executeQuery();
+		getConnection();
+		pstmt = conn.prepareStatement(otherAuthorSql);
+		pstmt.setInt(1, bookId);
+		rs = pstmt.executeQuery();
 
 		StringBuilder stringBuilder = new StringBuilder();
 		while (rs.next()) {
-			Boolean isTranslator = rs.getBoolean("is_translator");
+			boolean isTranslator = rs.getBoolean("is_translator");
 			String authorName = rs.getString("name");
 
 			if (isTranslator)
@@ -115,14 +116,14 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		info.setOtherAuthors(stringBuilder.toString().trim());
 
-		String bookDetailSQL = "select b.description, b.publish_time, b.version, p.name,"
+		String bookDetailSQL = "select b.description, b.publish_time, b.version, p.name, "
 				+ "b.ISBN, b.pages, bs.buys, bs.danmus, bs.previews, bs.reviews"
-				+ "from book b join book_stat bs on b.id = bs.book_id join press p on b.press_id = p.id"
-				+ "where b.id = ?";
+				+ " from book b join book_stat bs on b.id = bs.book_id" + " join press p on b.press_id = p.id"
+				+ " where b.id = ?;";
 
-		setPstmt(getConn().prepareStatement(bookDetailSQL));
-		getPstmt().setInt(1, bookId);
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(bookDetailSQL);
+		pstmt.setInt(1, bookId);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setDescription(rs.getString("description"));
@@ -137,51 +138,53 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 			String publish_Time = rs.getDate("publish_time").toString();
 			String version = rs.getString("version");
 
-			info.setPublishInfo(pressName + " / " + publish_Time + " / " + version);
-
+			info.setPublishInfo(pressName + " / " + publish_Time + " / " + version + " Edition");
 		}
 
 		if (userId != -1) {
-			String canAddReadlistSQL = "select book_id" + " from readlist r"
-					+ " join readlist_books rb on r.id = rb.readlist_id"
-					+ " where r.create_user = ? and rb.book_id = ?";
+			String canAddReadlistSQL = "select count(r.id) as cnt" + " from readlist r"
+					+ " left outer join readlist_book rb on r.id = rb.readlist_id" + " where r.create_user = ?"
+					+ " and (rb.book_id != ? or rb.readlist_id is null);";
 
-			setPstmt(getConn().prepareStatement(canAddReadlistSQL));
-			getPstmt().setInt(1, userId);
-			getPstmt().setInt(2, bookId);
-			rs = getPstmt().executeQuery();
+			pstmt = conn.prepareStatement(canAddReadlistSQL);
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, bookId);
+			rs = pstmt.executeQuery();
 
-			if (rs.next() == false)
-				info.setCanAddReadList(true);
-			else
-				info.setCanAddReadList(false);
+			while (rs.next()) {
+				info.setCanAddReadList(rs.getInt("cnt") > 0);
+			}
 
-			//
-			String canAddWishlistSQL = "select w.user_id, w.book_id from wish_list w\n"
-					+ "where user_id = ? and book_id = ?;";
-			setPstmt(getConn().prepareStatement(canAddWishlistSQL));
-			getPstmt().setInt(1, userId);
-			getPstmt().setInt(2, bookId);
-			rs = getPstmt().executeQuery();
+			String canAddWishlistSQL = "select *" + " from wish_list w" + " where user_id = ? and book_id = ?;";
+			pstmt = conn.prepareStatement(canAddWishlistSQL);
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, bookId);
+			rs = pstmt.executeQuery();
 
 			if (rs.next() == false)
 				info.setCanAddWishList(true);
 			else
 				info.setCanAddWishList(false);
 
-			//
-			String canBuySQL = "select user_id, book_id, paied from transaction "
-					+ "where user_id = ? and book_id = ? and paied is true;";
+			String canBuySQL = "select user_id, book_id, paid" + " from transaction"
+					+ " where user_id = ? and book_id = ? and paid is true;";
 
-			setPstmt(getConn().prepareStatement(canBuySQL));
-			getPstmt().setInt(1, userId);
-			getPstmt().setInt(2, bookId);
-			rs = getPstmt().executeQuery();
+			pstmt = conn.prepareStatement(canBuySQL);
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, bookId);
+			rs = pstmt.executeQuery();
 
 			if (rs.next() == false)
 				info.setCanBuy(true);
-			else
+			else {
 				info.setCanBuy(false);
+				info.setCanAddWishList(false);
+			}
+		}
+		else {
+			info.setCanAddReadList(false);
+			info.setCanAddWishList(false);
+			info.setCanBuy(false);
 		}
 		return info;
 	}
@@ -196,13 +199,13 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		getConnection();
 
 		String sql = "select id from book" + " where label_id in (select label_id from book where id = ?)"
-				+ " limit ? offset ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookid);
-		getPstmt().setInt(2, count);
-		getPstmt().setInt(3, from);
+				+ " limit ? offset ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookid);
+		pstmt.setInt(2, count);
+		pstmt.setInt(3, from);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			relatedbooks.add(rs.getInt("id"));
@@ -223,12 +226,12 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		getConnection();
 
-		String sql = "select preview_url from book where id = ?";
+		String sql = "select preview_url from book where id = ?;";
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setURL(rs.getString("preview_url"));
@@ -249,10 +252,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		String sql = "select download_url from book where id = ?";
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setURL(rs.getString("download_url"));
@@ -273,10 +276,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		String sql = "select pdf_password from book where id = ?";
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			info.setURL(rs.getString("pdf_password"));
@@ -299,10 +302,10 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		getConnection();
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 		while (rs.next()) {
 			bookName = rs.getString("name");
 			price = rs.getDouble("price");
@@ -324,11 +327,11 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		getConnection();
 		String sql = "select paid from transaction where transaction.user_id = ? and transaction.book_id = ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		getPstmt().setInt(2, bookId);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
 
-		rs = getPstmt().executeQuery();
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			infoToFront.setSuccess(rs.getBoolean("paied"));

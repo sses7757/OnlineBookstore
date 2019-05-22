@@ -195,6 +195,8 @@ namespace Frontend
 						await NetworkGet.GetTitleDescription(readlist, false, id);
 						titles.Add(readlist.Title);
 					}
+					if (titles.Count <= 0)
+						break;
 					var combo = new ComboBox()
 					{
 						FontSize = 16,

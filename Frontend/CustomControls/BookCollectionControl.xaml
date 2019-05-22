@@ -63,7 +63,7 @@
 										   Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
 							</StackPanel>
 							<TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-									   Text="{x:Bind sys:String.Format('Author:\\t{0}', AuthorName)}"/>
+									   Text="{x:Bind local:BooklistPage.AuthorTrim(AuthorName)}"/>
 							<TextBlock Style="{StaticResource HorizontalBookTextStyle}"
 									   Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"/>
 							<TextBlock Style="{StaticResource HorizontalBookTextStyle}"

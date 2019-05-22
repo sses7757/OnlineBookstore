@@ -7,26 +7,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sys="using:System"
              x:Name="parent"
-             d:DesignHeight="700"
-             d:DesignWidth="1000"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             SizeChanged="Parent_SizeChanged">
 
     <Grid>
-        <RefreshContainer PullDirection="BottomToTop" RefreshRequested="RefreshRequested">
-            <controls:AdaptiveGridView x:Name="allGrid"
-                                       Grid.Column="1"
-                                       Margin="0"
-                                       Padding="{x:Bind OutPadding}"
-                                       DesiredWidth="500"
-                                       IsItemClickEnabled="False"
-                                       ItemsSource="{x:Bind Booklist.Booklists, Mode=OneWay}"
-                                       Loaded="AllGrid_Loaded"
-                                       Style="{StaticResource AGVStyle}">
-                <controls:AdaptiveGridView.ItemTemplate>
+        <RefreshContainer HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          PullDirection="BottomToTop"
+                          RefreshRequested="RefreshRequested">
+            <GridView x:Name="allGrid"
+                      Grid.Column="1"
+                      Margin="0"
+                      Padding="{x:Bind OutPadding}"
+                      IsItemClickEnabled="False"
+                      ItemsSource="{x:Bind Booklist.Booklists, Mode=OneWay}"
+                      Loaded="AllGrid_Loaded"
+                      SelectionMode="None">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <controls:StaggeredPanel HorizontalAlignment="Left"
+                                                 DesiredColumnWidth="{Binding DesireWidth, ElementName=parent}"/>
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
                     <DataTemplate x:DataType="local:BookDetailCollection">
-                        <SwipeControl Margin="8,20"
-                                      HorizontalAlignment="Stretch">
-                            <!--IsHitTestVisible="{Binding ShowTopSwipe, ElementName=parent}">-->
+                        <SwipeControl Margin="8,20" HorizontalAlignment="Stretch">
+                            <!--  IsHitTestVisible="{Binding ShowTopSwipe, ElementName=parent}">  -->
                             <SwipeControl.TopItems>
                                 <SwipeItems Mode="Reveal">
                                     <SwipeItem Background="LightGray"
@@ -36,10 +42,10 @@
                                 </SwipeItems>
                             </SwipeControl.TopItems>
 
-                            <Grid HorizontalAlignment="Stretch"
-                                  Style="{StaticResource BoardPanelStyle}"
-                                  Margin="0"
-                                  Padding="10,0">
+                            <Grid Margin="0"
+                                  Padding="10,0"
+                                  HorizontalAlignment="Stretch"
+                                  Style="{StaticResource BoardPanelStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -55,11 +61,11 @@
                                 <TextBox Grid.Row="0"
                                          Grid.Column="0"
                                          Margin="0,15,0,0"
-                                         Style="{StaticResource TitleTextBoxStyle}"
-                                         Text="{x:Bind Title, Mode=OneWay}"
-                                         Visibility="{Binding TextBoxVisibility, ElementName=parent}"
                                          KeyUp="TextBox_KeyUp"
-                                         Tag="title"/>
+                                         Style="{StaticResource TitleTextBoxStyle}"
+                                         Tag="title"
+                                         Text="{x:Bind Title, Mode=OneWay}"
+                                         Visibility="{Binding TextBoxVisibility, ElementName=parent}"/>
                                 <TextBlock Grid.Row="0"
                                            Grid.Column="0"
                                            Margin="0,15,0,0"
@@ -71,7 +77,7 @@
                                                  Margin="0,15,0,0"
                                                  Click="Hyperlink_Click"
                                                  Style="{StaticResource ShowAllBtnStyle}"
-                                                 Visibility="{Binding TextBlockVisibility, ElementName=parent}"/>
+                                                 Visibility="{Binding ShowAllVisibility, ElementName=parent}"/>
                                 <TextBlock Grid.Row="1"
                                            Grid.Column="0"
                                            Margin="0,10,0,0"
@@ -91,11 +97,11 @@
                                          Grid.Column="0"
                                          Grid.ColumnSpan="2"
                                          Margin="0,10"
-                                         Style="{StaticResource DescriptionTextBoxStyle}"
-                                         Text="{x:Bind Description, Mode=OneWay}"
-                                         Visibility="{Binding TextBoxVisibility, ElementName=parent}"
                                          KeyUp="TextBox_KeyUp"
-                                         Tag="description"/>
+                                         Style="{StaticResource DescriptionTextBoxStyle}"
+                                         Tag="description"
+                                         Text="{x:Bind Description, Mode=OneWay}"
+                                         Visibility="{Binding TextBoxVisibility, ElementName=parent}"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.Column="0"
                                            Grid.ColumnSpan="2"
@@ -110,6 +116,7 @@
                                 <ListView Grid.Row="4"
                                           Grid.Column="0"
                                           Grid.ColumnSpan="2"
+                                          Margin="0,0,0,20"
                                           ItemClick="Book_ItemClick"
                                           ItemsSource="{x:Bind Books, Mode=OneWay}"
                                           Style="{StaticResource ListStyle}">
@@ -138,8 +145,7 @@
                                                            Source="{x:Bind BookCover}"
                                                            Style="{StaticResource BookImageStyle}"/>
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Style="{StaticResource HorizontalBookNameTextStyle}"
-                                                                   Text="{x:Bind BookName}"/>
+                                                        <TextBlock Style="{StaticResource HorizontalBookNameTextStyle}" Text="{x:Bind BookName}"/>
                                                         <StackPanel Grid.Row="4"
                                                                     Grid.Column="1"
                                                                     Orientation="Horizontal">
@@ -147,15 +153,11 @@
                                                                            VerticalAlignment="Center"
                                                                            IsReadOnly="True"
                                                                            Value="{x:Bind OverallRating}"/>
-                                                            <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-                                                                       Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
+                                                            <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
                                                         </StackPanel>
-                                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-                                                                   Text="{x:Bind sys:String.Format('Author:\\t{0}', AuthorName)}"/>
-                                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-                                                                   Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"/>
-                                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-                                                                   Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"/>
+                                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind local:BooklistPage.AuthorTrim(AuthorName)}"/>
+                                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind sys:String.Format('Class:\\t{0}', Labels)}"/>
+                                                        <TextBlock Style="{StaticResource HorizontalBookTextStyle}" Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </SwipeControl>
@@ -165,8 +167,8 @@
                             </Grid>
                         </SwipeControl>
                     </DataTemplate>
-                </controls:AdaptiveGridView.ItemTemplate>
-            </controls:AdaptiveGridView>
+                </GridView.ItemTemplate>
+            </GridView>
         </RefreshContainer>
 
         <controls:Loading x:Name="loadingControl"
@@ -189,11 +191,11 @@
         </controls:Loading>
 
         <controls:InAppNotification x:Name="notification"
-									AnimationDuration="00:00:0.2"
-									HorizontalOffset="0"
-									ShowDismissButton="True"
-									StackMode="Replace"
-									VerticalOffset="100"/>
+                                    AnimationDuration="00:00:0.2"
+                                    HorizontalOffset="0"
+                                    ShowDismissButton="True"
+                                    StackMode="Replace"
+                                    VerticalOffset="100"/>
 
     </Grid>
 

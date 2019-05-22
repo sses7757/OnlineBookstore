@@ -77,6 +77,8 @@ public class BookhubServer {
 				try {
 					// 建立好连接后，从socket中获取输入流，并建立缓冲区进行读取
 					InputStream inputStream = socket.getInputStream();
+					OutputStream outputStream = socket.getOutputStream();
+
 					byte[] bytes = new byte[1 << 14];
 					int len;
 					StringBuilder sb = new StringBuilder();
@@ -84,18 +86,23 @@ public class BookhubServer {
 						// 注意指定编码格式，发送方和接收方一定要统一，建议使用UTF-8
 						sb.append(new String(bytes, 0, len, "UTF-8"));
 					}
+					if (sb.toString().trim().length() < 10)
+						return;
+
 					System.out.println("Get message from client:\n" + sb);
-					inputStream.close();
 
 					AbstractController controller = new ReflectionController();
 					String send = controller.methodController(sb.toString());
+					System.out.println("Send message to client:\n" + send);
 
-					OutputStream outputStream = socket.getOutputStream();
-					outputStream.write(send.getBytes());
+					outputStream.write(send.getBytes("UTF-8"));
 					outputStream.flush();
-					outputStream.close();
 
+					outputStream.close();
+					inputStream.close();
 					socket.close();
+
+					System.out.println("Finish\n");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

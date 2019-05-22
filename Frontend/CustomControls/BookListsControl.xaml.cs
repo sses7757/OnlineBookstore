@@ -12,15 +12,6 @@ namespace Frontend.CustomControls
 {
 	public sealed partial class BookListsControl : UserControl, INotifyPropertyChanged
 	{
-		public enum IconType
-		{
-			AddIcon,
-			RemoveIcon,
-			BuyIcon,
-			EditIcon,
-			DeleteIcon
-		}
-
 		public BookListsControl()
 		{
 			this.InitializeComponent();
@@ -48,10 +39,17 @@ namespace Frontend.CustomControls
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		private void OnPropertyChanged()
+		private void OnPropertyChanged(string name = null)
 		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftSwipeText"));
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftIconSource"));
+			if (name == null)
+			{
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftSwipeText"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftIconSource"));
+			}
+			else
+			{
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+			}
 		}
 
 		public bool CanEdit { set; get; } = false;
@@ -59,12 +57,32 @@ namespace Frontend.CustomControls
 		public int PaddingX { set; get; }
 		public Action RefreshOverride { set; get; } = null;
 		public bool IsBillboard { set; get; }
+		public bool ShowAllVisible { set; get; } = true;
 
 		private Thickness OutPadding { get => new Thickness(this.PaddingX, 0, this.PaddingX, 0); }
 
 		public Visibility TextBoxVisibility { get => CanEdit.ToVisibility(); }
+		public Visibility ShowAllVisibility { get => ShowAllVisible.ToVisibility(); }
 		public Visibility TextBlockVisibility { get => (!CanEdit).ToVisibility(); }
 		public Visibility UserInfoVisibility { get => (!this.IsBillboard).ToVisibility(); }
+
+
+		private void Parent_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			this.OnPropertyChanged("DesireWidth");
+		}
+
+		public double DesireWidth {
+			get {
+				if (this.ActualWidth > 900)
+					return this.ActualWidth / 2 - PaddingX;
+				else if (this.ActualWidth > 400)
+					return this.ActualWidth - 2 * PaddingX;
+				else
+					return 450;
+			}
+		}
+
 
 		/// <summary>
 		/// Show all button of read list, navigate to book list page

@@ -155,5 +155,95 @@ namespace Frontend
 									"Please try again later.", 4000);
 			}
 		}
+
+		private async void Button_Click(object sender, RoutedEventArgs e)
+		{
+			var bookIds = await NetworkGet.GetShelfBooks();
+			if (bookIds.Length <= 0)
+			{
+				notification.Show("You cannot write any review since you own zero book", 4000);
+				return;
+			}
+			var books = new List<BookSummary>(bookIds.Length);
+			foreach (var id in bookIds)
+			{
+				var book = new BookSummary(id);
+				await NetworkGet.GetBookSummary(book);
+				if (!MyReviews.Select(r => r.BookName).Contains(book.BookFullName))
+					books.Add(book);
+			}
+
+			var ratingCtrl = new RatingControl()
+			{
+				Value = 5
+			};
+			var combo = new ComboBox()
+			{
+				FontSize = 15,
+				ItemsSource = books.Select(b => b.BookName).ToList(),
+				SelectedIndex = 0,
+				Header = "Please select the book you want to write review to"
+			};
+			var titleBox = new TextBox()
+			{
+				FontSize = 16,
+				Header = "Please input the review title",
+				PlaceholderText = "Review title",
+				TextWrapping = TextWrapping.Wrap
+			};
+			var contentBox = new TextBox()
+			{
+				FontSize = 15,
+				Header = "Please input the review content",
+				PlaceholderText = "Review content",
+				TextWrapping = TextWrapping.Wrap
+			};
+			var panel = new StackPanel()
+			{
+				Spacing = 10,
+				MaxWidth = 500
+			};
+			panel.Children.Add(ratingCtrl);
+			panel.Children.Add(combo);
+			panel.Children.Add(titleBox);
+			panel.Children.Add(contentBox);
+			ContentDialog dialog = new ContentDialog
+			{
+				Content = panel,
+				Title = "Write Review",
+				IsSecondaryButtonEnabled = true,
+				PrimaryButtonText = "Confirm",
+				SecondaryButtonText = "Cancle"
+			};
+			if (await dialog.ShowAsync() == ContentDialogResult.Secondary
+				|| titleBox.Text.Length <= 2 || contentBox.Text.Length <= 5)
+			{
+				return;
+			}
+			var success = await NetworkSet.CreateReview(
+				books.Where(b => b.BookFullName == combo.SelectedItem as string).ToList()[0].ID,
+				Convert.ToInt32(ratingCtrl.Value),
+				titleBox.Text, contentBox.Text);
+			if (success)
+			{
+				var review = new Review(-1)
+				{
+					Title = titleBox.Text,
+					Content = contentBox.Text,
+					Rating = Convert.ToInt32(ratingCtrl.Value),
+					BookName = combo.SelectedItem as string,
+					PublishDate = DateTime.Now
+				};
+				MyReviews.Add(review);
+				notification.Show("Success in writing your review for book" +
+									$" \"{combo.SelectedItem as string}\"", 4000);
+			}
+			else
+			{
+				notification.Show("Something wrong in writing your review for book" +
+									$" \"{combo.SelectedItem as string}\". " +
+									"Please try again later.", 4000);
+			}
+		}
 	}
 }

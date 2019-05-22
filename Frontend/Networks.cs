@@ -181,7 +181,7 @@ namespace Frontend
 
 	public class Connection
 	{
-		public const string REMOTE_IP = "10.21.37.214";
+		public const string REMOTE_IP = "127.0.0.1";//"10.21.37.214";
 		public const int REMOTE_PORT = 2307;
 
 		private Socket socket;
@@ -190,12 +190,7 @@ namespace Frontend
 		{
 			if (socket != null)
 			{
-				try
-				{
-					socket.Shutdown(SocketShutdown.Both);
-				}
-				catch (Exception) { }
-				socket.Close();
+				Close();
 			}
 			IPAddress ip = IPAddress.Parse(REMOTE_IP);
 			IPEndPoint ipEnd = new IPEndPoint(ip, REMOTE_PORT);
@@ -215,8 +210,16 @@ namespace Frontend
 
 		private bool SocketConnected
 		{
-			get => !(socket == null ||
-					 socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
+			get {
+				try
+				{
+					return !(socket == null || socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
 		}
 
 		private async Task<int> Send(ArraySegment<byte> buffer)
@@ -229,7 +232,7 @@ namespace Frontend
 		private async Task<int> Receive(ArraySegment<byte> buffer)
 		{
 			int receiveLen = await this.socket.ReceiveAsync(buffer, SocketFlags.None);
-			this.socket.Shutdown(SocketShutdown.Receive);
+			//this.socket.Shutdown(SocketShutdown.Receive);
 			return receiveLen;
 		}
 
@@ -239,7 +242,10 @@ namespace Frontend
 			{
 				this.socket.Shutdown(SocketShutdown.Both);
 			}
-			catch (Exception) { }
+			catch (Exception e)
+			{
+				Debug.WriteLine("Socket shutdown error: " + e.Message);
+			}
 			this.socket.Close();
 		}
 
@@ -319,8 +325,8 @@ namespace Frontend
 			}
 
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
-			Storage.UserId = recv.UserId.Value;
-			Storage.IsAdmin = recv.IsAdmin.Value;
+			Storage.UserId = recv.UserId ?? -1;
+			Storage.IsAdmin = recv.IsAdmin ?? false;
 			return (LoginStatus)recv.LoginStatus.Value;
 		}
 
@@ -345,7 +351,7 @@ namespace Frontend
 
 		public static async void GetSubLabels(Label label)
 		{
-			var query = new QueryObject("GetMainLabels")
+			var query = new QueryObject("GetSubLabels")
 			{
 				MainLabel = label.Name
 			};
@@ -663,7 +669,7 @@ namespace Frontend
 			new QueryObject()
 			{
 				SearchType = 2,
-				OrderDescend = false,
+				OrderDescend = true,
 				Order = 2
 			};
 
@@ -727,12 +733,18 @@ namespace Frontend
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			collection.Title = recv.Title;
 			collection.Description = recv.Description;
+			collection.OnPropertyChanged("Title");
+			collection.OnPropertyChanged("Description");
 			if (isBillboard)
 				return;
 			collection.CreateUser = recv.CreateUser;
 			collection.EditTime = recv.TimeStap.Value.GetTime();
 			collection.FollowAmount = recv.FollowAmount.Value;
 			collection.Followed = recv.Followed.Value;
+			collection.OnPropertyChanged("CreateUser");
+			collection.OnPropertyChanged("EditTime");
+			collection.OnPropertyChanged("FollowAmount");
+			collection.OnPropertyChanged("Followed");
 		}
 
 		public static async Task<int[]> GetMyWishlist()

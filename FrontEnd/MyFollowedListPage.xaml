@@ -15,7 +15,8 @@
 									   VerticalAlignment="Stretch"
 									   IsBillboard="False"
 									   PaddingX="120"
-                                       ShowTopSwipe="True"/>
+                                       ShowTopSwipe="True"
+                                       ShowAllVisible="False"/>
 
     </Grid>
 </Page>

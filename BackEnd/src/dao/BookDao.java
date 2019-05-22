@@ -7,8 +7,9 @@ import socket.InfoToFront;
 
 public interface BookDao {
 	/**
-	 *  return the brief abstract of a book.
-	 *  final edit on 5.11.2019
+	 * return the brief abstract of a book.
+	 * final edit on 5.21.2019
+	 * @author Jason Zhao, Kevin Sun
 	 * @param infoFromFront
 	 * @return bookCoverUrl, bookName, AuthorName
 	 * @throws SQLException
@@ -53,10 +54,6 @@ public interface BookDao {
 	 *          3 Booleans (
 	 *          Can this user add this book to his read list or wish list.
 	 *          Can this user can buy this book.
-	 * @throws SQLException
-	 *
-	 * @param infoFromFront
-	 * @return
 	 * @throws SQLException
 	 */
 	InfoToFront GetBookDetail(InfoFromFront infoFromFront) throws SQLException;

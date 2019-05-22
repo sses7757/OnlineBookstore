@@ -34,7 +34,7 @@
 							</SwipeControl.LeftItems>
 
 							<StackPanel>
-								<TextBlock FontSize="17"
+								<TextBlock FontSize="17" FontWeight="Normal"
 										   Style="{StaticResource TitleTextStyle}"
 										   Text="{x:Bind Content, Mode=OneWay}"/>
 								<TextBlock FontWeight="SemiLight"

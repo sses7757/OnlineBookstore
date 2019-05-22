@@ -126,6 +126,7 @@ namespace Frontend
 				default:
 					return;
 			}
+			Info.TimeRangeType = (TimeSpanType)(sender as ComboBox).SelectedIndex;
 			TimeRangeSelector_ValueChanged(timeRangeSelector, null);
 		}
 
@@ -198,6 +199,10 @@ namespace Frontend
 
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)
 		{
+			if ((sender as CheckBox).Content as string == "Inlcude free books")
+				Info.IncludeFreeBooks = (sender as CheckBox).IsChecked.Value;
+			else
+				Info.OrderDescend = (sender as CheckBox).IsChecked.Value;
 			Info.OnPropertyChanged(null);
 		}
 	}

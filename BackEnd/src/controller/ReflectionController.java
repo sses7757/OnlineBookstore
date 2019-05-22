@@ -1,6 +1,5 @@
 package controller;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import service.DAOFactory;
@@ -27,7 +26,6 @@ public class ReflectionController extends AbstractController {
 		DAOFactory factory = new DAOFactoryImpl();
 
 		String type = info.getType();
-
 		// According to the method, find the corresponding object. baseDao <- son of BaseDao.
 		Object baseDao = factory.getBaseDao(type);
 
@@ -39,16 +37,20 @@ public class ReflectionController extends AbstractController {
 		}
 
 		Object infoToFront = null;
+		boolean setSuccessFalse = false;
 		try {
 			infoToFront = method.invoke(baseDao, info);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+			setSuccessFalse = true;
 		}
 		InfoToFront front;
 
 		if (infoToFront instanceof InfoToFront) {
 			front = (InfoToFront) infoToFront;
 			front.setType(method.getName());
+			if (setSuccessFalse)
+				front.setSuccess(false);
 		}
 		else {
 			System.err.println("Invoke method did not return correct result");

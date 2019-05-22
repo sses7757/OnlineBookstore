@@ -11,12 +11,13 @@
 
 	<Grid>
 		<RefreshContainer PullDirection="BottomToTop" RefreshRequested="RefreshRequested">
-			<controls:AdaptiveGridView Padding="150,20"
+            <controls:AdaptiveGridView Padding="150,20"
 									   DesiredWidth="150"
 									   ItemClick="AdaptiveGridView_ItemClick"
 									   ItemsSource="{x:Bind ShelfBooks.Books, Mode=OneWay}"
-									   Style="{StaticResource AGVStyle}">
-				<controls:AdaptiveGridView.ItemTemplate>
+									   Style="{StaticResource AGVStyle}"
+                                       ItemHeight="285">
+                <controls:AdaptiveGridView.ItemTemplate>
 					<DataTemplate x:DataType="local:BookSummary">
 						<StackPanel MaxWidth="170"
 									Margin="14,10"

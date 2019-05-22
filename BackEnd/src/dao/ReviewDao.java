@@ -38,4 +38,13 @@ public interface ReviewDao {
 	 */
 	InfoToFront CreateReview(InfoFromFront infoFromFront) throws SQLException;
 
+	/**
+	 * Get the reviews' ids of user 
+	 * @author Kevin Sun
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
+	InfoToFront GetMyReviews(InfoFromFront infoFromFront) throws SQLException;
+
 }

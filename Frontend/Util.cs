@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using QRCoder;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Frontend
 {
 	internal static class Storage
 	{
-		internal static bool Test { get; } = true;
+		internal static bool Test { get; } = false;
 
 		internal static int UserId { set; get; } = -1;
 		internal static Visibility SignUpVisibility { get => (!NetworkGet.IsValidID(UserId)).ToVisibility(); }
@@ -208,7 +209,7 @@ namespace Frontend
 			return false;
 		}
 
-		private static object lockObj = null;
+		private static Dictionary<string, object> lockDict = new Dictionary<string, object>();
 		private static readonly Random random = new Random();
 
 		/// <summary>
@@ -219,20 +220,24 @@ namespace Frontend
 		/// <param name="func">an async method that actually dose computing</param>
 		/// <param name="parameter">the parameter need to pass to the async method</param>
 		/// <returns></returns>
-		public static async Task<TOut> GlobalLock<TIn, TOut>(this Func<TIn, Task<TOut>> func, TIn parameter) //where
+		public static async Task<TOut> GlobalLock<TIn, TOut>(this Func<TIn, Task<TOut>> func, TIn parameter)
 		{
+			if (!lockDict.ContainsKey(func.Method.Name))
+				lockDict.Add(func.Method.Name, null);
+			object lockObj = lockDict[func.Method.Name];
+
 			await Task.Delay(random.Next(REFRESH_RATE / 5, REFRESH_RATE / 3));
 			while (lockObj != null)
 			{
 				await Task.Delay(REFRESH_RATE / 2);
 			}
-			System.Diagnostics.Debug.WriteLine("GL start:\t" + DateTime.Now.Second +
-												":" + DateTime.Now.Millisecond);
-			lockObj = new object();
+			System.Diagnostics.Debug.WriteLine($"GL of {func.Method.Name} start:" +
+												$"\t{DateTime.Now.Second}:{DateTime.Now.Millisecond}");
+			lockDict[func.Method.Name] = new object();
 			var result = await func(parameter);
-			lockObj = null;
-			System.Diagnostics.Debug.WriteLine("GL end:\t" + DateTime.Now.Second +
-												":" + DateTime.Now.Millisecond);
+			lockDict[func.Method.Name] = null;
+			System.Diagnostics.Debug.WriteLine($"GL of {func.Method.Name} end:" +
+												$"\t{DateTime.Now.Second}:{DateTime.Now.Millisecond}");
 			return result;
 		}
 

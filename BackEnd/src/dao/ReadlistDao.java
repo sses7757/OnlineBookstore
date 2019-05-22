@@ -6,6 +6,15 @@ import socket.InfoFromFront;
 import socket.InfoToFront;
 
 public interface ReadlistDao {
+
+	/** get the user's readlists' IDs without a certian book
+	 * @author Niu Lei
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
+	public InfoToFront GetMyReadListsWithout(InfoFromFront infoFromFront) throws SQLException;
+
 	/** get the user's created readlists' IDs
 	 * @author Niu Lei
 	 * @param infoFromFront

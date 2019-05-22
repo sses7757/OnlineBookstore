@@ -1,6 +1,7 @@
 package dao.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,16 +22,16 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 
 		getConnection();
 
-		String sql = "select review_id" + " from review" + " where book_id = ?" + " order by edit_time"
+		String sql = "select id" + " from review" + " where book_id = ?" + " order by edit_time"
 				+ " limit ? offset ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookId);
-		getPstmt().setInt(2, count);
-		getPstmt().setInt(3, from);
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
+		pstmt.setInt(2, count);
+		pstmt.setInt(3, from);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
-			reviewId.add(rs.getInt("review_id"));
+			reviewId.add(rs.getInt("id"));
 		}
 
 		InfoToFront info = new InfoToFront();
@@ -45,17 +46,18 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 
 		getConnection();
 
-		String sql = "select r.user_id, r.rating, r.edit_time, r.title, r.content, b.name as book_name"
-				+ " from review r" + " join book b on r.book_id = b.id" + " where r.review_id = ?";
+		String sql = "select u.name, r.rating, r.edit_time, r.title, r.content, b.name as book_name"
+				+ " from review r" + " join book b on r.book_id = b.id" + " join user u on u.id = r.user_id"
+				+ " where r.id = ?";
 
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, reviewId);
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, reviewId);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
-			info.setCreateUser(rs.getString("user_id"));
+			info.setCreateUser(rs.getString("name"));
 			info.setRating(rs.getInt("rating"));
-			info.setTimeStap(rs.getTimestamp("edit_time").getTime());
+			info.setTimeStap(rs.getTimestamp("edit_time").getTime() / 1000); // milliseconds/1000 = seconds
 			info.setTitle(rs.getString("title"));
 			info.setContent(rs.getString("content"));
 			info.setBookName(rs.getString("book_name"));
@@ -69,30 +71,32 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 		int userId = infoFromFront.getUserId();
 		int reviewId = infoFromFront.getReviewId();
 		boolean isDeleteAction = infoFromFront.getDeleteAction();
-		String newTitle = infoFromFront.getTitle();
+		String newTitle = infoFromFront.getNewTitle();
 		String newContent = infoFromFront.getNewContent();
-		int newRating = infoFromFront.getRating();
+		int newRating = infoFromFront.getNewRating();
 
 		InfoToFront info = new InfoToFront();
 
 		String sql = "";
+		getConnection();
+
 		if (isDeleteAction) {
 			sql += "DELETE FROM review WHERE user_id = ? AND review_id = ?";
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setInt(1, userId);
-			getPstmt().setInt(2, reviewId);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, reviewId);
 		}
 		else {
-			sql += "UPDATE review " + "SET title = ? , content = ? , rating = ?"
-					+ "WHERE review_id = ? AND user_id = ?";
+			sql += "UPDATE review " + "SET title = ?, content = ?, rating = ?" + " WHERE id = ? AND user_id = ?";
 
-			setPstmt(getConn().prepareStatement(sql));
-			getPstmt().setString(1, newTitle);
-			getPstmt().setString(2, newContent);
-			getPstmt().setInt(3, newRating);
-
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, newTitle);
+			pstmt.setString(2, newContent);
+			pstmt.setInt(3, newRating);
+			pstmt.setInt(4, reviewId);
+			pstmt.setInt(5, userId);
 		}
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 
 		if (rows == 1)
 			info.setSuccess(true);
@@ -114,22 +118,47 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 
 		InfoToFront info = new InfoToFront();
 
+		String sql = "insert into review(user_id, book_id, title, content, rating) values(?,?,?,?,?);";
+
 		getConnection();
-
-		String sql = "insert into review(user_id, book_id, title, content, rating) values(?,?,?,?,?)";
-
+		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, userId);
 		pstmt.setInt(2, bookId);
 		pstmt.setString(3, title);
 		pstmt.setString(4, content);
 		pstmt.setInt(5, rating);
 
-		pstmt = conn.prepareStatement(sql);
-
 		int rows = pstmt.executeUpdate();
 		info.setSuccess(rows == 1);
 
 		closeAll();
+		return info;
+	}
+
+	@Override
+	public InfoToFront GetMyReviews(InfoFromFront infoFromFront) throws SQLException {
+		int userId = infoFromFront.getUserId();
+		InfoToFront info = new InfoToFront();
+
+		if (userId <= 0) {
+			info.setIDs(new ArrayList<Integer>());
+			return info;
+		}
+
+		List<Integer> reviews = new LinkedList<Integer>();
+
+		String sql = "select id from review where user_id = ?;";
+
+		getConnection();
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+
+		rs = pstmt.executeQuery();
+		while (rs.next()) {
+			reviews.add(rs.getInt("id"));
+		}
+
+		info.setIDs(reviews);
 		return info;
 	}
 }

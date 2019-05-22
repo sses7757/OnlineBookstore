@@ -246,10 +246,10 @@ namespace Frontend
 						_ = Books.ReloadBooks(this.ToQueryObject(), "Search result of " + this.QueryText);
 						break;
 					case ContentType.Billboards:
-						Billboards.Reload();
+						Billboards.Reload(this.ToQueryObject());
 						break;
 					case ContentType.ReadLists:
-						ReadLists.Reload();
+						ReadLists.Reload(this.ToQueryObject());
 						break;
 					default:
 						return;
@@ -514,7 +514,7 @@ namespace Frontend
 		}
 
 		private readonly bool isBillBoard;
-		private readonly QueryObject query;
+		private QueryObject query;
 
 		internal BooklistCollection()
 		{
@@ -534,6 +534,12 @@ namespace Frontend
 		}
 
 		internal bool Finished { get; set; } = false;
+
+		internal void Reload(QueryObject newQuery, bool addMore = false)
+		{
+			this.query = newQuery;
+			this.Reload(addMore);
+		}
 
 		internal async void Reload(bool addMore = false)
 		{
@@ -664,6 +670,7 @@ namespace Frontend
 			this.Books.Clear();
 			this.Finished = false;
 			var ids = await NetworkGet.GetBookListBooks(isBillboard, id, 0, count);
+			await NetworkGet.GetTitleDescription(this, isBillboard, id);
 			await NetworkGet.GetBookQuasiDetailContents(this, ids);
 			this.Finished = true;
 			return true;
@@ -686,12 +693,16 @@ namespace Frontend
 				this.Title = newTitle;
 			if (newDesc != null)
 				this.Description = newDesc;
-			
+			OnPropertyChanged("Title");
+			OnPropertyChanged("Description");
+
 			this.Finished = false;
+
 			if (query.IsBillboard.HasValue && query.BookListId.HasValue)
 				await NetworkGet.GetTitleDescription(this, query.IsBillboard.Value, query.BookListId.Value);
 			var ids = await NetworkGet.GetFromQuery(this.query, 0, Util.INIT_AMOUNT);
 			await NetworkGet.GetBookQuasiDetailContents(this, ids);
+
 			this.Finished = true;
 			return true;
 		}

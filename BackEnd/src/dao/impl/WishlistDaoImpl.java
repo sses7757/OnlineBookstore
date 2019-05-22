@@ -17,9 +17,9 @@ public class WishlistDaoImpl extends BaseDao implements WishlistDao {
 		getConnection();
 
 		String sql = "select book_id from wish_list where user_id = ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, userId);
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			wishlist.add(rs.getInt("book_id"));
@@ -41,11 +41,11 @@ public class WishlistDaoImpl extends BaseDao implements WishlistDao {
 		getConnection();
 		String sql = isaddaction ? "INSERT INTO wish_list(book_id, user_id)" + " VALUES (?,?)"
 				: "DELETE FROM wish_list WHERE book_id = ? and user_id = ?";
-		setPstmt(getConn().prepareStatement(sql));
-		getPstmt().setInt(1, bookid);
-		getPstmt().setInt(2, userid);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookid);
+		pstmt.setInt(2, userid);
 
-		int rows = getPstmt().executeUpdate();
+		int rows = pstmt.executeUpdate();
 
 		InfoToFront info = new InfoToFront();
 		info.setSuccess(rows == 1);

@@ -1,6 +1,7 @@
 package controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import socket.InfoFromFront;
@@ -12,7 +13,7 @@ import socket.InfoToFront;
  * Edit on 2019.5.20 Kevin Sun.
  */
 public abstract class AbstractController {
-	private Gson gson = new Gson();
+	private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	protected InfoFromFront fromJson(String info) {
 		InfoFromFront infoFromFront;

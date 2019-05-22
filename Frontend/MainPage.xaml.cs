@@ -300,7 +300,7 @@ namespace Frontend
 
 		internal void QuerySubmitted(string query)
 		{
-			if (query.Length < 2)
+			if (query.Trim().Length == 0)
 				return;
 			ShowSearch(true);
 			NavView_Navigate("search", null, true, new SearchInfo(query));

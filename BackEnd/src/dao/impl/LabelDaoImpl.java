@@ -16,8 +16,8 @@ public class LabelDaoImpl extends BaseDao implements LabelDao {
 		getConnection();
 
 		String sql = "select name from label l";
-		setPstmt(getConn().prepareStatement(sql));
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(sql);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			labelList.add(rs.getString("name"));
@@ -36,17 +36,18 @@ public class LabelDaoImpl extends BaseDao implements LabelDao {
 
 		getConnection();
 
-		String sql = "selct sl.name" + "( avg (bs.buys)*0.8 + avg(reviews)*0.1 + avg(danmus)*0.1 ) as hot_spot "
-				+ "from sub_label sl" + "join book b on b.id = sl.id" + "join book_stat bs on bs.id = b.id"
-				+ "join label l on sl.id = l.main_id" + "group by l.id" + "order by hot_spot desc"
-				+ "where l.name = ?";
+		String sql = "select sl.name as sub_name,"
+				+ " (avg(bs.buys) * 0.8 + avg(reviews) * 0.1 + avg(danmus) * 0.1) as hot_spot"
+				+ " from sub_label sl" + " join label l on sl.main_id = l.id"
+				+ " join book b on b.sublabel_id = sl.id" + " join book_stat bs on bs.book_id = b.id"
+				+ " where l.name = ?" + " group by sl.id" + " order by hot_spot desc;";
 
-		getPstmt().setString(1, mainLabels);
-		setPstmt(getConn().prepareStatement(sql));
-		rs = getPstmt().executeQuery();
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, mainLabels);
+		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
-			labelList.add(rs.getString("sl.name"));
+			labelList.add(rs.getString("sub_name"));
 		}
 
 		closeAll();

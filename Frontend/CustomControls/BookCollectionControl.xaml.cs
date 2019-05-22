@@ -61,7 +61,7 @@ namespace Frontend.CustomControls
 		private Visibility UserInfoVisibility { get => this.IsReadList.ToVisibility(); }
 		private Visibility DescriptionVisibility {
 			get => (this.BookCollection.Description != null &&
-					this.BookCollection.Description.Length > 5).ToVisibility();
+					this.BookCollection.Description.Length > 2).ToVisibility();
 		}
 
 		/// <summary>

@@ -48,7 +48,7 @@ namespace Frontend
 				return;
 			}
 
-			if (nameBox.Text.Length <= 4 || passBox.Password.Length <= 6)
+			if (nameBox.Text.Length < 4 || passBox.Password.Length < 4)
 			{
 				notification.Show("Please input valid user name & password", DELAY);
 				return;
