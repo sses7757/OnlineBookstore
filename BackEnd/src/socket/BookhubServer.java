@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,6 +16,8 @@ import dao.impl.BaseDao;
 
 public class BookhubServer {
 
+	public static Map<Integer, Thread> ongoingTransactions = new HashMap<>();
+
 	/**
 	 * @author Kevin Sun
 	 * @param userId
@@ -21,28 +25,28 @@ public class BookhubServer {
 	 * @throws SQLException 
 	 */
 	public static void waitForPaying(final int userId, final int bookId) throws SQLException {
-		// directly set paid
-		String sql = "update transaction " + "set paid = true "
-				+ "where transaction.user_id = ? and transaction.book_id = ?";
-
-		new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
 			public void run() {
 				try {
 					Thread.sleep(5000);
 
 					BaseDao base = new BaseDao();
 					base.getConnection();
-
+					// directly set paid
+					String sql = "update transaction " + "set paid = true " + "where user_id = ? and book_id = ?;";
 					base.setPstmt(base.getConn().prepareStatement(sql));
 					base.getPstmt().setInt(1, userId);
 					base.getPstmt().setInt(2, bookId);
+					base.getPstmt().executeUpdate();
 
 					base.closeAll();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-		}).run();
+		});
+		ongoingTransactions.put(userId, t);
+		t.start();
 	}
 
 	private static final int PORT = 2307;

@@ -81,13 +81,13 @@ public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 		getConnection();
 
 		if (isDeleteAction) {
-			sql += "DELETE FROM review WHERE user_id = ? AND review_id = ?";
+			sql += "DELETE FROM review WHERE user_id = ? AND id = ?;";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, reviewId);
 		}
 		else {
-			sql += "UPDATE review " + "SET title = ?, content = ?, rating = ?" + " WHERE id = ? AND user_id = ?";
+			sql += "UPDATE review " + "SET title = ?, content = ?, rating = ?" + " WHERE id = ? AND user_id = ?;";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, newTitle);

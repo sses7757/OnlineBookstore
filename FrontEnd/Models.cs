@@ -454,6 +454,7 @@ namespace Frontend
 		internal string PublishInfo { get; set; }
 		internal string ISBN { get; set; }
 		internal double Price { get; set; }
+		internal double AddPrice { get; set; }
 		internal int Discount { get; set; }
 		internal int BuyAmount { get; set; }
 		internal int DanmuAmount { get; set; }

@@ -910,6 +910,19 @@ namespace Frontend
 			var recv = await Connection.SendAndReceive.GlobalLock(query);
 			return recv.PrivateKey;
 		}
+
+		internal static async Task<double> GetAddPrice(int id)
+		{
+			var query = new QueryObject("GetAddPrice")
+			{
+				BookId = id
+			};
+			if (Storage.Test)
+				return 10;
+
+			var recv = await Connection.SendAndReceive.GlobalLock(query);
+			return recv.Price.Value;
+		}
 	}
 
 
@@ -1093,9 +1106,9 @@ namespace Frontend
 			return recv.Success;
 		}
 
-		public static async Task<bool> CancleTransaction(int bookId)
+		public static async Task<bool> CancelTransaction(int bookId)
 		{
-			var change = new ChangeObject("CancleTransaction")
+			var change = new ChangeObject("CancelTransaction")
 			{
 				BookId = bookId,
 			};

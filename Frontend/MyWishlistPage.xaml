@@ -43,7 +43,7 @@
                                        Source="{x:Bind BookCover}"
                                        Style="{StaticResource BookImageStyle}"/>
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Style="{StaticResource HorizontalBookNameTextStyle}" Text="{x:Bind BookName}"/>
+                                    <TextBlock Style="{StaticResource HorizontalBookNameTextStyle}" Text="{x:Bind BookFullName}"/>
                                     <StackPanel Grid.Row="4"
                                                 Grid.Column="1"
                                                 Orientation="Horizontal">
@@ -55,7 +55,7 @@
                                                    Text="{x:Bind sys:String.Format('({0:N1})', OverallRating)}"/>
                                     </StackPanel>
                                     <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
-                                               Text="{x:Bind local:BooklistPage.PriceDiscount(Price, Discount)}"/>
+                                               Text="{x:Bind local:MyWishlistPage.AddPrice(Price, Discount, AddPrice)}"/>
                                     <TextBlock Style="{StaticResource HorizontalBookTextStyle}"
                                                Text="{x:Bind local:MyWishlistPage.AuthorClass(AuthorName, Labels)}"/>
                                 </StackPanel>

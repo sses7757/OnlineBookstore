@@ -39,8 +39,8 @@ public class WishlistDaoImpl extends BaseDao implements WishlistDao {
 		boolean isaddaction = infoFromFront.getAddAction();
 
 		getConnection();
-		String sql = isaddaction ? "INSERT INTO wish_list(book_id, user_id)" + " VALUES (?,?)"
-				: "DELETE FROM wish_list WHERE book_id = ? and user_id = ?";
+		String sql = isaddaction ? "INSERT INTO wish_list(book_id, user_id)" + " VALUES (?,?);"
+				: "DELETE FROM wish_list WHERE book_id = ? and user_id = ?;";
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, bookid);
 		pstmt.setInt(2, userid);

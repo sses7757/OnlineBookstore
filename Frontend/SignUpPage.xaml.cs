@@ -37,7 +37,7 @@ namespace Frontend
 				notification.Show("Password and confirm password are dismatched", DELAY);
 				return;
 			}
-			if (nameBox.Text.Length <= 4 || passBox.Password.Length <= 6 || !emailBox.Text.Contains("@"))
+			if (nameBox.Text.Length < 4 || passBox.Password.Length < 4 || !emailBox.Text.Contains("@"))
 			{
 				notification.Show("Please input valid user name, e-mail or password", DELAY);
 				return;

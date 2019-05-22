@@ -45,7 +45,7 @@ namespace Frontend
 
 		public void RefreshButtonPressed()
 		{
-			listControl.Refresh();
+			this.Refresh();
 		}
 
 		public void AdminButtonPressed(bool isChecked)

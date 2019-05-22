@@ -100,10 +100,19 @@ public interface BookDao {
 
 	/**
 	 * Cancel a transaction, need consider the paid = true?
-	 * @author Miao Yanchao
+	 * @author Miao Yanchao, Kevin Sun
 	 * @param infoFromFront
 	 * @return
 	 * @throws SQLException
 	 */
 	InfoToFront CancelTransaction(InfoFromFront infoFromFront) throws SQLException;
+
+	/**
+	 * Get the price of the book when it is added to user's wish list
+	 * @author Kevin Sun
+	 * @param infoFromFront
+	 * @return
+	 * @throws SQLException
+	 */
+	InfoToFront GetAddPrice(InfoFromFront infoFromFront) throws SQLException;
 }

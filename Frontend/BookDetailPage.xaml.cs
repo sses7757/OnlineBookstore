@@ -218,7 +218,7 @@ namespace Frontend
 														bookId, null);
 						if (successful)
 						{
-							this.detail.CanAddReadList = false;
+							this.detail.CanAddReadList = titles.Count - 1 > 0;
 							this.Detail = detail;
 							notification.Show("Success in adding book to your read list" +
 												$"\"{combo.SelectedItem as string}\"", 4000);

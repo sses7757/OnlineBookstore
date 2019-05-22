@@ -282,7 +282,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
-			info.setURL(rs.getString("pdf_password"));
+			info.setPrivateKey(rs.getString("pdf_password"));
 		}
 
 		closeAll();
@@ -298,35 +298,77 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		String bookName = null;
 		double price = 0;
 
-		String sql = "select name, price_now(id) as price from book where book.id = ?";
-
+		InfoToFront infoToFront = new InfoToFront();
 		getConnection();
 
-		pstmt = conn.prepareStatement(sql);
+		String getSql = "select name, price_now(id) as price from book where book.id = ?";
+		pstmt = conn.prepareStatement(getSql);
 		pstmt.setInt(1, bookId);
-
 		rs = pstmt.executeQuery();
 		while (rs.next()) {
 			bookName = rs.getString("name");
 			price = rs.getDouble("price");
 		}
-		closeAll();
 
-		InfoToFront infoToFront = new InfoToFront();
-		infoToFront.setURL(String.format("https://qr.alipay.com/?user=team309&name=%s&price=%f", bookName, price));
-		BookhubServer.waitForPaying(userId, bookId);
+		String checkSql = "select paid from transaction where user_id = ? and book_id = ?";
+		pstmt = conn.prepareStatement(checkSql);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+		rs = pstmt.executeQuery();
+		if (rs.next()) {
+			if (rs.getBoolean("paid")) {
+				infoToFront.setSuccess(false);
+				return infoToFront;
+			}
+			else {
+				closeAll();
 
-		return infoToFront;
+				infoToFront.setURL(
+						String.format("https://qr.alipay.com/?user=team309&name=%s&price=%f", bookName, price));
+				BookhubServer.waitForPaying(userId, bookId);
+
+				return infoToFront;
+			}
+		}
+		else {
+			String insertSql = "insert into transaction(user_id, book_id) values (?,?);";
+			pstmt = conn.prepareStatement(insertSql);
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, bookId);
+			int rows = pstmt.executeUpdate();
+			if (rows == 1) {
+				infoToFront.setSuccess(true);
+			}
+			else {
+				closeAll();
+				return infoToFront;
+			}
+
+			closeAll();
+
+			infoToFront.setURL(
+					String.format("https://qr.alipay.com/?user=team309&name=%s&price=%f", bookName, price));
+			BookhubServer.waitForPaying(userId, bookId);
+
+			return infoToFront;
+		}
 	}
 
 	@Override
 	public InfoToFront CheckBuyComplete(InfoFromFront infoFromFront) throws SQLException {
 		int userId = infoFromFront.getUserId();
 		int bookId = infoFromFront.getBookId();
+
+		try {
+			BookhubServer.ongoingTransactions.get(userId).interrupt();
+		} catch (Exception e) {
+			// do nothing
+		}
+
 		InfoToFront infoToFront = new InfoToFront();
 
 		getConnection();
-		String sql = "select paid from transaction where transaction.user_id = ? and transaction.book_id = ?";
+		String sql = "select paid from transaction where user_id = ? and book_id = ?";
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, userId);
 		pstmt.setInt(2, bookId);
@@ -334,7 +376,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
-			infoToFront.setSuccess(rs.getBoolean("paied"));
+			infoToFront.setSuccess(rs.getBoolean("paid"));
 		}
 		closeAll();
 		return infoToFront;
@@ -345,12 +387,18 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		int userId = infoFromFront.getUserId();
 		int bookId = infoFromFront.getBookId();
 
+		try {
+			BookhubServer.ongoingTransactions.get(userId).interrupt();
+		} catch (Exception e) {
+			// do nothing
+		}
+
 		InfoToFront infoToFront = new InfoToFront();
 
 		getConnection();
 
 		boolean paid = false;
-		String sqlQuery = "select paid from transaction where transaction.user_id = ? and transaction.book_id = ?";
+		String sqlQuery = "select paid from transaction where transaction.user_id = ? and transaction.book_id = ?;";
 		pstmt = conn.prepareStatement(sqlQuery);
 		pstmt.setInt(1, userId);
 		pstmt.setInt(2, bookId);
@@ -364,7 +412,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 			return infoToFront;
 		}
 
-		String sql = "delete from transaction where transaction.user_id = ? ,transaction.book_id = ?";
+		String sql = "delete from transaction where user_id = ? and book_id = ?";
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, userId);
 		pstmt.setInt(2, bookId);
@@ -379,6 +427,28 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		closeAll();
 
 		return infoToFront;
+	}
+
+	@Override
+	public InfoToFront GetAddPrice(InfoFromFront infoFromFront) throws SQLException {
+		int userId = infoFromFront.getUserId();
+		int bookId = infoFromFront.getBookId();
+
+		getConnection();
+		String sql = "select add_price from wish_list where user_id = ? and book_id = ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+		rs = pstmt.executeQuery();
+
+		InfoToFront info = new InfoToFront();
+		while (rs.next()) {
+			info.setPrice(rs.getDouble("add_price"));
+		}
+
+		closeAll();
+
+		return info;
 	}
 
 }

@@ -29,7 +29,6 @@ namespace Frontend
 		public ReadPage()
 		{
 			this.InitializeComponent();
-			this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
 			this.bulletScreen = new BulletScreen();
 			this.bulletPool = new List<LiveComment>();
@@ -112,9 +111,7 @@ namespace Frontend
 				break;
 			}
 			memStream.Position = 0;
-			var doc = await PdfDocument.LoadFromStreamAsync(
-								memStream.AsRandomAccessStream(),
-								privateKey);
+			var doc = await PdfDocument.LoadFromStreamAsync(memStream.AsRandomAccessStream(), privateKey);
 
 			Load(doc);
 			return doc;
@@ -176,17 +173,16 @@ namespace Frontend
 		/// <summary>
 		/// Load comments according to the playback position
 		/// </summary>
-		private void LoadComments(uint pagePosNow)
+		private void LoadComments(uint pageNumNow)
 		{
 			// Get all the avaliable bullets's id.
-			List<Guid> idList = bulletScreen.Bullets.ToList().
-													 Where(o => !o.IsObsolete).
-													 Select(o => o.CommentItem.ID).
-													 ToList();
+			var idList = bulletScreen.Bullets.ToList().
+											  Where(o => !o.IsObsolete).
+											  Select(o => o.CommentItem.ID).
+											  ToList();
 			// Get comments need to load to screen from the comment pool.
-			IEnumerable<LiveComment> list = this.bulletPool.
-											Where(o => o.PageNum == pagePosNow
-												  && !idList.Contains(o.ID));
+			var list = this.bulletPool.Where(o => o.PageNum == pageNumNow && !idList.Contains(o.ID));
+
 			// default positon is top right.
 			Vector2 startPosition = new Vector2(1, 0);
 			// If there's any comment need to load to screen
@@ -424,7 +420,7 @@ namespace Frontend
 
 	internal class LiveComment
 	{
-		internal Guid ID { get; private set; }
+		internal int ID { get; private set; }
 
 		private readonly Danmu danmu;
 
@@ -435,7 +431,7 @@ namespace Frontend
 
 		internal LiveComment(Danmu danmu, uint pagenum)
 		{
-			this.ID = Guid.NewGuid();
+			this.ID = danmu.ID;
 			this.danmu = danmu;
 			this.PageNum = pagenum;
 		}

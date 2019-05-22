@@ -184,6 +184,11 @@ namespace Frontend.CustomControls
 
 		internal void Refresh(bool add = false)
 		{
+			if (this.RefreshOverride != null)
+			{
+				this.RefreshOverride.Invoke();
+				return;
+			}
 			if (!loadingControl.IsLoading)
 			{
 				Booklist.Reload(add);
@@ -196,7 +201,7 @@ namespace Frontend.CustomControls
 			if (this.RefreshOverride == null)
 				this.Refresh(true);
 			else
-				this.RefreshOverride();
+				this.RefreshOverride.Invoke();
 		}
 
 		private async void Top_SwipeItem_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)

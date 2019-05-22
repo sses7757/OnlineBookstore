@@ -25,6 +25,7 @@
         </ScrollViewer>
 
 		<canvas:CanvasAnimatedControl x:Name="animatedControl"
+                                      IsHitTestVisible="False"
 									  Height="400"
 									  MinHeight="200"
 									  Margin="0,20"
@@ -32,7 +33,7 @@
 									  VerticalAlignment="Top"
 									  Draw="AnimatedControl_Draw"
 									  Update="AnimatedControl_Update"
-									  Visibility="{x:Bind local:Storage.DanmuVisibility, Mode=OneTime}"/>
+									  Visibility="{x:Bind local:Storage.DanmuVisibility, Mode=OneWay}"/>
 
 		<controls:Loading x:Name="loadingControl"
 						  HorizontalContentAlignment="Center"

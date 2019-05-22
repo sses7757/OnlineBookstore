@@ -34,6 +34,7 @@ namespace Frontend
 			{
 				var book = new BookDetail(id);
 				await NetworkGet.GetBookQuasiDetail(book);
+				book.AddPrice = await NetworkGet.GetAddPrice(id);
 				this.WishBooks.Add(book);
 			}
 			this.loadingControl.IsLoading = false;
@@ -105,6 +106,25 @@ namespace Frontend
 		internal static string AuthorClass(string author, string category)
 		{
 			return string.Format("Author:\t{0}\t\tCategory: {1}", author, category);
+		}
+
+		internal static string AddPrice(double price, int discount, double addPrice)
+		{
+			if (addPrice <= price)
+			{
+				if (discount == 100)
+					return string.Format("Price:\t{0:C2}", price);
+				else
+					return string.Format("Price:\t{0:C2} ({1}% OFF)", price, 100 - discount);
+			}
+			else
+			{
+				if (discount == 100)
+					return string.Format("Price:\t{0:C2} ({1:N2}% cheaper)", price, addPrice / price - 1);
+				else
+					return string.Format("Price:\t{0:C2} ({1}% OFF, {2:N2}% cheaper)",
+										price, 100 - discount, addPrice / price - 1);
+			}
 		}
 	}
 }

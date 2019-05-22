@@ -165,7 +165,10 @@ namespace Frontend
 					if (books != null)
 						books.Remove(book);
 					else
+					{
 						book.CanBuy = false;
+						book.CanAddWishList = false;
+					}
 					notification.Show("Payment success, wish you enjoy reading", 4000);
 				}
 				else
@@ -175,10 +178,17 @@ namespace Frontend
 			}
 			else
 			{
-				if (await NetworkSet.CancleTransaction(bookId))
+				if (await NetworkSet.CancelTransaction(bookId))
 					notification.Show("Transaction cancled", 4000);
 				else
+				{
+					if (book != null)
+					{
+						book.CanBuy = false;
+						book.CanAddWishList = false;
+					}
 					notification.Show("Transaction cannot be cancled since you have paid", 4000);
+				}
 			}
 		}
 

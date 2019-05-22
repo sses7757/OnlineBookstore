@@ -120,15 +120,16 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 		getConnection();
 		String sql = "";
 		if (isDeleteAction) {
-			sql += "DELETE FROM danmu d" + " WHERE d.id = ?";
+			sql += "DELETE FROM danmu WHERE id = ?;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, danmuId);
 		}
 		else {
-			sql += "UPDATE danmu d" + " SET content = ?" + " WHERE d.id = ?";
+			sql += "UPDATE danmu" + " SET content = ?" + " WHERE id = ?;";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, newContent);
+			pstmt.setInt(2, danmuId);
 		}
-
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, newContent);
-		pstmt.setInt(2, danmuId);
 
 		int rows = pstmt.executeUpdate();
 		info.setSuccess(rows == 1);
@@ -152,15 +153,17 @@ public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 		getConnection();
 		String sql = null;
 
-		sql = "insert into  danmu(user_id, book_id, page_num, content) values(?,?,?,?)";
+		sql = "insert into danmu(user_id, book_id, page_num, content) values(?,?,?,?)";
 
 		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, userId);
+		if (userId > 0)
+			pstmt.setInt(1, userId);
+		else
+			pstmt.setNull(1, java.sql.Types.INTEGER);
 		pstmt.setInt(2, bookId);
 		pstmt.setInt(3, pageNum);
 		pstmt.setString(4, content);
 
-		pstmt = conn.prepareStatement(sql);
 		int rows = pstmt.executeUpdate();
 		info.setSuccess(rows == 1);
 
