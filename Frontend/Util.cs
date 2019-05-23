@@ -192,7 +192,53 @@ namespace Frontend
 			}
 		}
 
-		public static async Task<BitmapImage> ToQRCode(this string str)
+		internal static async void OpenTerminal()
+		{
+			var terminal = new CustomControls.TerminalControl();
+			ContentDialog dialog = new ContentDialog()
+			{
+				Content = terminal,
+				Title = "Perform SQL Statements",
+				IsSecondaryButtonEnabled = true,
+				PrimaryButtonText = "Confirm",
+				SecondaryButtonText = "Cancel"
+			};
+			if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+			{
+				var recv = await NetworkAdmin.PerformSQL(terminal.SQLCode);
+				if (recv.Contains("<html>"))
+				{
+					var web = new WebView(WebViewExecutionMode.SeparateThread)
+					{
+						Width = 800,
+						Height = 600
+					};
+					web.NavigateToString(recv);
+					dialog = new ContentDialog()
+					{
+						Content = web,
+						Title = "Execute Result",
+						IsSecondaryButtonEnabled = false,
+						PrimaryButtonText = "OK"
+					};
+					dialog.Width = 850;
+					await dialog.ShowAsync();
+				}
+				else
+				{
+					dialog = new ContentDialog()
+					{
+						Content = recv,
+						Title = "Execute Result",
+						IsSecondaryButtonEnabled = false,
+						PrimaryButtonText = "OK"
+					};
+					await dialog.ShowAsync();
+				}
+			}
+		}
+
+		internal static async Task<BitmapImage> ToQRCode(this string str)
 		{
 			QRCodeGenerator qrGenerator = new QRCodeGenerator();
 			QRCodeData qrCodeData = qrGenerator.CreateQrCode(str, QRCodeGenerator.ECCLevel.Q);
@@ -209,7 +255,7 @@ namespace Frontend
 			return image;
 		}
 
-		public static bool IsWebUri(this Uri uri)
+		internal static bool IsWebUri(this Uri uri)
 		{
 			if (uri != null)
 			{
@@ -230,7 +276,7 @@ namespace Frontend
 		/// <param name="func">an async method that actually dose computing</param>
 		/// <param name="parameter">the parameter need to pass to the async method</param>
 		/// <returns></returns>
-		public static async Task<TOut> GlobalLock<TIn, TOut>(this Func<TIn, Task<TOut>> func, TIn parameter)
+		internal static async Task<TOut> GlobalLock<TIn, TOut>(this Func<TIn, Task<TOut>> func, TIn parameter)
 		{
 			if (!lockDict.ContainsKey(func.Method.Name))
 				lockDict.Add(func.Method.Name, null);
@@ -256,13 +302,13 @@ namespace Frontend
 		/// </summary>
 		/// <param name="TimeStamp">time stamp</param>
 		/// <returns>DateTime</returns>
-		public static DateTime GetTime(this long TimeStamp)
+		internal static DateTime GetTime(this long TimeStamp)
 		{
 			DateTime startTime = new DateTime(1970, 1, 1); // 当地时区
 			return startTime.AddSeconds(TimeStamp);
 		}
 
-		public static string CutString(this string str, int maxLen = 38)
+		internal static string CutString(this string str, int maxLen = 38)
 		{
 			if (Encoding.UTF8.GetBytes(str).Length > maxLen)
 			{

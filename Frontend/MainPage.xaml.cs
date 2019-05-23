@@ -49,6 +49,8 @@ namespace Frontend
 			{ "login", typeof(LoginPage) }
 		};
 
+		internal Type CurrentPage { get => ContentFrame.CurrentSourcePageType; }
+
 		private void ShowSearch(bool visible)
 		{
 			SearchMain.Visibility = (!visible).ToVisibility();

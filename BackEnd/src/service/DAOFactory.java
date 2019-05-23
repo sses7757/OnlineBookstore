@@ -1,5 +1,6 @@
 package service;
 
+import dao.AdminDao;
 import dao.BillboardDao;
 import dao.BookDao;
 import dao.DanmuDao;
@@ -29,6 +30,8 @@ public interface DAOFactory {
 	UserDao getUserDao();
 
 	WishlistDao getWishlistDao();
+
+	AdminDao getAdminDao();
 
 	BaseDao getBaseDao(String methodName);
 }

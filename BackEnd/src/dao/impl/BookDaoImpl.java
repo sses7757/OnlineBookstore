@@ -16,7 +16,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		int bookId = infoFromFront.getBookId();
 
 		InfoToFront info = new InfoToFront();
-		info.setType("GetBookSummary");
+
 		getConnection();
 
 		String sql = "select b.name as book_name," + " book_cover_url," + " a.name as author_name" + " from book b"

@@ -163,7 +163,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		private readonly BulletScreen bulletScreen;

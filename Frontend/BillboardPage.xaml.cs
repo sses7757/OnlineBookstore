@@ -26,7 +26,20 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// TODO show edit & add billboard
+			if (isChecked)
+			{
+				listControl.CanEdit = true;
+				listControl.ShowLeftSwipe = true;
+				listControl.ShowLeftSwipe = true;
+				listControl.UpdateSwipes();
+			}
+			else
+			{
+				listControl.CanEdit = false;
+				listControl.ShowLeftSwipe = false;
+				listControl.ShowLeftSwipe = false;
+				listControl.UpdateSwipes();
+			}
 		}
 	}
 }

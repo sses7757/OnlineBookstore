@@ -75,6 +75,8 @@ public class InfoToFront {
 	// Type: DownloadBook
 	private String PrivateKey;
 
+	private String Message;
+
 	public boolean isSuccess() {
 		return Success;
 	}
@@ -369,5 +371,13 @@ public class InfoToFront {
 
 	public void setSubLabels(List<String> subLabels) {
 		SubLabels = subLabels;
+	}
+
+	public String getMessage() {
+		return Message;
+	}
+
+	public void setMessage(String message) {
+		Message = message;
 	}
 }

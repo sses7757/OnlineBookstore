@@ -181,7 +181,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		private void HyperlinkButton_Click_SubLabel(object sender, RoutedEventArgs e)

@@ -49,7 +49,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		internal static string PriceDiscount(double price, int discount)

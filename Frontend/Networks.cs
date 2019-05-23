@@ -117,6 +117,32 @@ namespace Frontend
 		}
 	}
 
+	public class AdminObject : IJsonable
+	{
+		public int UserId { set; get; } = -1;
+		public string Type { set; get; }
+		public string SQL { set; get; }
+		public int? BillboardId { set; get; }
+		public int? ChangeType { set; get; }
+		public int? AlteredBookId { set; get; }
+		public string AlteredText { set; get; }
+
+		public AdminObject(string type)
+		{
+			this.Type = type;
+		}
+
+		public string ToJson()
+		{
+			JsonSerializerSettings settings = new JsonSerializerSettings
+			{
+				Formatting = Formatting.Indented,
+				NullValueHandling = NullValueHandling.Ignore
+			};
+			return JsonConvert.SerializeObject(this, settings);
+		}
+	}
+
 	public class ReceiveObject
 	{
 		public bool Success { set; get; } = false;
@@ -166,6 +192,8 @@ namespace Frontend
 
 		public string PrivateKey { set; get; }
 
+		public string Message { set; get; }
+
 		public static ReceiveObject FromJson(string json)
 		{
 			try
@@ -181,10 +209,20 @@ namespace Frontend
 
 	public class Connection
 	{
-		public const string REMOTE_IP = "127.0.0.1";//"10.21.37.214";
-		public const int REMOTE_PORT = 2307;
+		private const string REMOTE_IP = "127.0.0.1";//"10.21.37.214";
+		private const int REMOTE_PORT_USER = 2307, REMOTE_PORT_ADMIN = 2308;
+
+		private readonly int RemotePort;
 
 		private Socket socket;
+
+		private Connection(bool portAdmin = false)
+		{
+			if (portAdmin)
+				this.RemotePort = REMOTE_PORT_ADMIN;
+			else
+				this.RemotePort = REMOTE_PORT_USER;
+		}
 
 		internal async Task Reconnect()
 		{
@@ -193,7 +231,7 @@ namespace Frontend
 				Close();
 			}
 			IPAddress ip = IPAddress.Parse(REMOTE_IP);
-			IPEndPoint ipEnd = new IPEndPoint(ip, REMOTE_PORT);
+			IPEndPoint ipEnd = new IPEndPoint(ip, RemotePort);
 			this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			try
 			{
@@ -208,8 +246,7 @@ namespace Frontend
 			}
 		}
 
-		private bool SocketConnected
-		{
+		private bool SocketConnected {
 			get {
 				try
 				{
@@ -250,9 +287,14 @@ namespace Frontend
 		}
 
 		/// <summary>
-		/// Singleton
+		/// Singleton user
 		/// </summary>
 		private static Connection Instance { get; } = new Connection();
+
+		/// <summary>
+		/// Singleton admin
+		/// </summary>
+		private static Connection InstanceAdmin { get; } = new Connection(true);
 
 		/// <summary>
 		/// Send to remote host with user id
@@ -275,7 +317,7 @@ namespace Frontend
 				int sendLen = await Instance.Send(send);
 				Debug.WriteLine("Send of \"{0}\" finish, total {1} bytes.", query.Type, sendLen);
 
-				receive = new byte[1<<14];
+				receive = new byte[1 << 14];
 				int recvLen = await Instance.Receive(receive);
 				Debug.WriteLine("Receive finish, total {0} bytes.", recvLen);
 
@@ -300,6 +342,53 @@ namespace Frontend
 		/// Delegate of private static async send and receive message method
 		/// </summary>
 		internal static readonly Func<IJsonable, Task<ReceiveObject>> SendAndReceive = SendWithUser;
+
+
+		/// <summary>
+		/// Send to remote host with user id of admin
+		/// </summary>
+		/// <param name="query"> A copied <code>QueryObject</code> </param>
+		private static async Task<string> SendAdminWithUser(IJsonable query)
+		{
+			if (Storage.Test)
+				return "";
+
+			if (!InstanceAdmin.SocketConnected)
+			{
+				await InstanceAdmin.Reconnect();
+			}
+			query.UserId = Storage.UserId;
+			var send = Encoding.UTF8.GetBytes(query.ToJson());
+			byte[] receive;
+			try
+			{
+				int sendLen = await InstanceAdmin.Send(send);
+				Debug.WriteLine("Send of \"{0}\" finish, total {1} bytes.", query.Type, sendLen);
+
+				receive = new byte[1 << 14];
+				int recvLen = await InstanceAdmin.Receive(receive);
+				Debug.WriteLine("Receive finish, total {0} bytes.", recvLen);
+
+				InstanceAdmin.Close();
+			}
+			catch (Exception)
+			{
+				await InstanceAdmin.Reconnect();
+				return await SendAdminWithUser(query); // recurrence
+			}
+			var str = Encoding.UTF8.GetString(receive);
+			if (str == null || str.Trim().Length == 0)
+			{
+				await InstanceAdmin.Reconnect();
+				return await SendAdminWithUser(query); // recurrence
+			}
+			return str;
+		}
+
+		/// <summary>
+		/// Delegate of private static async send and receive message method of admin
+		/// </summary>
+		internal static readonly Func<IJsonable, Task<string>> SendAdminAndReceive = SendAdminWithUser;
 
 	}
 
@@ -983,6 +1072,11 @@ namespace Frontend
 		public static async Task<bool> ChangeReadList(int readListId, BookListChangeType changeType,
 													  int? alteredId = null, string alteredText = null)
 		{
+			if (Util.MainElem.CurrentPage == typeof(BillboardPage) && Storage.IsAdmin)
+			{
+				return await NetworkAdmin.ChangeBillboard(readListId, changeType, alteredId, alteredText);
+			}
+
 			var change = new ChangeObject("ChangeReadList")
 			{
 				ReadListId = readListId,
@@ -1131,6 +1225,48 @@ namespace Frontend
 
 			var recv = await Connection.SendAndReceive.GlobalLock(change);
 			return recv.Success;
+		}
+	}
+
+	public class NetworkAdmin
+	{
+		public static async Task<string> PerformSQL(string sql)
+		{
+			var admin = new AdminObject("PerformSQL")
+			{
+				SQL = sql
+			};
+			var recv = await Connection.SendAdminAndReceive.GlobalLock(admin);
+			return recv;
+		}
+
+		public static async Task<bool> ChangeBillboard(int id, BookListChangeType changeType,
+													  int? alteredId = null, string alteredText = null)
+		{
+			var admin = new AdminObject("ChangeBillboard")
+			{
+				BillboardId = id,
+				ChangeType = (int)changeType,
+				AlteredBookId = alteredId,
+				AlteredText = alteredText
+			};
+			if (Storage.Test)
+				return true;
+
+			var recv = await Connection.SendAdminAndReceive.GlobalLock(admin);
+			var obj = JsonConvert.DeserializeObject(recv, typeof(ReceiveObject)) as ReceiveObject;
+			if (obj != null && obj.Message != null && obj.Message.Trim().Length > 0)
+			{
+				var dialog = new Windows.UI.Xaml.Controls.ContentDialog()
+				{
+					Content = obj.Message.Trim(),
+					Title = "Edit Billboard Result",
+					IsSecondaryButtonEnabled = false,
+					PrimaryButtonText = "OK"
+				};
+				await dialog.ShowAsync();
+			}
+			return obj != null && obj.Success;
 		}
 	}
 }

@@ -15,9 +15,10 @@ public class BaseDao {
 	// JDBC driver and database URL
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://localhost:3306/bookstore?serverTimezone=UTC&useSSL=false";
-	// user name and password.
-	static final String USER = "root";
-	static final String PASS = "112233";
+
+	// TODO : change the user into service
+	protected String userName = "root";
+	protected String userPassword = "112233";
 
 	static {
 		try {
@@ -34,7 +35,7 @@ public class BaseDao {
 	public void getConnection() {
 
 		try {
-			setConn(DriverManager.getConnection(DB_URL, USER, PASS));
+			setConn(DriverManager.getConnection(DB_URL, userName, userPassword));
 			// Since the default of MySQL is repeatable-read, there is no need
 			// pstmt = conn.prepareStatement("set session transaction isolation level repeatable read;");
 			// pstmt.execute();

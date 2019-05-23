@@ -2,6 +2,7 @@ package service.impl;
 
 import java.lang.reflect.Method;
 
+import dao.AdminDao;
 import dao.BillboardDao;
 import dao.BookDao;
 import dao.DanmuDao;
@@ -9,6 +10,7 @@ import dao.LabelDao;
 import dao.ReviewDao;
 import dao.UserDao;
 import dao.WishlistDao;
+import dao.impl.AdminDaoImpl;
 import dao.impl.BaseDao;
 import dao.impl.BillboardDaoImpl;
 import dao.impl.BookDaoImpl;
@@ -21,10 +23,7 @@ import dao.impl.WishlistDaoImpl;
 import service.DAOFactory;
 
 public class DAOFactoryImpl implements DAOFactory {
-	/*
-	 * enum isWhichDao{ isBillboradDao, isBookDao, isDanmuDao, isLabelDao, isReadlistDao, isReviewDao, isUserDao,
-	 * isWishlistDao }
-	 */
+
 	boolean isBillboard(String method) {
 		Method[] methods = BillboardDaoImpl.class.getDeclaredMethods();
 		for (int i = 0; i < methods.length; i++) {
@@ -105,6 +104,16 @@ public class DAOFactoryImpl implements DAOFactory {
 		return false;
 	}
 
+	boolean isAdmin(String method) {
+		Method[] methods = AdminDaoImpl.class.getDeclaredMethods();
+		for (int i = 0; i < methods.length; i++) {
+			if (method.equals(methods[i].getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public BillboardDao getBillboardDao() {
 		return new BillboardDaoImpl();
@@ -141,6 +150,11 @@ public class DAOFactoryImpl implements DAOFactory {
 	}
 
 	@Override
+	public AdminDao getAdminDao() {
+		return new AdminDaoImpl();
+	}
+
+	@Override
 	public BaseDao getBaseDao(String methodName) {
 		if (isBillboard(methodName)) {
 			return new BillboardDaoImpl();
@@ -166,9 +180,11 @@ public class DAOFactoryImpl implements DAOFactory {
 		else if (isWishlist(methodName)) {
 			return new WishlistDaoImpl();
 		}
+		else if (isAdmin(methodName)) {
+			return new AdminDaoImpl();
+		}
 		else {
 			return new ComplexQueryImpl();
 		}
 	}
-
 }

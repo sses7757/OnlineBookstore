@@ -11,7 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import controller.AbstractController;
-import controller.ReflectionController;
+import controller.AdminReflectionController;
+import controller.UserReflectionController;
 import dao.impl.BaseDao;
 
 public class BookhubServer {
@@ -49,9 +50,19 @@ public class BookhubServer {
 		t.start();
 	}
 
-	private static final int PORT = 2307;
+	private static final int USER_PORT = 2307, ADMIN_PROT = 2308;
+
+	private boolean isAdmin;
 
 	private ServerSocket server;
+
+	public BookhubServer() {
+		this(false);
+	}
+
+	public BookhubServer(boolean isadmin) {
+		this.isAdmin = isadmin;
+	}
 
 	/**
 	 * Turn on the Server.<br>
@@ -62,15 +73,15 @@ public class BookhubServer {
 	 * Return the info in the form of Json.<br>
 	 * <p>
 	 * Edit on 2019.5.19 Jason Zhao.<br>
-	 * Edit on 2019.5.20 Kevin Sun.<br>
+	 * Edit on 2019.5.23 Kevin Sun.<br>
 	 *
 	 * @throws Exception
 	 */
 	public void turnOnServer(final int N) throws Exception {
 		// 监听指定的端口
-		server = new ServerSocket(PORT);
+		server = new ServerSocket(isAdmin ? ADMIN_PROT : USER_PORT);
 
-		System.out.println("Big brother is watching.");
+		System.out.printf("Big brother is watching port %d.\n", server.getLocalPort());
 
 		ExecutorService threadPool = Executors.newFixedThreadPool(N);
 
@@ -93,9 +104,10 @@ public class BookhubServer {
 					if (sb.toString().trim().length() < 10)
 						return;
 
-					System.out.println("Get message from client:\n" + sb);
+					System.out.printf("Get message from %d client:\n%s\n", server.getLocalPort(), sb.toString());
 
-					AbstractController controller = new ReflectionController();
+					AbstractController controller = isAdmin ? new AdminReflectionController()
+							: new UserReflectionController();
 					String send = controller.methodController(sb.toString());
 					System.out.println("Send message to client:\n" + send);
 

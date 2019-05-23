@@ -174,7 +174,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// TODO show edit info button
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		private async void Button_Click(object sender, RoutedEventArgs e)

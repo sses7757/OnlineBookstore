@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
+import socket.InfoFromAdmin;
 import socket.InfoFromFront;
 import socket.InfoToFront;
 
@@ -19,6 +20,17 @@ public abstract class AbstractController {
 		InfoFromFront infoFromFront;
 		try {
 			infoFromFront = gson.fromJson(info, InfoFromFront.class);
+		} catch (JsonSyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return infoFromFront;
+	}
+
+	protected InfoFromAdmin fromAdminJson(String info) {
+		InfoFromAdmin infoFromFront;
+		try {
+			infoFromFront = gson.fromJson(info, InfoFromAdmin.class);
 		} catch (JsonSyntaxException e) {
 			e.printStackTrace();
 			return null;

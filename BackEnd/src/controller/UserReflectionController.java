@@ -8,17 +8,12 @@ import socket.InfoFromFront;
 import socket.InfoToFront;
 
 /**
- * @author Jason Zhao
+ * @author Jason Zhao, Kevin Sun
  * <p>
- * Edit on 2019.5.20 Kevin Sun.
+ * Edit on 2019.5.23 Kevin Sun.
  */
-public class ReflectionController extends AbstractController {
+public class UserReflectionController extends AbstractController {
 
-	/*
-	 * £¨·Ç Javadoc£©
-	 * 
-	 * @see controller.AbstractController#methodController(java.lang.String)
-	 */
 	@Override
 	public String methodController(String infoFromFront) {
 		InfoFromFront info = this.fromJson(infoFromFront);

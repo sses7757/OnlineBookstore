@@ -27,7 +27,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		internal static string DateFollow(DateTime date, int followers, string user)

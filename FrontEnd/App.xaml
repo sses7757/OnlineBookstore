@@ -4,6 +4,8 @@
 			 xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls">
 
 	<Application.Resources>
+        <x:Double x:Key="ContentDialogMaxWidth">850</x:Double>
+        
         <Style x:Key="TitleTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>

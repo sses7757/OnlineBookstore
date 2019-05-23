@@ -194,7 +194,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)

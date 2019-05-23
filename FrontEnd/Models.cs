@@ -328,7 +328,7 @@ namespace Frontend
 
 		internal bool Selected { set; get; }
 
-		private const int HOT_AMOUNT = 8;
+		private const int HOT_AMOUNT = 4;
 
 		internal void RetriveSubs()
 		{

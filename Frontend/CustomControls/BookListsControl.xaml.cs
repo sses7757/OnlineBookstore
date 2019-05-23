@@ -45,6 +45,8 @@ namespace Frontend.CustomControls
 			{
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftSwipeText"));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftIconSource"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBoxVisibility"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockVisibility"));
 			}
 			else
 			{
