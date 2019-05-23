@@ -4,7 +4,7 @@
 # Database
 MySQL
 # Language 
-Frontend: C#
+Frontend: C#  
 Backend: JAVA
 # Package Reliance
 Frontend: Microsoft.NETCore.UniversalWindowsPlatform, Microsoft.Toolkit.Uwp.UI.Controls, QRCoder  
