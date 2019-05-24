@@ -17,7 +17,10 @@ import dao.impl.BaseDao;
 
 public class BookhubServer {
 
-	public static Map<Integer, Thread> ongoingTransactions = new HashMap<>();
+	/**
+	 * Used since we cannot actually implement paying progress
+	 */
+	public static final Map<Integer, Thread> ongoingTransactions = new HashMap<>();
 
 	/**
 	 * @author Kevin Sun
@@ -50,7 +53,12 @@ public class BookhubServer {
 		t.start();
 	}
 
-	private static final int USER_PORT = 2307, ADMIN_PROT = 2308;
+	private static int USER_PORT = 2317, ADMIN_PROT = 2318;
+
+	public static void setPorts(int user, int admin) {
+		USER_PORT = user;
+		ADMIN_PROT = admin;
+	}
 
 	private boolean isAdmin;
 

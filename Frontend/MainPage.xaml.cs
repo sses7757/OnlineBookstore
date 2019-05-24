@@ -18,6 +18,64 @@ namespace Frontend
 	/// </summary>
 	public sealed partial class MainPage : Page
 	{
+		private async void ShowInput()
+		{
+			var ip = new TextBox()
+			{
+				Header = "Please input the remote IP",
+				PlaceholderText = "127.0.0.1",
+			};
+			var userPort = new TextBox()
+			{
+				Header = "Please input the remote port of user",
+				PlaceholderText = "2317"
+			};
+			var adminPort = new TextBox()
+			{
+				Header = "Please input the remote port of admin",
+				PlaceholderText = "2318"
+			};
+			var panel = new StackPanel()
+			{
+				Spacing = 10
+			};
+			panel.Children.Add(ip);
+			panel.Children.Add(userPort);
+			panel.Children.Add(adminPort);
+			ContentDialog dialog = new ContentDialog()
+			{
+				Content = panel,
+				Title = "Internet Info",
+				PrimaryButtonText = "Confirm"
+			};
+			await dialog.ShowAsync();
+			try
+			{
+				System.Net.IPAddress.Parse(ip.Text);
+				Connection.REMOTE_IP = ip.Text;
+			}
+			catch (Exception)
+			{
+				Connection.REMOTE_IP = ip.PlaceholderText;
+			}
+			try
+			{
+				Connection.REMOTE_PORT_USER = Convert.ToUInt16(userPort.Text);
+			}
+			catch (Exception)
+			{
+				Connection.REMOTE_PORT_USER = Convert.ToUInt16(userPort.PlaceholderText);
+			}
+			try
+			{
+				Connection.REMOTE_PORT_ADMIN = Convert.ToUInt16(adminPort.Text);
+			}
+			catch (Exception)
+			{
+				Connection.REMOTE_PORT_ADMIN = Convert.ToUInt16(adminPort.PlaceholderText);
+			}
+		}
+
 		public MainPage()
 		{
 			this.InitializeComponent();
@@ -25,6 +83,7 @@ namespace Frontend
 			ApplicationView.PreferredLaunchViewSize = new Size(1440, 900);
 			ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
+			ShowInput();
 			ShowSearch(false);
 		}
 

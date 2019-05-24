@@ -10,6 +10,10 @@ import socket.InfoToFront;
 
 public class DanmuDaoImpl extends BaseDao implements DanmuDao {
 
+	public DanmuDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetDanmuContent(InfoFromFront infoFromFront) throws SQLException {
 		int danmuId = infoFromFront.getDanmuId();

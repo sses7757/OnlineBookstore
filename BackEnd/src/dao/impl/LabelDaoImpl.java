@@ -10,6 +10,10 @@ import socket.InfoToFront;
 
 public class LabelDaoImpl extends BaseDao implements LabelDao {
 
+	public LabelDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetMainLabels(InfoFromFront infoFromFront) throws SQLException {
 		List<String> labelList = new LinkedList<String>();

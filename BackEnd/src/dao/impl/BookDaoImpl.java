@@ -11,6 +11,10 @@ import socket.InfoToFront;
 
 public class BookDaoImpl extends BaseDao implements BookDao {
 
+	public BookDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetBookSummary(InfoFromFront infoFromFront) throws SQLException {
 		int bookId = infoFromFront.getBookId();

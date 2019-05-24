@@ -9,6 +9,11 @@ import socket.InfoFromFront;
 import socket.InfoToFront;
 
 public class WishlistDaoImpl extends BaseDao implements WishlistDao {
+
+	public WishlistDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetMyWishlist(InfoFromFront infoFromFront) throws SQLException {
 		int userId = infoFromFront.getUserId();

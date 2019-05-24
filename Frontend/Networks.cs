@@ -209,8 +209,8 @@ namespace Frontend
 
 	public class Connection
 	{
-		private const string REMOTE_IP = "127.0.0.1";//"10.21.37.214";
-		private const int REMOTE_PORT_USER = 2307, REMOTE_PORT_ADMIN = 2308;
+		public static string REMOTE_IP = null;// = "127.0.0.1";//"114.116.100.205";
+		public static int REMOTE_PORT_USER = 2317, REMOTE_PORT_ADMIN = 2318;
 
 		private readonly int RemotePort;
 
@@ -230,6 +230,9 @@ namespace Frontend
 			{
 				Close();
 			}
+			while (REMOTE_IP == null)
+				await Task.Delay(Util.REFRESH_RATE);
+
 			IPAddress ip = IPAddress.Parse(REMOTE_IP);
 			IPEndPoint ipEnd = new IPEndPoint(ip, RemotePort);
 			this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

@@ -16,9 +16,9 @@ import socket.frontEnum.ReadListChangeType;
 public class AdminDaoImpl extends BaseDao implements AdminDao {
 
 	public AdminDaoImpl() {
-		// TODO : change the user into admin
-		this.userName = "root";
-		this.userPassword = "112233";
+		super();
+		this.userName = NAME_ADMIN;
+		this.userPassword = PASSWORD_ADMIN;
 	}
 
 	private static String SQLExceptionToString(SQLException e) {
@@ -34,8 +34,8 @@ public class AdminDaoImpl extends BaseDao implements AdminDao {
 	public String PerformSQL(InfoFromAdmin infoFromAdmin) {
 		// int userId = infoFromAdmin.getUserId();
 		String sql = infoFromAdmin.getSQL();
-		if (sql == null || sql.isBlank())
-			return "Error: Empyt SQL String!";
+		if (sql == null || sql.trim().length() == 0)
+			return "Error: Empty SQL String!";
 
 		String result = null;
 		try {

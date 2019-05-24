@@ -11,6 +11,10 @@ import socket.frontEnum.ReadListChangeType;
 
 public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 
+	public ReadlistDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetMyReadListsWithout(InfoFromFront infoFromFront) throws SQLException {
 		int userid = infoFromFront.getUserId();

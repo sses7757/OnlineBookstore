@@ -18,6 +18,10 @@ import socket.frontEnum.TimeSpanType;
  */
 public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 
+	public ComplexQueryImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetFromQuery(InfoFromFront infoFromFront) throws SQLException {
 		// the info from front must have following
@@ -157,7 +161,7 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 	@SuppressWarnings("unchecked")
 	private InfoToFront GetBooksByQuery(BooksOrderType order, boolean orderDesend, InfoFromFront info, int from,
 			int count) throws SQLException {
-		if (info.getQueryText() == null || info.getQueryText().isBlank()) {
+		if (info.getQueryText() == null || info.getQueryText().trim().length() == 0) {
 			// Every thing except for SearchType, OrderDescend, Order are actually default value
 
 			String queryBookIdSQL = "select b.id from book b ";
@@ -336,7 +340,7 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 
 	private InfoToFront GetBillboardsByQuery(BillboardsOrderType order, boolean orderDesend, InfoFromFront info,
 			int from, int count) throws SQLException {
-		if (info.getQueryText() == null || info.getQueryText().isBlank()) {
+		if (info.getQueryText() == null || info.getQueryText().trim().length() == 0) {
 			// Every thing except for SearchType, OrderDescend, Order are actually default value
 
 			String queryBookIdSQL = "select b.id from billboard b ";
@@ -442,7 +446,7 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 
 	private InfoToFront GetReadlistsByQuery(ReadlistsOrderType order, boolean orderDesend, InfoFromFront info,
 			int from, int count) throws SQLException {
-		if (info.getQueryText() == null || info.getQueryText().isBlank()) {
+		if (info.getQueryText() == null || info.getQueryText().trim().length() == 0) {
 			// Every thing except for SearchType, OrderDescend, Order are actually default value
 
 			String queryBookIdSQL = "select b.id from readlist b order by ";

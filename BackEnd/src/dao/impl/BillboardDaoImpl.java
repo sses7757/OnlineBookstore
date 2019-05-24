@@ -9,6 +9,11 @@ import socket.InfoFromFront;
 import socket.InfoToFront;
 
 public class BillboardDaoImpl extends BaseDao implements BillboardDao {
+
+	public BillboardDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetBookListBooks(InfoFromFront infoFromFront) throws SQLException {
 		boolean isbillboard = infoFromFront.getIsBillboard();

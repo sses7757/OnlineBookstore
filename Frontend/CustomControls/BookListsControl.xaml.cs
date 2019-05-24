@@ -43,6 +43,8 @@ namespace Frontend.CustomControls
 		{
 			if (name == null)
 			{
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowTopSwipe"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowLeftSwipe"));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftSwipeText"));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LeftIconSource"));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBoxVisibility"));
@@ -209,7 +211,10 @@ namespace Frontend.CustomControls
 		private async void Top_SwipeItem_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
 		{
 			if (!this.ShowTopSwipe)
+			{
+				notification.Show("The feature is not available for now", 5000);
 				return;
+			}
 
 			if (!(args.SwipeControl.DataContext is BookDetailCollection collection) ||
 				!collection.ID.HasValue)
@@ -259,16 +264,22 @@ namespace Frontend.CustomControls
 
 		private async void Left_SwipeItem_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
 		{
+			if (!this.ShowLeftSwipe)
+			{
+				notification.Show("The feature is not available for now", 5000);
+				return;
+			}
+
 			if (!(args.SwipeControl.DataContext is BookDetail book))
 			{
-				System.Diagnostics.Debug.WriteLine("Top swipe item error!");
+				System.Diagnostics.Debug.WriteLine("Left swipe item error!");
 				return;
 			}
 			var parent = args.SwipeControl.GetParentUpto(Util.LEVEL_DataTemplate + 5) as SwipeControl;
 			var collection = parent?.DataContext as BookDetailCollection;
 			if (collection == null || !collection.ID.HasValue)
 			{
-				System.Diagnostics.Debug.WriteLine("Top swipe item error!");
+				System.Diagnostics.Debug.WriteLine("Left swipe item error!");
 			}
 			var id = collection.ID.Value;
 			var success = await NetworkSet.ChangeReadList(id, BookListChangeType.DeleteBook, book.ID);

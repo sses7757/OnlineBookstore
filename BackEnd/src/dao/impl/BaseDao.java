@@ -13,20 +13,46 @@ public class BaseDao {
 	// protected int result;
 
 	// JDBC driver and database URL
-	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost:3306/bookstore?serverTimezone=UTC&useSSL=false";
+	protected static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+	protected static final String PREFIX_JDBC = "jdbc:mysql://localhost:3306/",
+			POSTFIX_JDBC = "?serverTimezone=Asia/Shanghai&useSSL=false";
 
-	// TODO : change the user into service
-	protected String userName = "root";
-	protected String userPassword = "112233";
+	protected static String DATABASE = "bookstore";
+	protected static String NAME_USER = "root", PASSWORD_USER = "112233";
+	protected static String NAME_ADMIN = "root", PASSWORD_ADMIN = "112233";
+
+	public static void setDatabaseName(String name) {
+		DATABASE = name;
+	}
+
+	public static void setUserInfo(String name, String pass) {
+		NAME_USER = name;
+		PASSWORD_USER = pass;
+	}
+
+	public static void setAdminInfo(String name, String pass) {
+		NAME_ADMIN = name;
+		PASSWORD_ADMIN = pass;
+	}
+
+	protected String userName;
+	protected String userPassword;
+	protected final String DB_URL;
 
 	static {
 		try {
 			Class.forName(JDBC_DRIVER);
+			new com.google.gson.Gson();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			System.err.println("Fail to load the database");
+			System.err.println("Fail to load the database driver");
 		}
+	}
+
+	public BaseDao() {
+		DB_URL = PREFIX_JDBC + DATABASE + POSTFIX_JDBC;
+		userName = NAME_USER;
+		userPassword = PASSWORD_USER;
 	}
 
 	/**
@@ -35,7 +61,7 @@ public class BaseDao {
 	public void getConnection() {
 
 		try {
-			setConn(DriverManager.getConnection(DB_URL, userName, userPassword));
+			conn = DriverManager.getConnection(DB_URL, userName, userPassword);
 			// Since the default of MySQL is repeatable-read, there is no need
 			// pstmt = conn.prepareStatement("set session transaction isolation level repeatable read;");
 			// pstmt.execute();

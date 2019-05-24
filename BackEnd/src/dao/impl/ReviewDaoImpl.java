@@ -11,6 +11,10 @@ import socket.InfoToFront;
 
 public class ReviewDaoImpl extends BaseDao implements ReviewDao {
 
+	public ReviewDaoImpl() {
+		super();
+	}
+
 	@Override
 	public InfoToFront GetBookReviews(InfoFromFront infoFromFront) throws SQLException {
 		int bookId, from, count;

@@ -9,6 +9,11 @@ import socket.frontEnum.LoginStatus;
 
 public class UserDaoImpl extends BaseDao implements UserDao {
 
+	public UserDaoImpl() {
+		super();
+	}
+
+	@Override
 	public InfoToFront Login(InfoFromFront infoFromFront) throws SQLException {
 		String userName = infoFromFront.getUserName();
 		String encodedPassword = infoFromFront.getEncodedPassword().toUpperCase();
