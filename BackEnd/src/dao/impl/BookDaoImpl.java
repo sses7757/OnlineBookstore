@@ -273,22 +273,30 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 	@Override
 	public InfoToFront GetBookKey(InfoFromFront infoFromFront) throws SQLException {
 		int bookId = infoFromFront.getBookId();
+		int userId = infoFromFront.getUserId();
 
 		InfoToFront info = new InfoToFront();
 
 		getConnection();
 
-		String sql = "select pdf_password from book where id = ?";
+		String buySQL = "select * from transaction where user_id = ? and book_id = ?;";
+		pstmt = conn.prepareStatement(buySQL);
+		pstmt.setInt(1, userId);
+		pstmt.setInt(2, bookId);
+		rs = pstmt.executeQuery();
+		if (!rs.next()) {
+			info.setPrivateKey(null);
+			closeAll();
+			return info;
+		}
 
+		String sql = "select pdf_password from book where id = ?;";
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, bookId);
-
 		rs = pstmt.executeQuery();
-
 		while (rs.next()) {
 			info.setPrivateKey(rs.getString("pdf_password"));
 		}
-
 		closeAll();
 
 		return info;

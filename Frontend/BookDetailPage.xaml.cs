@@ -103,6 +103,11 @@ namespace Frontend
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Detail"));
 		}
 
+		internal static string PreviewOrRead(BookDetail detail)
+		{
+			return detail.CanBuy ? "Preview" : "Read";
+		}
+
 		internal static string PublishInfoAndPage(BookDetail detail)
 		{
 			return string.Format("{0} / {1} pages", detail.PublishInfo, detail.PageCount);
@@ -247,8 +252,24 @@ namespace Frontend
 					}
 					break;
 				case "preview":
-					var pdfUrl = await NetworkGet.GetBookPreview(bookId);
-					Util.MainElem.NavigateToReadBook(bookId, pdfUrl);
+					var content = (sender as Button).Content as string;
+					if (content == "Read")
+					{
+						var pdfUrl = await NetworkGet.DownloadBook(bookId);
+						var pass = await NetworkGet.GetBookKey(bookId);
+						if (pass == null || pass.Length == 0)
+						{
+							notification.Show("It seems that you haven't bought the book. " +
+											"Please try again later.", 4000);
+							return;
+						}
+						Util.MainElem.NavigateToReadBook(bookId, pdfUrl, pass);
+					}
+					else
+					{
+						var pdfUrl = await NetworkGet.GetBookPreview(bookId);
+						Util.MainElem.NavigateToReadBook(bookId, pdfUrl);
+					}
 					break;
 				default:
 					return;

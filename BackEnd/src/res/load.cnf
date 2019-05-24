@@ -3,5 +3,5 @@ port_admin = 2318
 database = bookstore
 user = root
 password_user = 112233
-admin = admin
+admin = root
 password_admin = 112233

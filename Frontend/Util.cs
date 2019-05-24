@@ -17,7 +17,7 @@ namespace Frontend
 {
 	internal static class Storage
 	{
-		internal static bool Test { get; } = false;
+		internal static bool Test { get; } = true;
 
 		internal static int UserId { set; get; } = -1;
 		internal static Visibility SignUpVisibility { get => (!NetworkGet.IsValidID(UserId)).ToVisibility(); }
@@ -265,7 +265,7 @@ namespace Frontend
 			return false;
 		}
 
-		private static Dictionary<string, object> lockDict = new Dictionary<string, object>();
+		private static readonly Dictionary<string, object> lockDict = new Dictionary<string, object>();
 		private static readonly Random random = new Random();
 
 		/// <summary>
@@ -278,12 +278,12 @@ namespace Frontend
 		/// <returns></returns>
 		internal static async Task<TOut> GlobalLock<TIn, TOut>(this Func<TIn, Task<TOut>> func, TIn parameter)
 		{
+			await Task.Delay(random.Next(REFRESH_RATE / 5, REFRESH_RATE / 2));
+
 			if (!lockDict.ContainsKey(func.Method.Name))
 				lockDict.Add(func.Method.Name, null);
-			object lockObj = lockDict[func.Method.Name];
 
-			await Task.Delay(random.Next(REFRESH_RATE / 5, REFRESH_RATE / 3));
-			while (lockObj != null)
+			while (lockDict[func.Method.Name] != null)
 			{
 				await Task.Delay(REFRESH_RATE / 2);
 			}

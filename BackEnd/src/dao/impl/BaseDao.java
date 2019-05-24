@@ -15,7 +15,7 @@ public class BaseDao {
 	// JDBC driver and database URL
 	protected static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	protected static final String PREFIX_JDBC = "jdbc:mysql://localhost:3306/",
-			POSTFIX_JDBC = "?serverTimezone=Asia/Shanghai&useSSL=false";
+			POSTFIX_JDBC = "?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true";
 
 	protected static String DATABASE = "bookstore";
 	protected static String NAME_USER = "root", PASSWORD_USER = "112233";

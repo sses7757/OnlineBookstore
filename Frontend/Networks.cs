@@ -282,9 +282,9 @@ namespace Frontend
 			{
 				this.socket.Shutdown(SocketShutdown.Both);
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
-				Debug.WriteLine("Socket shutdown error: " + e.Message);
+				//Debug.WriteLine("Socket shutdown error: " + e.Message);
 			}
 			this.socket.Close();
 		}

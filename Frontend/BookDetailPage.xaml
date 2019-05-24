@@ -90,7 +90,7 @@
 								HorizontalAlignment="Stretch"
 								VerticalAlignment="Stretch"
 								Click="Button_Click"
-								Content="Preview"
+								Content="{x:Bind local:BookDetailPage.PreviewOrRead(Detail), Mode=OneWay}"
 								FontSize="16"
 								FontWeight="SemiBold"
 								Style="{StaticResource AccentButtonStyle}"
