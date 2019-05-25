@@ -19,6 +19,7 @@
 									   PaddingX="120"
                                        ShowTopSwipe="True"
                                        ShowLeftSwipe="True"
+                                       ShowAddButton="True"
                                        IsTopSwipeFollow="False"
                                        CanEdit="True"
                                        ShowAllVisible="False"/>

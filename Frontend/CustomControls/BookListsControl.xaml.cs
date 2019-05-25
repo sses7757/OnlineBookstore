@@ -19,6 +19,7 @@ namespace Frontend.CustomControls
 
 		public BooklistCollection Booklist { set; get; }
 
+		public bool ShowAddButton { set; get; } = false;
 		public bool ShowTopSwipe { set; get; } = false;
 		public bool ShowLeftSwipe { set; get; } = false;
 		public bool IsTopSwipeFollow { set; get; } = true;
@@ -375,6 +376,56 @@ namespace Frontend.CustomControls
 			collection.OnPropertyChanged("Description");
 			collection.OnPropertyChanged("EditTime");
 			return true;
+		}
+
+		private async void Button_Click(object sender, RoutedEventArgs e)
+		{
+			if (!ShowAddButton)
+				return;
+
+			var titleBox = new TextBox()
+			{
+				Header = "Please input the title of your new read-list",
+				PlaceholderText = "Title here",
+				FontSize = 16
+			};
+			var descBox = new TextBox()
+			{
+				Header = "Please input the description of your new read-list",
+				PlaceholderText = "Description here",
+				FontSize = 16
+			};
+			var panel = new StackPanel()
+			{
+				Spacing = 10
+			};
+			panel.Children.Add(titleBox);
+			panel.Children.Add(descBox);
+			var dialog = new ContentDialog()
+			{
+				Content = panel,
+				Title = "Create Read List",
+				IsSecondaryButtonEnabled = true,
+				PrimaryButtonText = "Confirm",
+				SecondaryButtonText = "Cancle"
+			};
+			if (await dialog.ShowAsync() == ContentDialogResult.Primary &&
+				titleBox.Text.Trim().Length > 2 && descBox.Text.Trim().Length > 4)
+			{
+				var success = await NetworkSet.CreateReadList(titleBox.Text.Trim(), descBox.Text.Trim());
+				if (success)
+				{
+					var b = new BookDetailCollection()
+					{
+						Title = titleBox.Text.Trim(),
+						Description = descBox.Text.Trim(),
+						CreateUser = this.Booklist.Booklists.Count > 0 ?
+										this.Booklist.Booklists[0].CreateUser : "MySelf",
+						EditTime = DateTime.Now
+					};
+					this.Booklist.Booklists.Add(b);
+				}
+			}
 		}
 	}
 }

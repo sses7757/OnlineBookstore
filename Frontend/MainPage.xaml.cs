@@ -23,17 +23,17 @@ namespace Frontend
 			var ip = new TextBox()
 			{
 				Header = "Please input the remote IP",
-				PlaceholderText = "127.0.0.1",
+				PlaceholderText = "114.116.100.205",
 			};
 			var userPort = new TextBox()
 			{
 				Header = "Please input the remote port of user",
-				PlaceholderText = "2317"
+				PlaceholderText = "2307"
 			};
 			var adminPort = new TextBox()
 			{
 				Header = "Please input the remote port of admin",
-				PlaceholderText = "2318"
+				PlaceholderText = "2308"
 			};
 			var panel = new StackPanel()
 			{

@@ -17,7 +17,7 @@ namespace Frontend
 {
 	internal static class Storage
 	{
-		internal static bool Test { get; } = true;
+		internal static bool Test { get; } = false;
 
 		internal static int UserId { set; get; } = -1;
 		internal static Visibility SignUpVisibility { get => (!NetworkGet.IsValidID(UserId)).ToVisibility(); }
