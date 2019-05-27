@@ -59,7 +59,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 
 		private async void Edit_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)

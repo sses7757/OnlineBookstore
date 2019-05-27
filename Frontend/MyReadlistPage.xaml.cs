@@ -56,7 +56,8 @@ namespace Frontend
 
 		public void AdminButtonPressed(bool isChecked)
 		{
-			// do nothing
+			if (isChecked)
+				Util.OpenTerminal();
 		}
 	}
 }
