@@ -25,6 +25,8 @@ namespace Frontend
 
 		private async void BindBooks()
 		{
+			asb.Text = Info.QueryText;
+
 			directBooks = new CustomControls.BookCollectionControl(Info.Books, false)
 			{
 				PaddingX = 125,

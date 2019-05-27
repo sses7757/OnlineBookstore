@@ -23,7 +23,7 @@ namespace Frontend
 			var ip = new TextBox()
 			{
 				Header = "Please input the remote IP",
-				PlaceholderText = "114.116.100.205",
+				PlaceholderText = "114.116.100.205",//"127.0.0.1",
 			};
 			var userPort = new TextBox()
 			{
@@ -60,19 +60,19 @@ namespace Frontend
 			}
 			try
 			{
-				Connection.REMOTE_PORT_USER = Convert.ToUInt16(userPort.Text);
+				Connection.REMOTE_PORT_USER = Convert.ToInt32(userPort.Text);
 			}
 			catch (Exception)
 			{
-				Connection.REMOTE_PORT_USER = Convert.ToUInt16(userPort.PlaceholderText);
+				Connection.REMOTE_PORT_USER = Convert.ToInt32(userPort.PlaceholderText);
 			}
 			try
 			{
-				Connection.REMOTE_PORT_ADMIN = Convert.ToUInt16(adminPort.Text);
+				Connection.REMOTE_PORT_ADMIN = Convert.ToInt32(adminPort.Text);
 			}
 			catch (Exception)
 			{
-				Connection.REMOTE_PORT_ADMIN = Convert.ToUInt16(adminPort.PlaceholderText);
+				Connection.REMOTE_PORT_ADMIN = Convert.ToInt32(adminPort.PlaceholderText);
 			}
 		}
 

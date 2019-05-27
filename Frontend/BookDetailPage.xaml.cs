@@ -105,7 +105,7 @@ namespace Frontend
 
 		internal static string PreviewOrRead(BookDetail detail)
 		{
-			return detail.CanBuy ? "Preview" : "Read";
+			return (!detail.CanBuy && Storage.UserId > 0) ? "Read" : "Preview";
 		}
 
 		internal static string PublishInfoAndPage(BookDetail detail)

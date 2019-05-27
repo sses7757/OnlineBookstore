@@ -410,7 +410,7 @@ namespace Frontend.CustomControls
 				SecondaryButtonText = "Cancle"
 			};
 			if (await dialog.ShowAsync() == ContentDialogResult.Primary &&
-				titleBox.Text.Trim().Length > 2 && descBox.Text.Trim().Length > 4)
+				titleBox.Text.Trim().Length > 1 && descBox.Text.Trim().Length > 1)
 			{
 				var success = await NetworkSet.CreateReadList(titleBox.Text.Trim(), descBox.Text.Trim());
 				if (success)

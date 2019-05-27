@@ -120,10 +120,10 @@ namespace Frontend
 			else
 			{
 				if (discount == 100)
-					return string.Format("Price:\t{0:C2} ({1:N2}% cheaper)", price, addPrice / price - 1);
+					return string.Format("Price:\t{0:C2} ({1:N2}% cheaper)", price, 100 * (1 - price / addPrice));
 				else
 					return string.Format("Price:\t{0:C2} ({1}% OFF, {2:N2}% cheaper)",
-										price, 100 - discount, addPrice / price - 1);
+										price, 100 - discount, 100 * (1 - price / addPrice));
 			}
 		}
 	}

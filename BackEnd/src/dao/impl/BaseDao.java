@@ -65,8 +65,8 @@ public class BaseDao {
 			// Since the default of MySQL is repeatable-read, there is no need
 			// pstmt = conn.prepareStatement("set session transaction isolation level repeatable read;");
 			// pstmt.execute();
-			pstmt = conn.prepareStatement("set global sql_safe_updates = 1;");
-			pstmt.execute();
+			// pstmt = conn.prepareStatement("set global sql_safe_updates = 1;");
+			// pstmt.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.err.println("Fail to connect to the database. "

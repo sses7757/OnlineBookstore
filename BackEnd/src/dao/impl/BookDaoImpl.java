@@ -48,7 +48,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		getConnection();
 
-		String sql = "select l.name as main, sl.name as sub, b.original_price, bs.discount, bs.overall_rating"
+		String sql = "select l.name as main, sl.name as sub, price_now(b.id) as price, bs.discount, bs.overall_rating"
 				+ " from book b" + " join book_stat bs on b.id = bs.book_id"
 				+ " join sub_label sl on b.sublabel_id = sl.id" + " join label l on sl.main_id = l.id"
 				+ " where b.id = ?;";
@@ -58,7 +58,7 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 
 		while (rs.next()) {
 			info.setMainAndSubLabel(rs.getString("main") + "-" + rs.getString("sub"));
-			info.setPrice(rs.getDouble("original_price"));
+			info.setPrice(rs.getDouble("price"));
 			info.setDisCount(rs.getInt("discount"));
 			info.setOverallRating(rs.getDouble("overall_rating"));
 		}
@@ -203,16 +203,20 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		getConnection();
 
 		String sql = "select id from book" + " where label_id in (select label_id from book where id = ?)"
-				+ " limit ? offset ?;";
+				+ " order by id limit ? offset ?;";
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, bookid);
-		pstmt.setInt(2, count);
+		pstmt.setInt(2, count + 1);
 		pstmt.setInt(3, from);
 
 		rs = pstmt.executeQuery();
 
 		while (rs.next()) {
 			relatedbooks.add(rs.getInt("id"));
+		}
+		relatedbooks.remove(Integer.valueOf(bookid));
+		while (relatedbooks.size() > count) {
+			relatedbooks.remove(relatedbooks.size() - 1);
 		}
 
 		closeAll();
@@ -231,15 +235,17 @@ public class BookDaoImpl extends BaseDao implements BookDao {
 		getConnection();
 
 		String sql = "select preview_url from book where id = ?;";
-
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, bookId);
-
 		rs = pstmt.executeQuery();
-
 		while (rs.next()) {
 			info.setURL(rs.getString("preview_url"));
 		}
+
+		sql = "update book_stat set previews = previews + 1 where book_id = ?;";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, bookId);
+		pstmt.executeUpdate();
 
 		closeAll();
 

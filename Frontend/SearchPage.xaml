@@ -114,7 +114,8 @@
                             <ColumnDefinition Width="9*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <AutoSuggestBox Grid.Column="0"
+                        <AutoSuggestBox x:Name="asb"
+                                        Grid.Column="0"
                                         Margin="10,0"
                                         PlaceholderText="Search books, read lists, billboards, …"
                                         QuerySubmitted="QuerySubmitted"

@@ -22,9 +22,10 @@ public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 		List<Integer> readlist = new LinkedList<>();
 
 		getConnection();
-		String sql = "select distinct r.id as readlist" + " from readlist r"
-				+ " left outer join readlist_book rb on r.id = rb.readlist_id" + " where r.create_user = ?"
-				+ " and (rb.book_id != ? or rb.readlist_id is null);";
+		String sql = "select readlist" + " from (select distinct id as readlist" + " from readlist"
+				+ " where create_user = ?) a"
+				+ " left join (select distinct readlist_id from readlist_book where book_id = ?) b"
+				+ " on a.readlist = b.readlist_id" + " where readlist_id is null;";
 
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, userid);
@@ -156,7 +157,7 @@ public class ReadlistDaoImpl extends BaseDao implements ReadlistDao {
 		String title = infoFromFront.getTitle();
 		String description = infoFromFront.getDescription();
 
-		String sql = "insert into readlsit (create_user, title, description) values (?,?,?);";
+		String sql = "insert into readlist (create_user, title, description) values (?,?,?);";
 		getConnection();
 
 		pstmt = conn.prepareStatement(sql);

@@ -180,7 +180,7 @@ namespace Frontend
 			var combo = new ComboBox()
 			{
 				FontSize = 15,
-				ItemsSource = books.Select(b => b.BookName).ToList(),
+				ItemsSource = books.Select(b => b.BookFullName).ToList(),
 				SelectedIndex = 0,
 				Header = "Please select the book you want to write review to"
 			};
@@ -216,7 +216,7 @@ namespace Frontend
 				SecondaryButtonText = "Cancle"
 			};
 			if (await dialog.ShowAsync() == ContentDialogResult.Secondary
-				|| titleBox.Text.Length <= 2 || contentBox.Text.Length <= 5)
+				|| titleBox.Text.Length <= 1 || contentBox.Text.Length <= 1)
 			{
 				return;
 			}

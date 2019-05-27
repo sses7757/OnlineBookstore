@@ -209,19 +209,16 @@ namespace Frontend
 
 	public class Connection
 	{
-		public static string REMOTE_IP = null;// = "127.0.0.1";//"114.116.100.205";
-		public static int REMOTE_PORT_USER = 2317, REMOTE_PORT_ADMIN = 2318;
+		public static string REMOTE_IP = null;
+		public static int REMOTE_PORT_USER, REMOTE_PORT_ADMIN;
 
-		private readonly int RemotePort;
+		private readonly bool isAdmin;
 
 		private Socket socket;
 
 		private Connection(bool portAdmin = false)
 		{
-			if (portAdmin)
-				this.RemotePort = REMOTE_PORT_ADMIN;
-			else
-				this.RemotePort = REMOTE_PORT_USER;
+			this.isAdmin = portAdmin;
 		}
 
 		internal async Task Reconnect()
@@ -230,11 +227,11 @@ namespace Frontend
 			{
 				Close();
 			}
-			while (REMOTE_IP == null)
+			while (REMOTE_IP == null || REMOTE_PORT_USER == 0 || REMOTE_PORT_ADMIN == 0)
 				await Task.Delay(Util.REFRESH_RATE);
 
 			IPAddress ip = IPAddress.Parse(REMOTE_IP);
-			IPEndPoint ipEnd = new IPEndPoint(ip, RemotePort);
+			IPEndPoint ipEnd = new IPEndPoint(ip, this.isAdmin ? REMOTE_PORT_ADMIN : REMOTE_PORT_USER);
 			this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			try
 			{
