@@ -127,7 +127,7 @@
                 </NavigationViewItem.FocusVisualPrimaryBrush>
             </NavigationViewItem>
             <NavigationViewItem x:Name="MyDanmuBtn"
-								Content="Created bullet screen"
+								Content="Created bullet comments"
 								Icon="ContactInfo"
 								Tag="mydanmu">
                 <NavigationViewItem.FocusVisualPrimaryBrush>

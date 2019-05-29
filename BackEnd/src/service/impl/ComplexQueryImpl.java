@@ -261,9 +261,11 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 					+ String.format(" where b.publish_time %s and b.pages %s", timeRangeString, pageRangeString)
 					+ labelString + (includeFree ? " " : " and b.original_price > 0") + " and ("
 					+ createArrayPlaceholder(
-							" or b.name like ? or b.description like ? or p.name like ? or a.name like ?",
+							" or b.name like ? or b.description like ? or p.name like ? or a.name like ?"
+									+ " or sl.name like ? or ml.name like ?",
 							queryText.length, 4)
 					+ ")" + " order by ";
+			final int queryTextCount = 6;
 
 			switch (order) {
 			case Recommend:
@@ -317,7 +319,7 @@ public class ComplexQueryImpl extends BaseDao implements ComplexQuery {
 			}
 			for (String s : queryText) { // for names filter
 				String q = "%" + s + "%";
-				for (int ii = 0; ii < 4; ++ii)
+				for (int ii = 0; ii < queryTextCount; ++ii)
 					pstmt.setString(i++, q);
 
 			}
